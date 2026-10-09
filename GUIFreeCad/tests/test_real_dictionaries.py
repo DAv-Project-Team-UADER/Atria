@@ -1,19 +1,19 @@
 ﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
-# Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
-# Bajo la direcciÃ³n de Ernesto Ledesma
-# Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
+# Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
+# Bajo la dirección de Ernesto Ledesma
+# Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
 #
 # Este programa es software libre: usted puede redistribuirlo y/o modificarlo
-# bajo los tÃ©rminos de la Licencia PÃºblica General GNU tal como fue publicada
-# por la FundaciÃ³n para el Software Libre, en la versiÃ³n 3 de la Licencia.
+# bajo los términos de la Licencia Pública General GNU tal como fue publicada
+# por la Fundación para el Software Libre, en la versión 3 de la Licencia.
 #
-# Este programa se distribuye con la esperanza de que sea Ãºtil,
-# pero SIN NINGUNA GARANTÃA; incluso sin la garantÃ­a implÃ­cita de
-# MERCANTIBILIDAD o APTITUD PARA UN PROPÃ“SITO PARTICULAR. Consulte la
-# Licencia PÃºblica General GNU para mÃ¡s detalles.
+# Este programa se distribuye con la esperanza de que sea útil,
+# pero SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de
+# MERCANTIBILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. Consulte la
+# Licencia Pública General GNU para más detalles.
 #
-# DeberÃ­as haber recibido una copia de la Licencia PÃºblica General GNU
-# junto con este programa. Si no es asÃ­, consulte <http://www.gnu.org/licenses/>.
+# Deberías haber recibido una copia de la Licencia Pública General GNU
+# junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 """
 Integration tests for real dictionary hierarchy (Atria/dic).
@@ -38,7 +38,7 @@ GUI_ROOT = Path(__file__).resolve().parents[1]
 if str(GUI_ROOT) not in sys.path:
     sys.path.insert(0, str(GUI_ROOT))
 
-from integration.atria_paths import atria_repo_root, ensure_atria_repo_on_path  # noqa: E402
+from GUIFreeCad.integration.atria_paths import atria_repo_root, ensure_atria_repo_on_path  # noqa: E402
 
 ensure_atria_repo_on_path()
 ATRIA_DIR = atria_repo_root().parent
@@ -159,7 +159,7 @@ class TestRealDictionariesConvention(unittest.TestCase):
 
     def test_atria_panel_visibility_commands_are_global_in_spanish(self) -> None:
         """Verify Spanish panel visibility aliases resolve from the base dictionary."""
-        from core.language_code import LanguageCode
+        from GUIFreeCad.core.language_code import LanguageCode
         from navigation.dictionary_loader import DictionaryLoader
 
         loader = DictionaryLoader(DIC_ROOT)
@@ -177,7 +177,7 @@ class TestRealDictionariesConvention(unittest.TestCase):
     def test_techdraw_and_geometry_translations_populated(self) -> None:
         """Verify that TechDraw and Sketcher/Geometry translations are populated and not empty stubs."""
         from navigation.dictionary_loader import DictionaryLoader
-        from core.language_code import LanguageCode
+        from GUIFreeCad.core.language_code import LanguageCode
 
         loader = DictionaryLoader(DIC_ROOT)
 

@@ -1,19 +1,19 @@
 ﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
-# Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
-# Bajo la direcciÃ³n de Ernesto Ledesma
-# Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
+# Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
+# Bajo la dirección de Ernesto Ledesma
+# Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
 #
 # Este programa es software libre: usted puede redistribuirlo y/o modificarlo
-# bajo los tÃ©rminos de la Licencia PÃºblica General GNU tal como fue publicada
-# por la FundaciÃ³n para el Software Libre, en la versiÃ³n 3 de la Licencia.
+# bajo los términos de la Licencia Pública General GNU tal como fue publicada
+# por la Fundación para el Software Libre, en la versión 3 de la Licencia.
 #
-# Este programa se distribuye con la esperanza de que sea Ãºtil,
-# pero SIN NINGUNA GARANTÃA; incluso sin la garantÃ­a implÃ­cita de
-# MERCANTIBILIDAD o APTITUD PARA UN PROPÃ“SITO PARTICULAR. Consulte la
-# Licencia PÃºblica General GNU para mÃ¡s detalles.
+# Este programa se distribuye con la esperanza de que sea útil,
+# pero SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de
+# MERCANTIBILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. Consulte la
+# Licencia Pública General GNU para más detalles.
 #
-# DeberÃ­as haber recibido una copia de la Licencia PÃºblica General GNU
-# junto con este programa. Si no es asÃ­, consulte <http://www.gnu.org/licenses/>.
+# Deberías haber recibido una copia de la Licencia Pública General GNU
+# junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 """Build a text letter by letter by voice."""
 
@@ -24,11 +24,11 @@ from InputPrompts.PlaneGrammarSwitcher import PlaneGrammarSwitcher
 from InputPrompts.PromptResult import PromptResult
 from InputPrompts.SpokenNumberParser import SpokenNumberParser
 
-_ENYE = "qenyeq"  # la Ã‘ se protege antes de que NormalizeText le quite la tilde
+_ENYE = "qenyeq"  # la Ñ se protege antes de que NormalizeText le quite la tilde
 
 
 def _Prep(Text: str) -> str:
-    return SpokenNumberParser.NormalizeText(Text.lower().replace("eÃ±e", _ENYE).replace("Ã±", _ENYE))
+    return SpokenNumberParser.NormalizeText(Text.lower().replace("eñe", _ENYE).replace("ñ", _ENYE))
 
 
 class SpellingInputPrompt(BaseInputPrompt):
@@ -40,9 +40,9 @@ class SpellingInputPrompt(BaseInputPrompt):
         "es": {
             "a": "A", "be": "B", "ce": "C", "de": "D", "e": "E", "efe": "F", "ge": "G",
             "hache": "H", "i": "I", "jota": "J", "ka": "K", "ele": "L", "eme": "M",
-            "ene": "N", "eÃ±e": "Ã‘", "Ã±": "Ã‘", "o": "O", "pe": "P", "cu": "Q",
+            "ene": "N", "eñe": "Ñ", "ñ": "Ñ", "o": "O", "pe": "P", "cu": "Q",
             "erre": "R", "ese": "S", "te": "T", "u": "U", "uve": "V", "equis": "X",
-            "zeta": "Z", "ve": "V", "ye": "Y", "ere": "R", "ache": "H", "pug": "U", "tÃº": "U",
+            "zeta": "Z", "ve": "V", "ye": "Y", "ere": "R", "ache": "H", "pug": "U", "tú": "U",
         },
         "en": {
             "a": "A", "bee": "B", "cee": "C", "dee": "D", "e": "E", "eff": "F", "gee": "G",
@@ -54,11 +54,11 @@ class SpellingInputPrompt(BaseInputPrompt):
             "oh": "O", "pea": "P", "queue": "Q", "zed": "Z", "pug": "U",
         },
         "pt": {
-            "a": "A", "bÃª": "B", "cÃª": "C", "dÃª": "D", "e": "E", "gÃª": "G", "agÃ¡": "H",
-            "i": "I", "jota": "J", "cÃ¡": "K", "Ã©le": "L", "Ãªme": "M", "o": "O",
-            "pÃª": "P", "quÃª": "Q", "Ã©rre": "R", "Ã©sse": "S", "tÃª": "T", "u": "U",
-            "vÃª": "V", "xis": "X", "Ã­psilon": "Y", "zÃª": "Z", "fÃª": "F", "efe": "F", "ene": "N",
-            "dÃ¡blio": "W", "dÃ¡bliu": "W", "dÃ¢blio": "W", "capa": "K", "guÃª": "G",
+            "a": "A", "bÃª": "B", "cÃª": "C", "dÃª": "D", "e": "E", "gÃª": "G", "agá": "H",
+            "i": "I", "jota": "J", "cá": "K", "éle": "L", "Ãªme": "M", "o": "O",
+            "pÃª": "P", "quÃª": "Q", "érre": "R", "ésse": "S", "tÃª": "T", "u": "U",
+            "vÃª": "V", "xis": "X", "ípsilon": "Y", "zÃª": "Z", "fÃª": "F", "efe": "F", "ene": "N",
+            "dáblio": "W", "dábliu": "W", "dÃ¢blio": "W", "capa": "K", "guÃª": "G",
         },
     }
     # letras y simbolos de dos palabras: (primera, segunda) -> caracter
@@ -75,18 +75,18 @@ class SpellingInputPrompt(BaseInputPrompt):
     SymbolNames: dict[str, dict[str, str]] = {
         "es": {"guion": "-", "punto": "."},
         "en": {"dash": "-", "dot": ".", "underscore": "_"},
-        "pt": {"hÃ­fen": "-", "ponto": ".", "sublinhado": "_"},
+        "pt": {"hífen": "-", "ponto": ".", "sublinhado": "_"},
     }
     # "<letra> de <palabra clave>" ("be de boca", "cu de queso"): la palabra clave
     # decide la letra aunque Vosk confunda el nombre ("u"/"cu", "de"/"ge"...).
-    # Solo espanol; todas estan en el vocabulario del modelo small-es (ni "eÃ±e"
-    # ni "Ã±andÃº" ni "xilÃ³fono" lo estan, por eso "Ã±u" y "xerox").
+    # Solo espanol; todas estan en el vocabulario del modelo small-es (ni "eñe"
+    # ni "ñandú" ni "xilófono" lo estan, por eso "ñu" y "xerox").
     AnchorConnector: str = "de"
     AnchorWords: dict[str, dict[str, str]] = {
         "es": {
-            "aviÃ³n": "A", "boca": "B", "casa": "C", "dedo": "D", "elefante": "E",
+            "avión": "A", "boca": "B", "casa": "C", "dedo": "D", "elefante": "E",
             "fuego": "F", "gato": "G", "hilo": "H", "isla": "I", "jirafa": "J",
-            "kilo": "K", "luna": "L", "mano": "M", "nariz": "N", "Ã±u": "Ã‘",
+            "kilo": "K", "luna": "L", "mano": "M", "nariz": "N", "ñu": "Ñ",
             "oso": "O", "pato": "P", "queso": "Q", "kiosko": "Q", "kiosco": "Q",
             "quiosco": "Q", "rata": "R", "sol": "S", "taza": "T", "uva": "U",
             "vaca": "V", "whisky": "W", "xerox": "X", "taxi": "X", "yate": "Y",
@@ -97,7 +97,7 @@ class SpellingInputPrompt(BaseInputPrompt):
     AnchorLetterSpeech: dict[str, str] = {
         "A": "a", "B": "be", "C": "ce", "D": "de", "E": "e", "F": "efe", "G": "ge",
         "H": "hache", "I": "i", "J": "jota", "K": "ka", "L": "ele", "M": "eme",
-        "N": "ene", "Ã‘": "Ã±", "O": "o", "P": "pe", "Q": "cu", "R": "erre", "S": "ese",
+        "N": "ene", "Ñ": "ñ", "O": "o", "P": "pe", "Q": "cu", "R": "erre", "S": "ese",
         "T": "te", "U": "u", "V": "uve", "W": "doble uve", "X": "equis", "Y": "i griega",
         "Z": "zeta",
     }
@@ -193,7 +193,7 @@ class SpellingInputPrompt(BaseInputPrompt):
             elif token in self.DeleteTokens:
                 self._Text = self._Text[:-1]
             elif token == _ENYE:
-                self._Append("Ã‘")
+                self._Append("Ñ")
             elif token in self._Lookup:
                 self._Append(self._Lookup[token])
             elif token in self._SymbolLookup:
@@ -237,4 +237,4 @@ class SpellingInputPrompt(BaseInputPrompt):
         self.SetStatus(self._StatusText())
 
     def _StatusText(self) -> str:
-        return f"{len(self._Text)}/{self.MaxLength} â€” letras, espacio, borrar, okey, cancelar"
+        return f"{len(self._Text)}/{self.MaxLength} — letras, espacio, borrar, okey, cancelar"

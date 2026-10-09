@@ -6,9 +6,9 @@ import os
 import traceback
 from pathlib import Path
 
-from integration.atria_paths import ensure_atria_repo_on_path, ensure_gui_on_path
-from integration.voice_history import reset_voice_history, export_voice_status
-from speech.atria_voice_service import AtriaVoiceService
+from GUIFreeCad.integration.atria_paths import ensure_atria_repo_on_path, ensure_gui_on_path
+from GUIFreeCad.integration.voice_history import reset_voice_history, export_voice_status
+from GUIFreeCad.speech.atria_voice_service import AtriaVoiceService
 
 # Hay varios puntos que arrancan la voz (el comando de la GUI, el workbench al
 # activarse y freecad_voice_setup): el log muestra cuatro start_voice_engine en
@@ -77,7 +77,7 @@ def show_dock_panel() -> bool:
     adapter = _active_adapter(svc)
     if adapter is None:
         _print_message(
-            "[ATRIA] Primero activÃ¡ la voz (Â«Iniciar voz ATRIAÂ»): el panel se "
+            "[ATRIA] Primero activá la voz (Â«Iniciar voz ATRIAÂ»): el panel se "
             "alimenta del motor en curso.\n"
         )
         return False
@@ -88,7 +88,7 @@ def show_dock_panel() -> bool:
         return False
 
     try:
-        from integration.atria_dock_panel import install_dock_panel
+        from GUIFreeCad.integration.atria_dock_panel import install_dock_panel
         return install_dock_panel(browser, adapter) is not None
     except Exception as exc:  # noqa: BLE001 - el panel no debe tumbar la voz
         _print_message(f"[ATRIA] No se pudo montar el panel acoplado: {exc}\n")
@@ -98,7 +98,7 @@ def show_dock_panel() -> bool:
 def _resolve_dictionary_root() -> Path:
     """Localiza la carpeta de diccionarios respetando ATRIA_DICTIONARY_ROOT.
 
-    Orden de resoluciÃ³n (igual criterio que atria_commands._dictionary_root):
+    Orden de resolución (igual criterio que atria_commands._dictionary_root):
       1. Variable de entorno ATRIA_DICTIONARY_ROOT (la setea el launcher).
       2. Candidatos relativos subiendo desde este archivo: layout AtriaCore
          (``Atria/dic``) y layout previo (``DiccionariosEnBruto``).
@@ -106,7 +106,7 @@ def _resolve_dictionary_root() -> Path:
     Returns:
         Ruta a la carpeta de diccionarios; si no se encuentra ninguna,
         devuelve el mejor candidato del layout AtriaCore (DictionaryLoader
-        tolera que no exista y arranca con contextos vacÃ­os sin romper).
+        tolera que no exista y arranca con contextos vacíos sin romper).
     """
     env = os.environ.get("ATRIA_DICTIONARY_ROOT", "").strip()
     if env:
@@ -125,7 +125,7 @@ def _resolve_dictionary_root() -> Path:
 
 
 def _is_dictionary_dir(path: Path) -> bool:
-    """True si la carpeta es un diccionario real (no un placeholder vacÃ­o).
+    """True si la carpeta es un diccionario real (no un placeholder vacío).
 
     Evita confundir ``ComponentesATRIA/Atria/dic`` (solo placeholder) con el
     ``Atria/dic`` real que contiene base.py y los TraduceTo*.py.
@@ -158,9 +158,9 @@ def _start_voice_engine(*, debug: bool = False) -> bool:
     try:
         ensure_gui_on_path()
         ensure_atria_repo_on_path()
-        from core.atria_log import get_logger, log_file_path, log_unhandled_thread_exceptions
-        from core.model_manager import get_active_model_path
-        from core.settings import settings
+        from GUIFreeCad.core.atria_log import get_logger, log_file_path, log_unhandled_thread_exceptions
+        from GUIFreeCad.core.model_manager import get_active_model_path
+        from GUIFreeCad.core.settings import settings
 
         log = get_logger("arranque")
         log_unhandled_thread_exceptions()
@@ -177,7 +177,7 @@ def _start_voice_engine(*, debug: bool = False) -> bool:
         if model is None:
             err_msg = (
                 "[ATRIA] Sin modelo Vosk para idioma "
-                f"'{settings.language}'. ConfigurÃ¡ Preferencias ATRIA o ejecutÃ¡ "
+                f"'{settings.language}'. Configurá Preferencias ATRIA o ejecutá "
                 "python scripts/setup_models.py en GUIFreeCad.\n"
             )
             _print_error(err_msg)
@@ -186,16 +186,16 @@ def _start_voice_engine(*, debug: bool = False) -> bool:
 
         svc = AtriaVoiceService.get()
         if svc.is_cad_engine_loaded():
-            _print_message("[ATRIA] El motor de voz ya estÃ¡ activo.\n")
+            _print_message("[ATRIA] El motor de voz ya está activo.\n")
             export_voice_status("active", "Voz activa")
             _schedule_panel()
             return True
         reset_voice_history()
 
-        from core.language_code import LanguageCode
-        from core.preferences import preferences
+        from GUIFreeCad.core.language_code import LanguageCode
+        from GUIFreeCad.core.preferences import preferences
         from navigation.browser import Browser
-        from integration.browser_voice_adapter import BrowserVoiceAdapter
+        from GUIFreeCad.integration.browser_voice_adapter import BrowserVoiceAdapter
         from InputPrompts.PromptedCommandExecutor import PromptedCommandExecutor
 
         preferences.SetLanguage = LanguageCode.FromStorage(settings.language)
@@ -218,7 +218,7 @@ def _start_voice_engine(*, debug: bool = False) -> bool:
         adapter._export_state()
 
         if not svc.start_cad(adapter):
-            export_voice_status("error", "No se pudo iniciar micrÃ³fono")
+            export_voice_status("error", "No se pudo iniciar micrófono")
             return False
 
         export_voice_status("active", "Voz activa")
@@ -237,10 +237,10 @@ def _start_voice_engine(*, debug: bool = False) -> bool:
 def stop_voice_engine(*, wait: bool = True, timeout: float = 4.0) -> None:
     svc = AtriaVoiceService.get()
     if not svc.is_cad_engine_loaded() and not svc.is_mic_running():
-        _print_message("[ATRIA] El motor de voz no estÃ¡ activo.\n")
+        _print_message("[ATRIA] El motor de voz no está activo.\n")
         export_voice_status("inactive", "Voz inactiva")
         return
-    _print_message("[ATRIA] Deteniendo vozâ€¦ (puede tardar un instante).\n")
+    _print_message("[ATRIA] Deteniendo voz”¦ (puede tardar un instante).\n")
     svc.stop(wait=wait, timeout=timeout)
     export_voice_status("inactive", "Voz inactiva")
     _print_message("[ATRIA] Motor de voz detenido.\n")

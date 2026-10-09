@@ -1,25 +1,25 @@
 ﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
-# Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
-# Bajo la direcciÃ³n de Ernesto Ledesma
-# Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
+# Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
+# Bajo la dirección de Ernesto Ledesma
+# Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
 #
 # Este programa es software libre: usted puede redistribuirlo y/o modificarlo
-# bajo los tÃ©rminos de la Licencia PÃºblica General GNU tal como fue publicada
-# por la FundaciÃ³n para el Software Libre, en la versiÃ³n 3 de la Licencia.
+# bajo los términos de la Licencia Pública General GNU tal como fue publicada
+# por la Fundación para el Software Libre, en la versión 3 de la Licencia.
 #
-# Este programa se distribuye con la esperanza de que sea Ãºtil,
-# pero SIN NINGUNA GARANTÃA; incluso sin la garantÃ­a implÃ­cita de
-# MERCANTIBILIDAD o APTITUD PARA UN PROPÃ“SITO PARTICULAR. Consulte la
-# Licencia PÃºblica General GNU para mÃ¡s detalles.
+# Este programa se distribuye con la esperanza de que sea útil,
+# pero SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de
+# MERCANTIBILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. Consulte la
+# Licencia Pública General GNU para más detalles.
 #
-# DeberÃ­as haber recibido una copia de la Licencia PÃºblica General GNU
-# junto con este programa. Si no es asÃ­, consulte <http://www.gnu.org/licenses/>.
+# Deberías haber recibido una copia de la Licencia Pública General GNU
+# junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 """
 Tests for Draft dictionaries (Atria/dic/Workbench/DraftWork).
 
 Los comandos ``Draft_*`` solo existen una vez que el workbench Draft fue
-inicializado. Estos tests aseguran que cada callable del Ã¡rbol Draft activa el
+inicializado. Estos tests aseguran que cada callable del árbol Draft activa el
 workbench antes de ejecutar su comando (bug: "No such command 'Draft_Circle'").
 """
 
@@ -35,14 +35,14 @@ GUI_ROOT = Path(__file__).resolve().parents[1]
 if str(GUI_ROOT) not in sys.path:
     sys.path.insert(0, str(GUI_ROOT))
 
-from integration.atria_paths import atria_repo_root, ensure_atria_repo_on_path  # noqa: E402
+from GUIFreeCad.integration.atria_paths import atria_repo_root, ensure_atria_repo_on_path  # noqa: E402
 
 ensure_atria_repo_on_path()
 DIC_ROOT = atria_repo_root().parent / "dic"
 if str(DIC_ROOT) not in sys.path:
     sys.path.insert(0, str(DIC_ROOT))
 
-# SubmenÃºs de DraftWork que ejecutan comandos Draft_* vÃ­a runDraftCommand.
+# Submenús de DraftWork que ejecutan comandos Draft_* vía runDraftCommand.
 DRAFT_SUBMENUS = {
     "annotation_style_editor": "annotation",
     "annotation": "annotation",
@@ -61,7 +61,7 @@ DRAFT_SUBMENUS = {
 
 
 class _FakeGui:
-    """FreeCADGui falso: registra llamadas y simula comandos aÃºn no registrados."""
+    """FreeCADGui falso: registra llamadas y simula comandos aún no registrados."""
 
     def __init__(self) -> None:
         self.active = "StartWorkbench"
@@ -163,9 +163,9 @@ class TestDraftWorkbenchActivation(unittest.TestCase):
                     continue  # no ejecuta comandos Draft, solo mapea el objeto activo
                 with self.subTest(menu=folder, command=command):
                     self.gui.reset(active="StartWorkbench")
-                    func()  # con la regresiÃ³n levantarÃ­a "No such command"
+                    func()  # con la regresión levantaría "No such command"
                     runs = [c for c in self.gui.calls if c[0] == "run"]
-                    self.assertTrue(runs, "no ejecutÃ³ ningÃºn comando")
+                    self.assertTrue(runs, "no ejecutó ningún comando")
                     self.assertEqual(self.gui.calls[0], ("activate", "DraftWorkbench"))
                     checked += 1
         self.assertGreater(checked, 40)

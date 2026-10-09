@@ -9,10 +9,10 @@ import time
 from dataclasses import dataclass
 from typing import Callable, Literal
 
-from core.atria_log import get_logger
-from core.model_manager import get_active_model_path, has_small_model
-from core.settings import settings
-from speech.voice_commands import _buffer_to_bytes, match_command
+from GUIFreeCad.core.atria_log import get_logger
+from GUIFreeCad.core.model_manager import get_active_model_path, has_small_model
+from GUIFreeCad.core.settings import settings
+from GUIFreeCad.speech.voice_commands import _buffer_to_bytes, match_command
 
 log = get_logger("voz")
 
@@ -123,7 +123,7 @@ class AtriaVoiceService:
             self._last_prefs_cmd = None
             self._last_prefs_cmd_time = 0.0
         try:
-            from speech.voice_commands import all_grammar_phrases
+            from GUIFreeCad.speech.voice_commands import all_grammar_phrases
 
             self.set_grammar(all_grammar_phrases())
         except Exception:

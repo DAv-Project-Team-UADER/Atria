@@ -30,7 +30,7 @@ if _d:
         sys.path.insert(0, _d_real)
 
 try:
-    import gui.atria_commands as _atria_commands
+    import atriaGui.atria_commands as _atria_commands
 
     _atria_commands._ensure_selection_path()
     _atria_commands._ensure_validation_path()
@@ -43,9 +43,9 @@ class AtriaWorkbench(Gui.Workbench):
     ToolTip = "Atria (UADER)"
 
     def Initialize(self):
-        import gui.freecad_wb
+        import atriaGui.freecad_wb
 
-        gui.freecad_wb.setup_workbench(self)
+        atriaGui.freecad_wb.setup_workbench(self)
 
     def GetClassName(self):
         return "Gui::PythonWorkbench"

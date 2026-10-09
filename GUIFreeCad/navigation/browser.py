@@ -1,19 +1,19 @@
 ﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
-# Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
-# Bajo la direcciÃ³n de Ernesto Ledesma
-# Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
+# Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
+# Bajo la dirección de Ernesto Ledesma
+# Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
 #
 # Este programa es software libre: usted puede redistribuirlo y/o modificarlo
-# bajo los tÃ©rminos de la Licencia PÃºblica General GNU tal como fue publicada
-# por la FundaciÃ³n para el Software Libre, en la versiÃ³n 3 de la Licencia.
+# bajo los términos de la Licencia Pública General GNU tal como fue publicada
+# por la Fundación para el Software Libre, en la versión 3 de la Licencia.
 #
-# Este programa se distribuye con la esperanza de que sea Ãºtil,
-# pero SIN NINGUNA GARANTÃA; incluso sin la garantÃ­a implÃ­cita de
-# MERCANTIBILIDAD o APTITUD PARA UN PROPÃ“SITO PARTICULAR. Consulte la
-# Licencia PÃºblica General GNU para mÃ¡s detalles.
+# Este programa se distribuye con la esperanza de que sea útil,
+# pero SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de
+# MERCANTIBILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. Consulte la
+# Licencia Pública General GNU para más detalles.
 #
-# DeberÃ­as haber recibido una copia de la Licencia PÃºblica General GNU
-# junto con este programa. Si no es asÃ­, consulte <http://www.gnu.org/licenses/>.
+# Deberías haber recibido una copia de la Licencia Pública General GNU
+# junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 """
 Browser: voice navigation engine over dictionary folders.
@@ -46,8 +46,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
 
-from core.language_code import LanguageCode
-from core.preferences import Preferences, preferences
+from GUIFreeCad.core.language_code import LanguageCode
+from GUIFreeCad.core.preferences import Preferences, preferences
 from navigation.context_entry import ContextEntry, FindBySpoken, FindClosestBySpoken
 from navigation.dictionary_loader import DictionaryLoader
 
@@ -118,7 +118,7 @@ class Browser:
         """
         Default path: ATRIA/ejemplo de diccionario terminado (repo root).
         If that folder does not exist DictionaryLoader.IsReady will be False
-        and Browser starts with empty contexts â€” no crash.
+        and Browser starts with empty contexts — no crash.
         """
         here = Path(__file__).resolve()
         for parent in (here.parents[3], here.parents[4], here.parents[2]):
@@ -162,8 +162,8 @@ class Browser:
         for entry in self.Context:
             # Un mismo destino suele tener varios alias (la palabra hablada
             # "nuevo" y la clave interna "new"). _BuildContextForFrame agrega
-            # primero las habladas del TraduceTo, asÃ­ que nos quedamos con la
-            # primera vista por destino (la espaÃ±ol) y omitimos el resto.
+            # primero las habladas del TraduceTo, así que nos quedamos con la
+            # primera vista por destino (la español) y omitimos el resto.
             if any(self._SameTarget(entry.Target, t) for t in seen_targets):
                 continue
             seen_targets.append(entry.Target)
@@ -174,13 +174,13 @@ class Browser:
 
         lines = [f"[ATRIA] Contexto: {self.ContextPath}"]
         if submenus:
-            lines.append("  SubmenÃºs (entrar): " + ", ".join(sorted(submenus)))
+            lines.append("  Submenús (entrar): " + ", ".join(sorted(submenus)))
         if commands:
             lines.append("  Comandos (ejecutar): " + ", ".join(sorted(commands)))
         if self._IsDescended():
             up_word = self._FirstSpokenForNavAction("up")
             if up_word:
-                lines.append(f"  DecÃ­ Â«{up_word}Â» para subir un nivel.")
+                lines.append(f"  Decí Â«{up_word}Â» para subir un nivel.")
         if not submenus and not commands:
             lines.append("  (sin comandos en este contexto)")
         return "\n".join(lines)
@@ -292,19 +292,19 @@ class Browser:
         if not normalized:
             return BrowserResult(False, "empty", "Empty phrase")
 
-        # Comandos de navegaciÃ³n (subir, mostrar contexto, ...): se resuelven
+        # Comandos de navegación (subir, mostrar contexto, ...): se resuelven
         # contra Atria/dic/NavCommands/TraduceTo*.py, no contra un set fijo en
-        # cÃ³digo. Funcionan en cualquier contexto, sin depender de en quÃ©
-        # nivel del Ã¡rbol de comandos FreeCAD estÃ© parado el usuario.
+        # código. Funcionan en cualquier contexto, sin depender de en qué
+        # nivel del árbol de comandos FreeCAD esté parado el usuario.
         nav_action = self._ResolveNavAction(normalized)
         if nav_action is not None:
             return self._ExecuteNavAction(nav_action)
 
         # El contexto actual tiene prioridad sobre el salto base: si ya
-        # descendimos a un subcontexto, una palabra que tambiÃ©n existe en el
+        # descendimos a un subcontexto, una palabra que también existe en el
         # Base (p. ej. "archivo" sirve para entrar a explorer y, dentro de
         # explorer, para bajar a "file") debe resolverse contra el nivel
-        # actual primero. AsÃ­ "archivo â†’ archivo â†’ nuevo" baja por niveles en
+        # actual primero. Así "archivo â†’ archivo â†’ nuevo" baja por niveles en
         # vez de quedar saltando siempre al mismo contexto base.
         if self._IsDescended():
             entry, _is_fuzzy = self._FindWithFallback(self.Context, normalized)
@@ -340,20 +340,20 @@ class Browser:
         upward = self._SearchUpwardAndExecute(normalized)
         if upward.Success or upward.Action != "not_found":
             return upward
-        # Ãºltimo recurso: comandos globales de la raÃ­z (deshacer, cota, preferencias...)
+        # último recurso: comandos globales de la raíz (deshacer, cota, preferencias...)
         return self._ExecuteGlobalCallable(normalized) or upward
 
     def _ExecuteGlobalCallable(self, normalized_spoken: str) -> BrowserResult | None:
         """Run a root-level command from any context, without leaving the current one.
 
-        Las frases de ``Atria/dic/TraduceTo*.py`` entran en la gramÃ¡tica de Vosk en
-        todos los contextos, pero la bÃºsqueda ascendente solo las encontraba al
-        llegar al frame raÃ­z, y al ejecutarlas mandaba al usuario a la raÃ­z.
-        Esto las ejecuta en el lugar: un Â«deshacerÂ» o una Â«cotaÂ» no deberÃ­a
-        cambiar dÃ³nde estÃ¡ parado.
+        Las frases de ``Atria/dic/TraduceTo*.py`` entran en la gramática de Vosk en
+        todos los contextos, pero la búsqueda ascendente solo las encontraba al
+        llegar al frame raíz, y al ejecutarlas mandaba al usuario a la raíz.
+        Esto las ejecuta en el lugar: un Â«deshacerÂ» o una Â«cotaÂ» no debería
+        cambiar dónde está parado.
 
         Returns:
-            El resultado de la ejecuciÃ³n, o None si la frase no es un comando global.
+            El resultado de la ejecución, o None si la frase no es un comando global.
         """
         for spoken, target in self._base_translate.items():
             if isinstance(target, dict) or not callable(target):
@@ -372,12 +372,12 @@ class Browser:
     def _FindWithFallback(
         self, entries: list[ContextEntry], normalized: str
     ) -> tuple[ContextEntry | None, bool]:
-        """Exacto primero, fuzzy (difflib) despuÃ©s.
+        """Exacto primero, fuzzy (difflib) después.
 
         El modelo small-es confunde terminaciones ('eliptica'/'eliptico',
-        'hiperbolica'/'hiperbola') y Vosk con gramÃ¡tica acotada a veces
+        'hiperbolica'/'hiperbola') y Vosk con gramática acotada a veces
         devuelve la variante cercana. Si el exacto falla, probamos
-        FindClosestBySpoken (cutoff 0.82) y logueamos para diagnÃ³stico.
+        FindClosestBySpoken (cutoff 0.82) y logueamos para diagnóstico.
         """
         entry = FindBySpoken(entries, normalized)
         if entry is not None:
@@ -399,7 +399,7 @@ class Browser:
         """Sube un nivel: descarta el frame actual y reconstruye el padre.
 
         Returns:
-            El nombre interno del contexto al que se volviÃ³.
+            El nombre interno del contexto al que se volvió.
         """
         self._stack.pop()
         parent = self._stack[-1]
@@ -409,7 +409,7 @@ class Browser:
         return parent.InternalName
 
     # ------------------------------------------------------------------
-    # Navigation words (NavCommands) â€” not hardcoded, read from
+    # Navigation words (NavCommands) — not hardcoded, read from
     # Atria/dic/NavCommands/TraduceTo*.py and matched by identity against
     # NavActions.GoUp / NavActions.ShowContext.
     # ------------------------------------------------------------------
@@ -478,11 +478,11 @@ class Browser:
             seen_keys.add(DictionaryLoader.NormalizeSpoken(key))
             seen_targets.append(target)
 
-        # El diccionario interno (module_dict) es un *fallback* en inglÃ©s
-        # para claves que toatriaÃ­a no tienen traducciÃ³n. Si la clave interna
-        # ya tiene alias hablado (por texto o por destino ya visto vÃ­a
+        # El diccionario interno (module_dict) es un *fallback* en inglés
+        # para claves que toatriaía no tienen traducción. Si la clave interna
+        # ya tiene alias hablado (por texto o por destino ya visto vía
         # _InferInternalKey), no se debe repetir como entrada aparte: eso es
-        # lo que hacÃ­a aparecer "explorer" junto a "explorador" en el log.
+        # lo que hacía aparecer "explorer" junto a "explorador" en el log.
         for internal_key, target in frame.ModuleDict.items():
             norm_word = DictionaryLoader.NormalizeSpoken(internal_key)
             if norm_word in seen_spoken or norm_word in seen_keys:
@@ -500,13 +500,13 @@ class Browser:
 
     @staticmethod
     def _SameTarget(a: Any, b: Any) -> bool:
-        """True si dos destinos son "el mismo" submenÃº/comando.
+        """True si dos destinos son "el mismo" submenú/comando.
 
         Compara por identidad primero (caso normal). Si ambos son dict
-        (subcontexto), tambiÃ©n compara por claves: dos re-importaciones del
-        mismo mÃ³dulo de diccionario (p. ej. por rutas de sys.path
-        duplicadas) producen dos objetos distintos mismo con idÃ©ntico
-        contenido, y no deben listarse como dos submenÃºs separados.
+        (subcontexto), también compara por claves: dos re-importaciones del
+        mismo módulo de diccionario (p. ej. por rutas de sys.path
+        duplicadas) producen dos objetos distintos mismo con idéntico
+        contenido, y no deben listarse como dos submenús separados.
         """
         if a is b:
             return True
@@ -519,8 +519,8 @@ class Browser:
     #: llamando al privado, como venia haciendo BrowserVoiceAdapter.
     IsSameTarget = _SameTarget
 
-    #: Etiquetas en espaÃ±ol para el log cuando InternalKey es la clave canÃ³nica
-    #: en inglÃ©s de StandardViews (p. ej. iso â†’ isometric â†’ Â«isometricaÂ»).
+    #: Etiquetas en español para el log cuando InternalKey es la clave canónica
+    #: en inglés de StandardViews (p. ej. iso â†’ isometric â†’ Â«isometricaÂ»).
     _STANDARD_VIEW_LABEL_ES: dict[str, str] = {
         "bottom": "abajo",
         "boxzoom": "zoom caja",
@@ -553,9 +553,9 @@ class Browser:
                 return key
         # Comandos de StandardViews propagados a otros contextos (Lista 3/4):
         # el TraduceTo apunta al callable de StandardViews, pero ModuleDict es
-        # el del submenÃº actual (camera, features, ...). Sin este fallback,
-        # InternalKey queda en el sinÃ³nimo hablado ("iso") en vez de la clave
-        # canÃ³nica ("isometric") â€” y el log/Ã­cono muestran mal la acciÃ³n.
+        # el del submenú actual (camera, features, ...). Sin este fallback,
+        # InternalKey queda en el sinónimo hablado ("iso") en vez de la clave
+        # canónica ("isometric") — y el log/ícono muestran mal la acción.
         views = self._LoadStandardViewsDict()
         if views:
             for key, value in views.items():
@@ -641,10 +641,10 @@ class Browser:
 
         Returns:
             True si se pudo resolver y apilar el subcontexto. False si
-            ResolveSubFolder no encontrÃ³ una carpeta real para la clave
+            ResolveSubFolder no encontró una carpeta real para la clave
             (dato roto en el diccionario): se registra el error y el
             Browser se queda en el contexto actual en vez de apilar un
-            frame que apuntarÃ­a a la misma carpeta que su padre.
+            frame que apuntaría a la misma carpeta que su padre.
         """
         try:
             folder = self._loader.ResolveSubFolder(
@@ -678,7 +678,7 @@ class Browser:
             parent_context = self._BuildContextForFrame(parent_frame)
 
             entry, _is_fuzzy = self._FindWithFallback(parent_context, normalized_spoken)
-            # en el frame raÃ­z solo se busca entrar a subcontextos: sus comandos son
+            # en el frame raíz solo se busca entrar a subcontextos: sus comandos son
             # globales y los ejecuta _ExecuteGlobalCallable sin mover el contexto
             if entry is not None and entry.IsCallable() and len(temp_stack) == 1:
                 entry = None

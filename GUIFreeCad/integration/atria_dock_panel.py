@@ -1,19 +1,19 @@
 ﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
-# Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
-# Bajo la direcciÃ³n de Ernesto Ledesma
-# Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
+# Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
+# Bajo la dirección de Ernesto Ledesma
+# Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
 #
 # Este programa es software libre: usted puede redistribuirlo y/o modificarlo
-# bajo los tÃ©rminos de la Licencia PÃºblica General GNU tal como fue publicada
-# por la FundaciÃ³n para el Software Libre, en la versiÃ³n 3 de la Licencia.
+# bajo los términos de la Licencia Pública General GNU tal como fue publicada
+# por la Fundación para el Software Libre, en la versión 3 de la Licencia.
 #
-# Este programa se distribuye con la esperanza de que sea Ãºtil,
-# pero SIN NINGUNA GARANTÃA; incluso sin la garantÃ­a implÃ­cita de
-# MERCANTIBILIDAD o APTITUD PARA UN PROPÃ“SITO PARTICULAR. Consulte la
-# Licencia PÃºblica General GNU para mÃ¡s detalles.
+# Este programa se distribuye con la esperanza de que sea útil,
+# pero SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de
+# MERCANTIBILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. Consulte la
+# Licencia Pública General GNU para más detalles.
 #
-# DeberÃ­as haber recibido una copia de la Licencia PÃºblica General GNU
-# junto con este programa. Si no es asÃ­, consulte <http://www.gnu.org/licenses/>.
+# Deberías haber recibido una copia de la Licencia Pública General GNU
+# junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 """Mounts the ATRIA panel as a dock inside FreeCAD, wired to the live Browser."""
 
@@ -35,8 +35,8 @@ def _is_view_command(target) -> bool:
     Los comandos de vista (frontal, acercar, zoom caja...) se propagan a casi
     todos los contextos para poder decirlos desde cualquier lado, pero sus
     botones solo tienen sentido dentro del contexto de vistas. Se reconocen
-    por el archivo donde estÃ¡ definido el callable, asÃ­ no importa por quÃ©
-    ruta de importaciÃ³n llegÃ³ al diccionario.
+    por el archivo donde está definido el callable, así no importa por qué
+    ruta de importación llegó al diccionario.
     """
     code = getattr(target, "__code__", None)
     if code is None:
@@ -52,7 +52,7 @@ def _in_view_context(context_path: str) -> bool:
 def _notify_panel_failure(message: str) -> None:
     """Inform the failure through the project's logging/messaging channel."""
     try:
-        from core.atria_log import get_logger
+        from GUIFreeCad.core.atria_log import get_logger
 
         get_logger("panel").warning(message)
     except Exception:  # noqa: BLE001 - logging must not break the command
@@ -113,9 +113,9 @@ def show_atria_panel() -> bool:
                 pass
         return True
 
-    # Dock not yet mounted â€” reuse the existing bootstrap flow.
+    # Dock not yet mounted — reuse the existing bootstrap flow.
     try:
-        from integration.voice_bootstrap import show_dock_panel
+        from GUIFreeCad.integration.voice_bootstrap import show_dock_panel
     except ImportError as exc:
         _notify_panel_failure(f"No se pudo montar el panel ATRIA: {exc}")
         return False
@@ -148,15 +148,10 @@ def show_atria_panel() -> bool:
 
 
 def _ensure_interfaz_on_path() -> None:
-    """Make ``InterfazATRIA`` importable (it lives outside GUIFreeCad)."""
-    here = Path(__file__).resolve()
-    for ancestor in here.parents:
-        candidate = ancestor / "InterfazATRIA"
-        if candidate.is_dir() and (candidate / "AtriaPanel.py").is_file():
-            text = str(candidate)
-            if text not in sys.path:
-                sys.path.insert(0, text)
-            return
+    """Añade la carpeta ui al path para que funcionen las importaciones del panel."""
+    ui_dir = Path(__file__).resolve().parent.parent / "ui"
+    if str(ui_dir) not in sys.path:
+        sys.path.insert(0, str(ui_dir))
 
 
 class BrowserPanelSource:
@@ -164,7 +159,7 @@ class BrowserPanelSource:
 
     Drop-in replacement for ``FileBridgeSource``: same role, no files, no
     polling. The panel pushes phrases in through ``SendCommand`` and the
-    adapter pushes state back out through ``PublishContext`` â€” everything in
+    adapter pushes state back out through ``PublishContext`` — everything in
     the FreeCAD process, so a click is as immediate as a method call.
 
     Args:
@@ -194,7 +189,7 @@ class BrowserPanelSource:
         aunque la voz este andando: nadie le avisaba del estado al montarlo.
         """
         try:
-            from speech.atria_voice_service import AtriaVoiceService
+            from GUIFreeCad.speech.atria_voice_service import AtriaVoiceService
             svc = AtriaVoiceService.get()
             active = svc.is_cad_engine_loaded() or svc.is_mic_running()
         except Exception:  # noqa: BLE001
@@ -204,7 +199,7 @@ class BrowserPanelSource:
     def OpenPreferences(self) -> None:
         """Open the ATRIA preferences dialog (the GUIFreeCad one)."""
         try:
-            from integration.launch_preferences import open_preferences
+            from GUIFreeCad.integration.launch_preferences import open_preferences
             open_preferences()
         except Exception as exc:  # noqa: BLE001 - no tumbar el panel
             self.PublishHistory(f"[ATRIA] No se pudieron abrir las preferencias: {exc}", True)
@@ -245,7 +240,7 @@ class BrowserPanelSource:
         if self._panel is None:
             return
 
-        from ContextView import ContextEntryView, ContextView
+        from GUIFreeCad.ui.ContextView import ContextEntryView, ContextView
 
         submenus, commands, seen = [], [], []
         in_view_context = _in_view_context(self._browser.ContextPath)
@@ -428,7 +423,7 @@ def _install_selection_observer(source) -> None:
 def _install_estilo() -> None:
     """Instala el estilo visual ATRIA; un fallo aca no debe tumbar el panel."""
     try:
-        from integration.EstiloAtria import instalarEstiloAtria
+        from GUIFreeCad.integration.EstiloAtria import instalarEstiloAtria
         instalarEstiloAtria()
     except Exception as exc:  # noqa: BLE001
         print(f"[ATRIA] Estilo visual no disponible: {exc}")
@@ -461,7 +456,7 @@ def install_dock_panel(browser, adapter):
         return None
 
     _ensure_interfaz_on_path()
-    from AtriaPanel import AtriaPanel
+    from GUIFreeCad.ui.AtriaPanel import AtriaPanel
 
     source = BrowserPanelSource(browser, adapter)
 
@@ -524,8 +519,8 @@ def _make_real_window(dock) -> None:
 
     Por defecto un QDockWidget suelto es una ``Qt.Tool``: queda siempre por
     encima de FreeCAD, sin boton de minimizar y sin entrada propia en la barra
-    de tareas. Con ``Qt.Window`` pasa a comportarse como una ventana normal â€”
-    se puede minimizar, mandar atras y alt-tabear â€” sin perder la capacidad de
+    de tareas. Con ``Qt.Window`` pasa a comportarse como una ventana normal —
+    se puede minimizar, mandar atras y alt-tabear — sin perder la capacidad de
     volver a anclarse.
     """
     try:

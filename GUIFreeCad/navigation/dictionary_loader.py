@@ -1,19 +1,19 @@
 ﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
-# Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
-# Bajo la direcciÃ³n de Ernesto Ledesma
-# Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
+# Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
+# Bajo la dirección de Ernesto Ledesma
+# Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
 #
 # Este programa es software libre: usted puede redistribuirlo y/o modificarlo
-# bajo los tÃ©rminos de la Licencia PÃºblica General GNU tal como fue publicada
-# por la FundaciÃ³n para el Software Libre, en la versiÃ³n 3 de la Licencia.
+# bajo los términos de la Licencia Pública General GNU tal como fue publicada
+# por la Fundación para el Software Libre, en la versión 3 de la Licencia.
 #
-# Este programa se distribuye con la esperanza de que sea Ãºtil,
-# pero SIN NINGUNA GARANTÃA; incluso sin la garantÃ­a implÃ­cita de
-# MERCANTIBILIDAD o APTITUD PARA UN PROPÃ“SITO PARTICULAR. Consulte la
-# Licencia PÃºblica General GNU para mÃ¡s detalles.
+# Este programa se distribuye con la esperanza de que sea útil,
+# pero SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de
+# MERCANTIBILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. Consulte la
+# Licencia Pública General GNU para más detalles.
 #
-# DeberÃ­as haber recibido una copia de la Licencia PÃºblica General GNU
-# junto con este programa. Si no es asÃ­, consulte <http://www.gnu.org/licenses/>.
+# Deberías haber recibido una copia de la Licencia Pública General GNU
+# junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 """Load base.py and TraduceTo* modules using Keychain + package import."""
 
@@ -26,7 +26,7 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any
 
-from core.language_code import LanguageCode
+from GUIFreeCad.core.language_code import LanguageCode
 
 _KEYCHAIN_ROOT = Path(__file__).resolve().parents[3]
 if str(_KEYCHAIN_ROOT) not in sys.path:
@@ -67,7 +67,7 @@ class DictionaryLoader:
             print(
                 f"[ATRIA-Browser] No se pudo cargar 'base.py' en {self.DictionaryRoot}: "
                 f"{error.__class__.__name__}: {error}. El motor arranca con "
-                "BaseContext vacÃ­o."
+                "BaseContext vacío."
             )
             return {}
         base = getattr(module, "Base", None)
@@ -88,7 +88,7 @@ class DictionaryLoader:
             return {}
         try:
             module = importlib.import_module(module_name)
-        except Exception as error:  # noqa: BLE001 - aislar mÃ³dulo roto
+        except Exception as error:  # noqa: BLE001 - aislar módulo roto
             print(
                 f"[ATRIA-Browser] No se pudo cargar '{module_name}': "
                 f"{error.__class__.__name__}: {error}."
@@ -104,16 +104,16 @@ class DictionaryLoader:
             path = folder / f"{stem}.py"
             if not path.is_file():
                 continue
-            # Si un diccionario estÃ¡ roto (import relativo invÃ¡lido, sintaxis,
+            # Si un diccionario está roto (import relativo inválido, sintaxis,
             # etc.) no se debe tumbar todo el motor: se omite y se sigue con
-            # el resto. Browser tolera un mapa vacÃ­o sin fallar.
+            # el resto. Browser tolera un mapa vacío sin fallar.
             try:
                 module = self._ImportTranslateModule(path, stem)
             except Exception as error:  # noqa: BLE001 - aislar diccionario roto
                 print(
                     f"[ATRIA-Browser] No se pudo cargar el diccionario '{path}': "
                     f"{error.__class__.__name__}: {error}. Se omite y se "
-                    "continÃºa con los diccionarios disponibles."
+                    "continúa con los diccionarios disponibles."
                 )
                 continue
             table = getattr(module, stem, None)
@@ -169,25 +169,25 @@ class DictionaryLoader:
         self, parent_folder: Path, internal_key: str, target: Any = None
     ) -> Path:
         # _InferInternalKey solo devuelve una clave confiable (explorer,
-        # preferences, sketcher...) cuando el destino estÃ¡ anidado como valor
-        # en el dict del nivel actual; si no, cae al spoken en espaÃ±ol
-        # ("vista estÃ¡ndar"), que no es nombre de carpeta ni de mÃ³dulo.
+        # preferences, sketcher...) cuando el destino está anidado como valor
+        # en el dict del nivel actual; si no, cae al spoken en español
+        # ("vista estándar"), que no es nombre de carpeta ni de módulo.
         # Por eso primero resolvemos por identidad de objeto: cada carpeta
         # hermana expone su dict maestro con el mismo nombre (StdView/
-        # StdView.py â†’ StdView, Sketcher/sketcher.py â†’ sketcher), asÃ­ que
+        # StdView.py â†’ StdView, Sketcher/sketcher.py â†’ sketcher), así que
         # comparamos `is target`. Esto aplica en cualquier profundidad del
-        # Ã¡rbol, no solo al descender desde la raÃ­z.
+        # árbol, no solo al descender desde la raíz.
         if target is not None:
             by_identity = self._FindChildByTargetIdentity(parent_folder, target)
             if by_identity is not None:
                 return by_identity
-        # Carpeta hermana directa por nombre (case-insensitive), Ãºtil cuando
-        # internal_key sÃ­ es confiable (p. ej. "explorer", "sketcher").
+        # Carpeta hermana directa por nombre (case-insensitive), útil cuando
+        # internal_key sí es confiable (p. ej. "explorer", "sketcher").
         direct = self._FindChildCaseInsensitive(parent_folder, internal_key)
         if direct is not None:
             return direct
         if parent_folder == self.DictionaryRoot:
-            # Caso especial: los submenÃºs propios de Explorer (file, edit,
+            # Caso especial: los submenús propios de Explorer (file, edit,
             # windows...) viven anidados dentro de la carpeta Explorer/.
             nested = self.DictionaryRoot / "explorer" / internal_key
             if nested.is_dir():
@@ -219,7 +219,7 @@ class DictionaryLoader:
                 module_name = ".".join(parent_parts + [child.name, stem])
                 try:
                     module = importlib.import_module(module_name)
-                except Exception:  # noqa: BLE001 - mÃ³dulo candidato invÃ¡lido, seguir buscando
+                except Exception:  # noqa: BLE001 - módulo candidato inválido, seguir buscando
                     continue
                 if any(value is target for value in vars(module).values()):
                     return child

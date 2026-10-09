@@ -1,19 +1,19 @@
 ﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
-# Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
-# Bajo la direcciÃ³n de Ernesto Ledesma
-# Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
+# Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
+# Bajo la dirección de Ernesto Ledesma
+# Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
 #
 # Este programa es software libre: usted puede redistribuirlo y/o modificarlo
-# bajo los tÃ©rminos de la Licencia PÃºblica General GNU tal como fue publicada
-# por la FundaciÃ³n para el Software Libre, en la versiÃ³n 3 de la Licencia.
+# bajo los términos de la Licencia Pública General GNU tal como fue publicada
+# por la Fundación para el Software Libre, en la versión 3 de la Licencia.
 #
-# Este programa se distribuye con la esperanza de que sea Ãºtil,
-# pero SIN NINGUNA GARANTÃA; incluso sin la garantÃ­a implÃ­cita de
-# MERCANTIBILIDAD o APTITUD PARA UN PROPÃ“SITO PARTICULAR. Consulte la
-# Licencia PÃºblica General GNU para mÃ¡s detalles.
+# Este programa se distribuye con la esperanza de que sea útil,
+# pero SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de
+# MERCANTIBILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. Consulte la
+# Licencia Pública General GNU para más detalles.
 #
-# DeberÃ­as haber recibido una copia de la Licencia PÃºblica General GNU
-# junto con este programa. Si no es asÃ­, consulte <http://www.gnu.org/licenses/>.
+# Deberías haber recibido una copia de la Licencia Pública General GNU
+# junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 """Voice folder browser: next/previous, open a folder, go up, confirm."""
 
@@ -29,8 +29,8 @@ from InputPrompts.SpokenNumberParser import SpokenNumberParser
 
 _WORDS: dict[str, dict[str, tuple[str, ...]]] = {
     "es": {
-        "next": ("siguiente", "avanzar", "abajo", "prÃ³ximo", "otro"),
-        "previous": ("anterior", "atrÃ¡s", "retroceder", "arriba", "previo"),
+        "next": ("siguiente", "avanzar", "abajo", "próximo", "otro"),
+        "previous": ("anterior", "atrás", "retroceder", "arriba", "previo"),
         "parent": ("subir", "padre"),
         "enter": ("abrir", "adentro"),
         "choose": ("elegir", "seleccionar"),
@@ -43,7 +43,7 @@ _WORDS: dict[str, dict[str, tuple[str, ...]]] = {
         "choose": ("choose", "select"),
     },
     "pt": {
-        "next": ("seguinte", "prÃ³ximo", "abaixo"),
+        "next": ("seguinte", "próximo", "abaixo"),
         "previous": ("anterior", "voltar", "cima"),
         "parent": ("subir", "pai"),
         "enter": ("abrir", "dentro"),
@@ -152,7 +152,7 @@ class FileSelectionInputPrompt(BaseInputPrompt):
     def _GoUp(self) -> None:
         parent = self._Dir.parent
         if parent == self._Dir:
-            self._Notice = "Ya estÃ¡s en la carpeta raÃ­z."
+            self._Notice = "Ya estás en la carpeta raíz."
             return
         self._Dir = parent
         self._Load()
@@ -165,7 +165,7 @@ class FileSelectionInputPrompt(BaseInputPrompt):
         if self._FoldersOnly:
             return self.AcceptValue(str(self._Dir))
         if not self._Entries:
-            self._Notice = "No hay nada para elegir acÃ¡."
+            self._Notice = "No hay nada para elegir acá."
             self._Refresh()
             return self.GetResult()
         selected = self._Entries[self._CurrentIndex]
@@ -183,7 +183,7 @@ class FileSelectionInputPrompt(BaseInputPrompt):
             self.SetHeardText(f"{entry.name}{'/' if entry.is_dir() else ''}")
             position = f"({self._CurrentIndex + 1}/{len(self._Entries)}) "
         else:
-            self.SetHeardText("(vacÃ­o)")
+            self.SetHeardText("(vacío)")
             position = ""
         self.SetStatus(
             self._Notice or f"{position}siguiente/anterior, abrir, subir, okey, cancelar"

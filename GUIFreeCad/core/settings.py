@@ -8,56 +8,28 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-
-
-def _has_models(path: Path) -> bool:
-    """True si la carpeta contiene al menos un modelo Vosk descargado."""
-    try:
-        return any(p.is_dir() and p.name.startswith("vosk-model") for p in path.iterdir())
-    except (OSError, FileNotFoundError):
-        return False
+# Path(__file__) es GUIFreeCad/core/settings.py
+# .parent es core/
+# .parent.parent es GUIFreeCad/
+# .parent.parent.parent es la raíz de Atria
+ATRIA_ROOT = Path(__file__).resolve().parent.parent.parent
+GUIFREECAD_ROOT = Path(__file__).resolve().parent.parent
 
 
 def _resolve_models_dir() -> Path:
-    """Localiza la carpeta de modelos Vosk respetando ATRIA_MODELS_DIR.
-
-    Orden de resoluciÃ³n (el layout AtriaCore ``Atria/models`` tiene prioridad):
-      1. Variable de entorno ATRIA_MODELS_DIR (la setea el launcher).
-      2. ``Atria/models`` del layout AtriaCore, si ya tiene modelos descargados.
-      3. ``GUIFreeCad/models`` (modo dev / compatibilidad), si tiene modelos.
-      4. ``Atria/models`` aunque estÃ© vacÃ­a (setup_models.py descarga ahÃ­).
-
-    Returns:
-        La carpeta de modelos a usar. La preferencia es ``Atria/models`` para
-        que todo cargue desde un Ãºnico lugar en el layout AtriaCore.
-    """
+    """Localiza la carpeta de modelos Vosk para Atria."""
     env = os.environ.get("ATRIA_MODELS_DIR", "").strip()
     if env:
         return Path(env)
 
-    atriacore = None
-    for ancestor in PROJECT_ROOT.resolve().parents:
-        candidate = ancestor / "Atria" / "models"
-        if candidate.is_dir():
-            atriacore = candidate
-            break
-
-    # Atria/models con modelos ya descargados gana.
-    if atriacore is not None and _has_models(atriacore):
-        return atriacore
-
-    # Compatibilidad: GUIFreeCad/models si toatriaÃ­a tiene los modelos ahÃ­.
-    legacy = PROJECT_ROOT / "models"
-    if _has_models(legacy):
-        return legacy
-
-    # Destino por defecto del layout AtriaCore (vacÃ­o -> setup_models descarga).
-    return atriacore if atriacore is not None else legacy
+    # Ahora la carpeta models está directamente en la raíz del proyecto
+    return ATRIA_ROOT / "models"
 
 
 MODELS_DIR = _resolve_models_dir()
-CONFIG_DIR = PROJECT_ROOT / "config"
+
+# La configuración se guardará en GUIFreeCad/config/settings.json
+CONFIG_DIR = GUIFREECAD_ROOT / "config"
 CONFIG_FILE = CONFIG_DIR / "settings.json"
 
 DEFAULTS: dict[str, Any] = {
@@ -78,7 +50,7 @@ class Settings:
     def load(self) -> None:
         if CONFIG_FILE.exists():
             try:
-                stored = json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
+                stored = json.loads(CONFIG_FILE.read_text(encoding="utf-8-sig"))
                 if isinstance(stored, dict):
                     self._data.update({k: stored[k] for k in DEFAULTS if k in stored})
             except (json.JSONDecodeError, OSError):

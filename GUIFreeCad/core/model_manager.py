@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Callable
 from urllib.request import urlretrieve
 
-from core.settings import MODELS_DIR
+from GUIFreeCad.core.settings import MODELS_DIR
 
 MODEL_BASE_URL = "https://alphacephei.com/vosk/models/"
 
