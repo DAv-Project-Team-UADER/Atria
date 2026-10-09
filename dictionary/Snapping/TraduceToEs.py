@@ -16,7 +16,10 @@
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 """Mapa de voz (ES) para la seccion Snapping (consolidado)."""
 
-WorkingPlaneFront = None  # TODO: sin implementacion en commands.py
+try:
+    from .commands import WorkingPlaneFront
+except ImportError:
+    WorkingPlaneFront = None
 try:
     from .commands import working_plane
 except ImportError:

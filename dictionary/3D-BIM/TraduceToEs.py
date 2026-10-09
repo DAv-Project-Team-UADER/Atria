@@ -116,6 +116,20 @@ try:
     from .commands import Window
 except ImportError:
     Window = None
+ArchEquipment = None  # TODO: sin implementacion en commands.py
+ArchFence = None  # TODO: sin implementacion en commands.py
+ArchFrame = None  # TODO: sin implementacion en commands.py
+ArchPanel = None  # TODO: sin implementacion en commands.py
+ArchRebar = None  # TODO: sin implementacion en commands.py
+ArchRoof = None  # TODO: sin implementacion en commands.py
+ArchStairs = None  # TODO: sin implementacion en commands.py
+ArchTruss = None  # TODO: sin implementacion en commands.py
+BentShapeRebar = None  # TODO: sin implementacion en commands.py
+HelicalRebar = None  # TODO: sin implementacion en commands.py
+LShapeRebar = None  # TODO: sin implementacion en commands.py
+StirrupRebar = None  # TODO: sin implementacion en commands.py
+StraightRebar = None  # TODO: sin implementacion en commands.py
+UShapeRebar = None  # TODO: sin implementacion en commands.py
 
 TraduceToEs = {
     # Beam
@@ -299,4 +313,83 @@ TraduceToEs = {
     'nueva ventana': Window,
     'generar ventana': Window,
     'añadir ventana': Window,
+    # ArchEquipment
+    'crear equipamiento': ArchEquipment,
+    'nuevo equipamiento': ArchEquipment,
+    'insertar equipamiento': ArchEquipment,
+    'añadir mobiliario': ArchEquipment,
+    'crear equipo': ArchEquipment,
+    # ArchFence
+    'crear cerca': ArchFence,
+    'nueva cerca': ArchFence,
+    'generar cerca': ArchFence,
+    'añadir cerca': ArchFence,
+    # ArchFrame
+    'crear marco': ArchFrame,
+    'nuevo marco': ArchFrame,
+    'generar marco': ArchFrame,
+    'añadir marco': ArchFrame,
+    # ArchPanel
+    'crear panel': ArchPanel,
+    'nuevo panel': ArchPanel,
+    'generar panel': ArchPanel,
+    'añadir panel': ArchPanel,
+    # ArchRebar
+    'crear armadura personalizada': ArchRebar,
+    'nueva barra de refuerzo': ArchRebar,
+    'generar armadura': ArchRebar,
+    'añadir rebar': ArchRebar,
+    'crear barra personalizada': ArchRebar,
+    # ArchRoof
+    'crear techo': ArchRoof,
+    'nuevo techo': ArchRoof,
+    'generar techo': ArchRoof,
+    'añadir techo': ArchRoof,
+    # ArchStairs
+    'crear escalera': ArchStairs,
+    'nueva escalera': ArchStairs,
+    'generar escalera': ArchStairs,
+    'añadir escalera': ArchStairs,
+    # ArchTruss
+    'crear armadura': ArchTruss,
+    'nueva armadura': ArchTruss,
+    'generar armadura': ArchTruss,
+    'añadir armadura': ArchTruss,
+    'crear celosía': ArchTruss,
+    # BentShapeRebar
+    'crear armadura doblada': BentShapeRebar,
+    'nueva barra doblada': BentShapeRebar,
+    'generar armadura doblada': BentShapeRebar,
+    'añadir barra de refuerzo doblada': BentShapeRebar,
+    'crear rebar doblado': BentShapeRebar,
+    # HelicalRebar
+    'crear armadura helicoidal': HelicalRebar,
+    'nueva barra helicoidal': HelicalRebar,
+    'generar armadura en espiral': HelicalRebar,
+    'añadir barra helicoidal': HelicalRebar,
+    'crear rebar helicoidal': HelicalRebar,
+    # LShapeRebar
+    'crear armadura en L': LShapeRebar,
+    'nueva barra en L': LShapeRebar,
+    'generar armadura en L': LShapeRebar,
+    'añadir barra de refuerzo en L': LShapeRebar,
+    'crear rebar en L': LShapeRebar,
+    # StirrupRebar
+    'crear estribo': StirrupRebar,
+    'nuevo estribo': StirrupRebar,
+    'generar estribos': StirrupRebar,
+    'añadir estribo': StirrupRebar,
+    'crear cerco de refuerzo': StirrupRebar,
+    # StraightRebar
+    'crear armadura recta': StraightRebar,
+    'nueva barra recta': StraightRebar,
+    'generar armadura recta': StraightRebar,
+    'añadir barra de refuerzo recta': StraightRebar,
+    'crear rebar recto': StraightRebar,
+    # UShapeRebar
+    'crear armadura en U': UShapeRebar,
+    'nueva barra en U': UShapeRebar,
+    'generar armadura en U': UShapeRebar,
+    'añadir barra de refuerzo en U': UShapeRebar,
+    'crear rebar en U': UShapeRebar,
 }

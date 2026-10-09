@@ -116,6 +116,20 @@ try:
     from .commands import Window
 except ImportError:
     Window = None
+ArchEquipment = None  # TODO: sin implementacion en commands.py
+ArchFence = None  # TODO: sin implementacion en commands.py
+ArchFrame = None  # TODO: sin implementacion en commands.py
+ArchPanel = None  # TODO: sin implementacion en commands.py
+ArchRebar = None  # TODO: sin implementacion en commands.py
+ArchRoof = None  # TODO: sin implementacion en commands.py
+ArchStairs = None  # TODO: sin implementacion en commands.py
+ArchTruss = None  # TODO: sin implementacion en commands.py
+BentShapeRebar = None  # TODO: sin implementacion en commands.py
+HelicalRebar = None  # TODO: sin implementacion en commands.py
+LShapeRebar = None  # TODO: sin implementacion en commands.py
+StirrupRebar = None  # TODO: sin implementacion en commands.py
+StraightRebar = None  # TODO: sin implementacion en commands.py
+UShapeRebar = None  # TODO: sin implementacion en commands.py
 
 TraduceToEn = {
     # Beam
@@ -299,4 +313,80 @@ TraduceToEn = {
     'new window': Window,
     'generate window': Window,
     'add window': Window,
+    # ArchEquipment
+    'create equipment': ArchEquipment,
+    'new equipment': ArchEquipment,
+    'insert equipment': ArchEquipment,
+    'add furniture': ArchEquipment,
+    # ArchFence
+    'create fence': ArchFence,
+    'new fence': ArchFence,
+    'generate fence': ArchFence,
+    'add fence': ArchFence,
+    # ArchFrame
+    'create frame': ArchFrame,
+    'new frame': ArchFrame,
+    'generate frame': ArchFrame,
+    'add frame': ArchFrame,
+    # ArchPanel
+    'create panel': ArchPanel,
+    'new panel': ArchPanel,
+    'generate panel': ArchPanel,
+    'add panel': ArchPanel,
+    # ArchRebar
+    'create custom rebar': ArchRebar,
+    'new reinforcing bar': ArchRebar,
+    'generate rebar': ArchRebar,
+    'add rebar': ArchRebar,
+    'create custom bar': ArchRebar,
+    # ArchRoof
+    'create roof': ArchRoof,
+    'new roof': ArchRoof,
+    'generate roof': ArchRoof,
+    'add roof': ArchRoof,
+    # ArchStairs
+    'create stairs': ArchStairs,
+    'new stairs': ArchStairs,
+    'generate stairs': ArchStairs,
+    'add stairs': ArchStairs,
+    # ArchTruss
+    'create truss': ArchTruss,
+    'new truss': ArchTruss,
+    'generate truss': ArchTruss,
+    'add truss': ArchTruss,
+    'create lattice': ArchTruss,
+    # BentShapeRebar
+    'create bent-shape rebar': BentShapeRebar,
+    'new bent bar': BentShapeRebar,
+    'generate bent-shape rebar': BentShapeRebar,
+    'add bent reinforcing bar': BentShapeRebar,
+    'create bent rebar': BentShapeRebar,
+    # HelicalRebar
+    'create helical rebar': HelicalRebar,
+    'new helical bar': HelicalRebar,
+    'generate spiral rebar': HelicalRebar,
+    'add helical bar': HelicalRebar,
+    # LShapeRebar
+    'create L-shape rebar': LShapeRebar,
+    'new L bar': LShapeRebar,
+    'generate L-shape rebar': LShapeRebar,
+    'add L reinforcing bar': LShapeRebar,
+    'create L rebar': LShapeRebar,
+    # StirrupRebar
+    'create stirrup': StirrupRebar,
+    'new stirrup': StirrupRebar,
+    'generate stirrups': StirrupRebar,
+    'add stirrup': StirrupRebar,
+    'create reinforcing hoop': StirrupRebar,
+    # StraightRebar
+    'create straight rebar': StraightRebar,
+    'new straight bar': StraightRebar,
+    'generate straight rebar': StraightRebar,
+    'add straight reinforcing bar': StraightRebar,
+    # UShapeRebar
+    'create U-shape rebar': UShapeRebar,
+    'new U bar': UShapeRebar,
+    'generate U-shape rebar': UShapeRebar,
+    'add U reinforcing bar': UShapeRebar,
+    'create U rebar': UShapeRebar,
 }

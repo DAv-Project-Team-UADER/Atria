@@ -14,30 +14,68 @@
 #
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
-
 """Mapa de voz (EN) para la seccion Annotation (consolidado)."""
 
-TwoDDrawing = None  # TODO: sin implementacion en commands.py
+try:
+    from .commands import TwoDDrawing
+except ImportError:
+    TwoDDrawing = None
 try:
     from .commands import aligned_dimension as Aligned_Dimension
 except ImportError:
     Aligned_Dimension = None
-Axis = None  # TODO: sin implementacion en commands.py
-AxisSystem = None  # TODO: sin implementacion en commands.py
-Grid = None  # TODO: sin implementacion en commands.py
-Hatch = None  # TODO: sin implementacion en commands.py
+try:
+    from .commands import Axis
+except ImportError:
+    Axis = None
+try:
+    from .commands import AxisSystem
+except ImportError:
+    AxisSystem = None
+try:
+    from .commands import Grid
+except ImportError:
+    Grid = None
+try:
+    from .commands import Hatch
+except ImportError:
+    Hatch = None
 try:
     from .commands import horizontal_dimension as Horizontal_Dimension
 except ImportError:
     Horizontal_Dimension = None
-Label = None  # TODO: sin implementacion en commands.py
-Leader = None  # TODO: sin implementacion en commands.py
-NewPage = None  # TODO: sin implementacion en commands.py
-NewView = None  # TODO: sin implementacion en commands.py
-SectionCut = None  # TODO: sin implementacion en commands.py
-SectionPlane = None  # TODO: sin implementacion en commands.py
-SectionView = None  # TODO: sin implementacion en commands.py
-Text = None  # TODO: sin implementacion en commands.py
+try:
+    from .commands import Label
+except ImportError:
+    Label = None
+try:
+    from .commands import Leader
+except ImportError:
+    Leader = None
+try:
+    from .commands import NewPage
+except ImportError:
+    NewPage = None
+try:
+    from .commands import NewView
+except ImportError:
+    NewView = None
+try:
+    from .commands import SectionCut
+except ImportError:
+    SectionCut = None
+try:
+    from .commands import SectionPlane
+except ImportError:
+    SectionPlane = None
+try:
+    from .commands import SectionView
+except ImportError:
+    SectionView = None
+try:
+    from .commands import Text
+except ImportError:
+    Text = None
 try:
     from .commands import vertical_dimension as Vertical_Dimension
 except ImportError:

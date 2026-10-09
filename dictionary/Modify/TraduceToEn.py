@@ -108,6 +108,14 @@ try:
     from .commands import Upgrade
 except ImportError:
     Upgrade = None
+CutWithPlane = None  # TODO: sin implementacion en commands.py
+Difference = None  # TODO: sin implementacion en commands.py
+ExtrudeFace = None  # TODO: sin implementacion en commands.py
+Extrude = None  # TODO: sin implementacion en commands.py
+Intersection = None  # TODO: sin implementacion en commands.py
+PointArray = None  # TODO: sin implementacion en commands.py
+PolarArray = None  # TODO: sin implementacion en commands.py
+Union = None  # TODO: sin implementacion en commands.py
 
 TraduceToEn = {
     # AddComponent
@@ -248,4 +256,43 @@ TraduceToEn = {
     'promote element': Upgrade,
     'raise level': Upgrade,
     'convert to face': Upgrade,
+    # CutWithPlane
+    'cut with plane': CutWithPlane,
+    'cut using plane': CutWithPlane,
+    'apply cutting plane': CutWithPlane,
+    'plane cut': CutWithPlane,
+    # Difference
+    'cut objects': Difference,
+    'subtract objects': Difference,
+    'apply difference': Difference,
+    'boolean cut': Difference,
+    # ExtrudeFace
+    'extrude face': ExtrudeFace,
+    'give volume to face': ExtrudeFace,
+    'face extrusion': ExtrudeFace,
+    # Extrude
+    'extrude piece': Extrude,
+    'extrude shape': Extrude,
+    'generate extrusion': Extrude,
+    'give three dimensional volume': Extrude,
+    # Intersection
+    'intersect objects': Intersection,
+    'create intersection': Intersection,
+    'extract common part': Intersection,
+    'shared volume': Intersection,
+    # PointArray
+    'crear matriz por puntos': PointArray,
+    'nueva matriz de puntos': PointArray,
+    'arreglo por puntos': PointArray,
+    'distribuir en puntos': PointArray,
+    # PolarArray
+    'create polar array': PolarArray,
+    'new polar array': PolarArray,
+    'polar array': PolarArray,
+    'generate circular array': PolarArray,
+    # Union
+    'union objects': Union,
+    'fuse pieces': Union,
+    'boolean union': Union,
+    'combine solids': Union,
 }

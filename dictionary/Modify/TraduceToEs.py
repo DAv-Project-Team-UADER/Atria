@@ -108,6 +108,14 @@ try:
     from .commands import Upgrade
 except ImportError:
     Upgrade = None
+CutWithPlane = None  # TODO: sin implementacion en commands.py
+Difference = None  # TODO: sin implementacion en commands.py
+ExtrudeFace = None  # TODO: sin implementacion en commands.py
+Extrude = None  # TODO: sin implementacion en commands.py
+Intersection = None  # TODO: sin implementacion en commands.py
+PointArray = None  # TODO: sin implementacion en commands.py
+PolarArray = None  # TODO: sin implementacion en commands.py
+Union = None  # TODO: sin implementacion en commands.py
 
 TraduceToEs = {
     # AddComponent
@@ -260,4 +268,43 @@ TraduceToEs = {
     'elevar nivel': Upgrade,
     'upgrade objeto': Upgrade,
     'convertir a cara': Upgrade,
+    # CutWithPlane
+    'cortar con plano': CutWithPlane,
+    'cortar mediante plano': CutWithPlane,
+    'aplicar plano de corte': CutWithPlane,
+    'corte plano': CutWithPlane,
+    # Difference
+    'cortar objetos': Difference,
+    'restar objetos': Difference,
+    'aplicar diferencia': Difference,
+    'corte booleano': Difference,
+    # ExtrudeFace
+    'extruir cara': ExtrudeFace,
+    'dar volumen a la cara': ExtrudeFace,
+    'extrusión de cara': ExtrudeFace,
+    # Extrude
+    'extruir pieza': Extrude,
+    'extruir forma': Extrude,
+    'generar extrusión': Extrude,
+    'dar volumen tridimensional': Extrude,
+    # Intersection
+    'intersecar objetos': Intersection,
+    'crear intersección': Intersection,
+    'extraer parte común': Intersection,
+    'volumen compartido': Intersection,
+    # PointArray
+    'crear matriz por puntos': PointArray,
+    'nueva matriz de puntos': PointArray,
+    'arreglo por puntos': PointArray,
+    'distribuir en puntos': PointArray,
+    # PolarArray
+    'crear matriz polar': PolarArray,
+    'nueva matriz polar': PolarArray,
+    'arreglo polar': PolarArray,
+    'generar matriz circular': PolarArray,
+    # Union
+    'unir objetos': Union,
+    'fusionar piezas': Union,
+    'unión booleana': Union,
+    'combinar sólidos': Union,
 }

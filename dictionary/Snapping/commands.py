@@ -24,6 +24,17 @@ import FreeCAD
 import FreeCADGui
 import FreeCADGui as Gui
 
+def _RequireDocument():
+    doc = FreeCAD.ActiveDocument
+    if doc is None:
+        raise RuntimeError("No hay un documento de FreeCAD abierto.")
+    return doc
+
+def _Require3dView():
+    view = FreeCADGui.activeView() if FreeCADGui.ActiveDocument else None
+    if view is None or not hasattr(view, "getSceneGraph"):
+        raise RuntimeError("No hay una vista 3D activa.")
+
 
 def _require_document():
     doc = FreeCAD.ActiveDocument
@@ -134,3 +145,35 @@ def working_plane_top(offset=0, interactive=False):
     plane = WorkingPlane.get_working_plane(update=False)
     plane.set_to_top(offset)
     return plane
+
+# --- WorkingPlaneFront ---
+"""Working Plane Front — Menú BIM → Snapping → Working Plane Front.
+
+Sitúa el plano de trabajo (Working Plane) en el plano XZ global, es decir la
+vista frontal. Es una de las tres orientaciones canónicas de plano de trabajo
+(Frontal, Planta, Lateral) accesibles desde el menú Snapping. Los nuevos objetos
+y los snaps se proyectan sobre este plano.
+Comando FreeCAD: BIM_SetWPFront.
+"""
+
+COMMAND_WORKING_PLANE_FRONT = "BIM_SetWPFront"
+
+def SetWorkingPlaneFront():
+    """Alinea el plano de trabajo con el plano XZ global (vista frontal).
+
+    Parámetros
+    ----------
+    Ninguno: es una acción directa, sin argumentos.
+
+    Devuelve
+    --------
+    None: el plano de trabajo queda alineado con la vista frontal.
+    """
+    _RequireDocument()
+    _Require3dView()
+
+    FreeCADGui.runCommand(COMMAND_WORKING_PLANE_FRONT)
+
+WorkingPlaneFront = {
+    "working plane front": SetWorkingPlaneFront,
+}
