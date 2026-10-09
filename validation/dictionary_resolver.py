@@ -1,19 +1,19 @@
 ﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
-# Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
-# Bajo la direcciÃ³n de Ernesto Ledesma
-# Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
+# Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
+# Bajo la dirección de Ernesto Ledesma
+# Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
 #
 # Este programa es software libre: usted puede redistribuirlo y/o modificarlo
-# bajo los tÃ©rminos de la Licencia PÃºblica General GNU tal como fue publicada
-# por la FundaciÃ³n para el Software Libre, en la versiÃ³n 3 de la Licencia.
+# bajo los términos de la Licencia Pública General GNU tal como fue publicada
+# por la Fundación para el Software Libre, en la versión 3 de la Licencia.
 #
-# Este programa se distribuye con la esperanza de que sea Ãºtil,
-# pero SIN NINGUNA GARANTÃA; incluso sin la garantÃ­a implÃ­cita de
-# MERCANTIBILIDAD o APTITUD PARA UN PROPÃ“SITO PARTICULAR. Consulte la
-# Licencia PÃºblica General GNU para mÃ¡s detalles.
+# Este programa se distribuye con la esperanza de que sea útil,
+# pero SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de
+# MERCANTIBILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. Consulte la
+# Licencia Pública General GNU para más detalles.
 #
-# DeberÃ­as haber recibido una copia de la Licencia PÃºblica General GNU
-# junto con este programa. Si no es asÃ­, consulte <http://www.gnu.org/licenses/>.
+# Deberías haber recibido una copia de la Licencia Pública General GNU
+# junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 """Resolve callable entries from DiccionariosEnBruto modules."""
 
@@ -77,7 +77,7 @@ def _LoadModuleFromFile(
         submodule_search_locations=[str(module_path.parent)],
     )
     if spec is None or spec.loader is None:
-        raise ImportError(f"No se pudo cargar el mÃ³dulo: {module_path}")
+        raise ImportError(f"No se pudo cargar el módulo: {module_path}")
     module = importlib.util.module_from_spec(spec)
     if parent is not None:
         module.__package__ = parent.__name__
@@ -109,7 +109,7 @@ def _LoadLeafDictionary(module_path: Path, dict_name: str) -> dict[str, Any]:
     )
     table = getattr(module, dict_name, None)
     if not isinstance(table, dict):
-        raise ValueError(f"El mÃ³dulo {module_path} no expone dict '{dict_name}'")
+        raise ValueError(f"El módulo {module_path} no expone dict '{dict_name}'")
     return table
 
 

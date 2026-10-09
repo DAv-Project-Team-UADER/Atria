@@ -6,7 +6,7 @@ import re
 import unicodedata
 from typing import Callable
 
-from core.model_manager import has_small_model
+from GUIFreeCad.core.model_manager import has_small_model
 
 # Aca vivia USE_GRAMMAR = False, con la nota "SetGrammar can block all
 # recognition on some models". Nadie leia esa variable, asi que no apagaba
@@ -31,18 +31,18 @@ def _buffer_to_bytes(indata) -> bytes:
 # Phrases mapped to internal command ids (multi-language)
 COMMAND_MAP: dict[str, list[str]] = {
     "lang_en": [
-        "english", "inglÃ©s", "ingles", "inglÃªs", "inglesh",
+        "english", "inglés", "ingles", "inglÃªs", "inglesh",
     ],
     "lang_es": [
-        "spanish", "espaÃ±ol", "espanol", "espanhol", "castellano",
+        "spanish", "español", "espanol", "espanhol", "castellano",
     ],
     "lang_pt": [
-        "portuguese", "portuguÃ©s", "portugues", "portuguÃªs", "portuguesa",
+        "portuguese", "portugués", "portugues", "portuguÃªs", "portuguesa",
         "brasil", "brazil", "idioma portugues", "idioma portuguÃªs",
     ],
     "model_small": [
-        "small model", "modelo pequeÃ±o", "modelo pequeno",
-        "pequeÃ±o modelo", "modelo chico", "modelo menor",
+        "small model", "modelo pequeño", "modelo pequeno",
+        "pequeño modelo", "modelo chico", "modelo menor",
     ],
     "model_large": [
         "large model", "modelo grande", "modelo largo", "grande modelo",
@@ -61,13 +61,13 @@ COMMAND_MAP: dict[str, list[str]] = {
         "startup off", "arranque desactivado", "arranque desactivado",
         "inicializaÃ§Ã£o desativada", "desactivado", "desativado",
     ],
-    "yes": ["yes", "sÃ­", "si", "sim", "yeah", "confirmar", "confirmar sim", "quero sim"],
+    "yes": ["yes", "sí", "si", "sim", "yeah", "confirmar", "confirmar sim", "quero sim"],
     "no": ["no", "nÃ£o", "nao", "nop", "negativo", "cancelar", "nao quero", "nÃ£o quero"],
     "apply": ["apply", "aplicar", "aplicar"],
     "ok": ["ok", "aceptar", "accept", "confirmar"],
     "open_preferences": [
         "preferencias", "abrir preferencias", "open preferences",
-        "configuracion", "configuraciÃ³n", "ajustes", "opciones",
+        "configuracion", "configuración", "ajustes", "opciones",
         "settings", "preferences",
     ],
 }
@@ -82,7 +82,7 @@ def _normalize(text: str) -> str:
     )
 
 
-# Longest phrases first so "modelo pequeÃ±o" wins over "pequeÃ±o"
+# Longest phrases first so "modelo pequeño" wins over "pequeño"
 _PHRASES_SORTED: list[tuple[str, str]] = []
 for cmd_id, phrases in COMMAND_MAP.items():
     for phrase in phrases:
@@ -123,7 +123,7 @@ def match_command(text: str) -> str | None:
 
 
 class VoiceCommandListener:
-    """Preferences voice â€” uses the shared AtriaVoiceService (same mic as CAD)."""
+    """Preferences voice — uses the shared AtriaVoiceService (same mic as CAD)."""
 
     def __init__(
         self,
@@ -140,7 +140,7 @@ class VoiceCommandListener:
         self._on_status = on_status
         self._on_audio = on_audio
         self._sample_rate = sample_rate  # kept for API compatibility
-        from speech.atria_voice_service import AtriaVoiceService
+        from GUIFreeCad.speech.atria_voice_service import AtriaVoiceService
 
         self._service = AtriaVoiceService.get()
         self._attached = False

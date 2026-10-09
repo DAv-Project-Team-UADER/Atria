@@ -41,7 +41,7 @@ class FreecadGuiBridge(QObject):
                 App.Console.PrintError(f"[ATRIA] Error ejecutando comando: {exc}\n")
             except ImportError:
                 pass
-            print(f"Error al ejecutar la funciÃ³n: {exc}")
+            print(f"Error al ejecutar la función: {exc}")
 
     @Slot()
     def _open_preferences(self) -> None:
@@ -54,10 +54,10 @@ class FreecadGuiBridge(QObject):
             App.Console.PrintMessage("[ATRIA] Preferencias abiertas por voz.\n")
         except Exception as exc:
             try:
-                from integration.atria_paths import ensure_gui_on_path
+                from GUIFreeCad.integration.atria_paths import ensure_gui_on_path
 
                 ensure_gui_on_path()
-                from integration.launch_preferences import open_preferences
+                from GUIFreeCad.integration.launch_preferences import open_preferences
 
                 open_preferences()
                 App.Console.PrintMessage("[ATRIA] Preferencias abiertas por voz.\n")

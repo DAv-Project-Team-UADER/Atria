@@ -1,22 +1,22 @@
 ﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
-# Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
-# Bajo la direcciÃ³n de Ernesto Ledesma
-# Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
+# Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
+# Bajo la dirección de Ernesto Ledesma
+# Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
 #
 # Este programa es software libre: usted puede redistribuirlo y/o modificarlo
-# bajo los tÃ©rminos de la Licencia PÃºblica General GNU tal como fue publicada
-# por la FundaciÃ³n para el Software Libre, en la versiÃ³n 3 de la Licencia.
+# bajo los términos de la Licencia Pública General GNU tal como fue publicada
+# por la Fundación para el Software Libre, en la versión 3 de la Licencia.
 #
-# Este programa se distribuye con la esperanza de que sea Ãºtil,
-# pero SIN NINGUNA GARANTÃA; incluso sin la garantÃ­a implÃ­cita de
-# MERCANTIBILIDAD o APTITUD PARA UN PROPÃ“SITO PARTICULAR. Consulte la
-# Licencia PÃºblica General GNU para mÃ¡s detalles.
+# Este programa se distribuye con la esperanza de que sea útil,
+# pero SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de
+# MERCANTIBILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. Consulte la
+# Licencia Pública General GNU para más detalles.
 #
-# DeberÃ­as haber recibido una copia de la Licencia PÃºblica General GNU
-# junto con este programa. Si no es asÃ­, consulte <http://www.gnu.org/licenses/>.
+# Deberías haber recibido una copia de la Licencia Pública General GNU
+# junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 """
-Unit tests for Browser â€” Developer 1 and Developer 2 coverage.
+Unit tests for Browser — Developer 1 and Developer 2 coverage.
 
 These tests use an in-memory MockDictionaryLoader so they do NOT depend on
 any dictionary folder on disk (ejemplo de diccionario terminado is in .gitignore).
@@ -75,7 +75,7 @@ def _install_freecad_stub() -> None:
 
 
 # ---------------------------------------------------------------------------
-# In-memory mock loader â€” no filesystem required
+# In-memory mock loader — no filesystem required
 # ---------------------------------------------------------------------------
 
 class _MockDictionaryLoader:
@@ -101,7 +101,7 @@ class _MockDictionaryLoader:
         self._base_module: dict[str, Any] = {
             "explorer": self._explorer,
         }
-        # Comando global de la raÃ­z (como "deshacer" o "cota" en dic/TraduceTo*.py):
+        # Comando global de la raíz (como "deshacer" o "cota" en dic/TraduceTo*.py):
         # un callable suelto, no un subcontexto.
         self.global_calls: list[str] = []
 
@@ -167,7 +167,7 @@ class _MockDictionaryLoader:
         return {}
 
     def LoadTranslateMap(self, folder: Path, language: Any) -> dict[str, Any]:
-        from core.language_code import LanguageCode
+        from GUIFreeCad.core.language_code import LanguageCode
 
         name = folder.name
         if name == "NavCommands":
@@ -197,7 +197,7 @@ class _MockDictionaryLoader:
 
 
 # ---------------------------------------------------------------------------
-# Tests â€” Developer 1 (Preferences)
+# Tests — Developer 1 (Preferences)
 # ---------------------------------------------------------------------------
 
 class TestPreferences(unittest.TestCase):
@@ -206,15 +206,15 @@ class TestPreferences(unittest.TestCase):
         _install_freecad_stub()
 
     def test_default_language_is_valid(self) -> None:
-        from core.language_code import LanguageCode
-        from core.preferences import Preferences
+        from GUIFreeCad.core.language_code import LanguageCode
+        from GUIFreeCad.core.preferences import Preferences
 
         p = Preferences()
         self.assertIsInstance(p.SetLanguage, LanguageCode)
 
     def test_set_language_changes_value(self) -> None:
-        from core.language_code import LanguageCode
-        from core.preferences import Preferences
+        from GUIFreeCad.core.language_code import LanguageCode
+        from GUIFreeCad.core.preferences import Preferences
 
         p = Preferences()
         p.SetLanguage = LanguageCode.En
@@ -225,8 +225,8 @@ class TestPreferences(unittest.TestCase):
         self.assertEqual(p.SetLanguage, LanguageCode.PT)
 
     def test_language_change_callback_fires(self) -> None:
-        from core.language_code import LanguageCode
-        from core.preferences import Preferences
+        from GUIFreeCad.core.language_code import LanguageCode
+        from GUIFreeCad.core.preferences import Preferences
 
         p = Preferences()
         p.SetLanguage = LanguageCode.Es
@@ -238,7 +238,7 @@ class TestPreferences(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
-# Tests â€” Developer 2 (Browser base + BaseContext + Keychain)
+# Tests — Developer 2 (Browser base + BaseContext + Keychain)
 # ---------------------------------------------------------------------------
 
 class TestBrowserDeveloper2(unittest.TestCase):
@@ -247,8 +247,8 @@ class TestBrowserDeveloper2(unittest.TestCase):
         _install_freecad_stub()
 
     def _make_browser(self, language=None):
-        from core.language_code import LanguageCode
-        from core.preferences import Preferences
+        from GUIFreeCad.core.language_code import LanguageCode
+        from GUIFreeCad.core.preferences import Preferences
         from navigation.browser import Browser
 
         p = Preferences()
@@ -285,7 +285,7 @@ class TestBrowserDeveloper2(unittest.TestCase):
         self.assertEqual(result.Action, "not_found")
 
     def test_language_change_reloads_base(self) -> None:
-        from core.language_code import LanguageCode
+        from GUIFreeCad.core.language_code import LanguageCode
 
         browser, prefs = self._make_browser(LanguageCode.Es)
         spoken_es = {e.Spoken for e in browser.Context}
@@ -298,7 +298,7 @@ class TestBrowserDeveloper2(unittest.TestCase):
 
     def test_no_crash_without_dictionary(self) -> None:
         """Browser must start cleanly even when dictionary folder is missing."""
-        from core.preferences import Preferences
+        from GUIFreeCad.core.preferences import Preferences
         from navigation.browser import Browser
 
         p = Preferences()
@@ -327,8 +327,8 @@ class TestBrowserDeveloper2(unittest.TestCase):
 
     def test_context_change_callback_fires(self) -> None:
         """on_context_change callback fires when descending or ascending context."""
-        from core.language_code import LanguageCode
-        from core.preferences import Preferences
+        from GUIFreeCad.core.language_code import LanguageCode
+        from GUIFreeCad.core.preferences import Preferences
         from navigation.browser import Browser
 
         changes: list[int] = []
@@ -345,7 +345,7 @@ class TestBrowserDeveloper2(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
-# Tests â€” Developer 3 (Descend and Ascend)
+# Tests — Developer 3 (Descend and Ascend)
 # ---------------------------------------------------------------------------
 
 class TestBrowserDeveloper3(unittest.TestCase):
@@ -354,8 +354,8 @@ class TestBrowserDeveloper3(unittest.TestCase):
         _install_freecad_stub()
 
     def _make_browser(self):
-        from core.language_code import LanguageCode
-        from core.preferences import Preferences
+        from GUIFreeCad.core.language_code import LanguageCode
+        from GUIFreeCad.core.preferences import Preferences
         from navigation.browser import Browser
 
         p = Preferences()
@@ -399,10 +399,10 @@ class TestBrowserDeveloper3(unittest.TestCase):
         self.assertEqual(browser._stack[-1].InternalName, "explorer")
 
     def test_global_command_runs_in_place_from_a_deep_context(self) -> None:
-        """Un comando de la raÃ­z (cota, deshacer...) no saca al usuario de su contexto."""
+        """Un comando de la raíz (cota, deshacer...) no saca al usuario de su contexto."""
         loader = _MockDictionaryLoader()
-        from core.language_code import LanguageCode
-        from core.preferences import Preferences
+        from GUIFreeCad.core.language_code import LanguageCode
+        from GUIFreeCad.core.preferences import Preferences
         from navigation.browser import Browser
 
         p = Preferences()
@@ -412,7 +412,7 @@ class TestBrowserDeveloper3(unittest.TestCase):
         browser.ProcessPhrase("imprimir")
         self.assertEqual(len(browser._stack), 3)
 
-        # se oye en cualquier contexto: estÃ¡ en la gramÃ¡tica de Vosk
+        # se oye en cualquier contexto: está en la gramática de Vosk
         self.assertIn("cota", browser.GetSpokenPhrases())
 
         res = browser.ProcessPhrase("cota")
@@ -442,7 +442,7 @@ class TestBrowserDeveloper3(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
-# Tests â€” NavCommands (subir / mostrar contexto, no hardcodeados)
+# Tests — NavCommands (subir / mostrar contexto, no hardcodeados)
 # ---------------------------------------------------------------------------
 
 class TestBrowserNavCommands(unittest.TestCase):
@@ -451,8 +451,8 @@ class TestBrowserNavCommands(unittest.TestCase):
         _install_freecad_stub()
 
     def _make_browser(self):
-        from core.language_code import LanguageCode
-        from core.preferences import Preferences
+        from GUIFreeCad.core.language_code import LanguageCode
+        from GUIFreeCad.core.preferences import Preferences
         from navigation.browser import Browser
 
         p = Preferences()
@@ -471,7 +471,7 @@ class TestBrowserNavCommands(unittest.TestCase):
         self.assertEqual(len(browser._stack), 1)
 
     def test_volver_still_ascends(self) -> None:
-        """El viejo sinÃ³nimo 'volver' sigue andando vÃ­a NavCommands."""
+        """El viejo sinónimo 'volver' sigue andando vía NavCommands."""
         browser = self._make_browser()
         browser.ProcessPhrase("explorador")
         res = browser.ProcessPhrase("volver")
@@ -485,7 +485,7 @@ class TestBrowserNavCommands(unittest.TestCase):
         self.assertEqual(res.Action, "back")
 
     def test_contexto_describes_current_context(self) -> None:
-        """'contexto' dispara ShowContext y no ejecuta ningÃºn comando FreeCAD."""
+        """'contexto' dispara ShowContext y no ejecuta ningún comando FreeCAD."""
         browser = self._make_browser()
         browser.ProcessPhrase("explorador")
         stack_before = len(browser._stack)

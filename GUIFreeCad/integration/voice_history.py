@@ -50,7 +50,7 @@ def _publish_status_to_panel(status: str, detail: str) -> None:
     depende de que alguien se acuerde de avisarle al panel.
     """
     try:
-        from integration.atria_dock_panel import get_source
+        from GUIFreeCad.integration.atria_dock_panel import get_source
     except ImportError:
         return
     try:

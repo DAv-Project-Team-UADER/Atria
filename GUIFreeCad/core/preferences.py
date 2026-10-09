@@ -1,28 +1,11 @@
-﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
-# Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
-# Bajo la direcciÃ³n de Ernesto Ledesma
-# Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
-#
-# Este programa es software libre: usted puede redistribuirlo y/o modificarlo
-# bajo los tÃ©rminos de la Licencia PÃºblica General GNU tal como fue publicada
-# por la FundaciÃ³n para el Software Libre, en la versiÃ³n 3 de la Licencia.
-#
-# Este programa se distribuye con la esperanza de que sea Ãºtil,
-# pero SIN NINGUNA GARANTÃA; incluso sin la garantÃ­a implÃ­cita de
-# MERCANTIBILIDAD o APTITUD PARA UN PROPÃ“SITO PARTICULAR. Consulte la
-# Licencia PÃºblica General GNU para mÃ¡s detalles.
-#
-# DeberÃ­as haber recibido una copia de la Licencia PÃºblica General GNU
-# junto con este programa. Si no es asÃ­, consulte <http://www.gnu.org/licenses/>.
-
-"""ATRIA preferences facade (SetLanguage public API for Browser)."""
+﻿"""ATRIA preferences facade (SetLanguage public API for Browser)."""
 
 from __future__ import annotations
 
-from typing import Callable
+from typing import Callable, Any
 
-from core.language_code import LanguageCode
-from core.settings import settings
+from GUIFreeCad.core.language_code import LanguageCode
+from GUIFreeCad.core.settings import settings
 
 LanguageChangeCallback = Callable[[LanguageCode, LanguageCode], None]
 
@@ -30,9 +13,6 @@ LanguageChangeCallback = Callable[[LanguageCode, LanguageCode], None]
 class Preferences:
     """
     Public preferences surface used by Browser and the FreeCAD GUI.
-
-    SetLanguage may be En, Es, or PT; changing it notifies registered listeners
-    (Browser should reload commands from base.py).
     """
 
     def __init__(self) -> None:
@@ -44,15 +24,26 @@ class Preferences:
         return LanguageCode.FromStorage(settings.language)
 
     @SetLanguage.setter
-    def SetLanguage(self, value: LanguageCode) -> None:
-        if not isinstance(value, LanguageCode):
-            raise TypeError("SetLanguage must be LanguageCode (En, Es, or PT)")
-        previous = self.SetLanguage
-        settings.language = value.value
+    def SetLanguage(self, value: Any) -> None:
+        # Extraemos el texto base (ej: 'es') para evitar el problema de los imports dobles
+        if hasattr(value, "value"):
+            lang_str = str(value.value)
+        elif isinstance(value, str):
+            lang_str = value
+        else:
+            raise TypeError("SetLanguage must be LanguageCode or a valid string")
+            
+        # Forzamos la creación usando la clase LanguageCode local
+        nuevo_idioma = LanguageCode.FromStorage(lang_str)
+        idioma_previo = self.SetLanguage
+        
+        settings.language = nuevo_idioma.value
         settings.save()
-        if previous is not value:
+        
+        # Comparamos los valores de texto en lugar de los objetos de memoria
+        if idioma_previo.value != nuevo_idioma.value:
             for callback in list(self._language_callbacks):
-                callback(previous, value)
+                callback(idioma_previo, nuevo_idioma)
 
     def RegisterLanguageChange(self, callback: LanguageChangeCallback) -> None:
         self._language_callbacks.append(callback)

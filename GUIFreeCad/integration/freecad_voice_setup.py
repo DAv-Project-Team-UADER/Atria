@@ -21,8 +21,8 @@ def install_freecad_integration() -> None:
         import FreeCAD as App
         import FreeCADGui as Gui
 
-        from integration.atria_paths import ensure_gui_on_path
-        from integration.freecad_gui_bridge import init_gui_bridge
+        from GUIFreeCad.integration.atria_paths import ensure_gui_on_path
+        from GUIFreeCad.integration.freecad_gui_bridge import init_gui_bridge
 
         ensure_gui_on_path()
         init_gui_bridge()
@@ -31,7 +31,7 @@ def install_freecad_integration() -> None:
         _INSTALLED = True
 
         App.Console.PrintMessage(
-            "[ATRIA] Workbench listo. Mensajes [ATRIA] van a esta pestaÃ±a Â«InformeÂ», "
+            "[ATRIA] Workbench listo. Mensajes [ATRIA] van a esta pestaña Â«InformeÂ», "
             "no a la consola Python (>>>).\n"
         )
         _print_voice_startup_hint()
@@ -40,7 +40,7 @@ def install_freecad_integration() -> None:
         try:
             import FreeCAD as App
 
-            App.Console.PrintError("[ATRIA] Error instalando integraciÃ³n GUIFreeCad:\n")
+            App.Console.PrintError("[ATRIA] Error instalando integración GUIFreeCad:\n")
             App.Console.PrintError(traceback.format_exc())
         except ImportError:
             pass
@@ -56,7 +56,7 @@ def _register_voice_commands(Gui) -> None:
             }
 
         def Activated(self):
-            from integration.voice_bootstrap import start_voice_engine
+            from GUIFreeCad.integration.voice_bootstrap import start_voice_engine
 
             start_voice_engine()
 
@@ -72,7 +72,7 @@ def _register_voice_commands(Gui) -> None:
             }
 
         def Activated(self):
-            from integration.voice_bootstrap import stop_voice_engine
+            from GUIFreeCad.integration.voice_bootstrap import stop_voice_engine
 
             stop_voice_engine()
 
@@ -116,17 +116,17 @@ def _extend_workbench_ui(Gui) -> None:
 def _print_voice_startup_hint() -> None:
     try:
         import FreeCAD as App
-        from core.settings import settings
+        from GUIFreeCad.core.settings import settings
 
         settings.load()
         auto = os.environ.get("ATRIA_AUTO_START_VOICE") == "1" or settings.startup_enabled
         if auto:
             App.Console.PrintMessage(
-                "[ATRIA] Arranque de voz programado (~1,5 s). EsperÃ¡ Â«Voz activaÂ» en Informe.\n"
+                "[ATRIA] Arranque de voz programado (~1,5 s). Esperá Â«Voz activaÂ» en Informe.\n"
             )
         else:
             App.Console.PrintMessage(
-                "[ATRIA] MicrÃ³fono inactivo. ActivÃ¡ Â«Iniciar ATRIA y FreeCAD al encender la PCÂ» "
+                "[ATRIA] Micrófono inactivo. Activá Â«Iniciar ATRIA y FreeCAD al encender la PCÂ» "
                 "en Preferencias, o clic en Â«Iniciar voz ATRIAÂ».\n"
             )
     except Exception:
@@ -142,7 +142,7 @@ def _maybe_autostart_voice() -> None:
         import os
 
         import FreeCAD as App
-        from core.settings import settings
+        from GUIFreeCad.core.settings import settings
 
         settings.load()
         if not (os.environ.get("ATRIA_AUTO_START_VOICE") == "1" or settings.startup_enabled or settings.auto_voice):
@@ -154,12 +154,12 @@ def _maybe_autostart_voice() -> None:
             from PySide2.QtCore import QTimer  # type: ignore[no-redef]
 
         def _start() -> None:
-            from integration.voice_bootstrap import start_voice_engine
+            from GUIFreeCad.integration.voice_bootstrap import start_voice_engine
 
             if not start_voice_engine():
                 App.Console.PrintWarning(
                     "[ATRIA] No se pudo iniciar la voz. "
-                    "ProbÃ¡ Â«Iniciar voz ATRIAÂ» manualmente.\n"
+                    "Probá Â«Iniciar voz ATRIAÂ» manualmente.\n"
                 )
             # InterfazATRIA launch handled by freecad_wb._schedule_interfaz_atria_launch()
 

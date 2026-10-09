@@ -30,7 +30,7 @@ def _startup_dir() -> Path:
 def resolve_iniciar_atria_bat() -> Path | None:
     """Ruta a iniciar_atria.bat (raiz del repo ATRIA)."""
     try:
-        from integration.atria_paths import atria_repo_root
+        from GUIFreeCad.integration.atria_paths import atria_repo_root
 
         repo = atria_repo_root()
     except FileNotFoundError:

@@ -18,9 +18,9 @@ def _has_models(path: Path) -> bool:
 
 
 def _resolve_models_dir() -> Path:
-    """Misma lÃ³gica que core.settings: ATRIA_MODELS_DIR -> Atria/models -> models.
+    """Misma lógica que core.settings: ATRIA_MODELS_DIR -> Atria/models -> models.
 
-    Prioriza Atria/models (layout AtriaCore) para descargar/usar todo en un Ãºnico
+    Prioriza Atria/models (layout AtriaCore) para descargar/usar todo en un único
     lugar.
     """
     env = os.environ.get("ATRIA_MODELS_DIR", "").strip()

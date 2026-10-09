@@ -5,7 +5,7 @@ from __future__ import annotations
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
 
-from core.i18n import tr
+from GUIFreeCad.core.i18n import tr
 
 
 class UnavailableModelDialog(QDialog):

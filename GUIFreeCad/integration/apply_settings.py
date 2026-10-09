@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from core.settings import settings
-from ui.theme import apply_theme
+from GUIFreeCad.core.settings import settings
+from GUIFreeCad.ui.theme import apply_theme
 
 
 def apply_report_palette(theme: str) -> None:
     """Set the report view text color via FreeCAD's parameter system.
 
     ``ReportOutput::OnChange`` observes ``OutputWindow/colorText`` and calls
-    ``reportHl->setTextColor()`` when it changes â€” the only reliable way to
+    ``reportHl->setTextColor()`` when it changes — the only reliable way to
     update the highlighter from outside C++.
     """
     try:
@@ -39,7 +39,7 @@ def apply_saved_settings(app=None) -> None:
         apply_theme(app, settings.theme)
 
     try:
-        from integration.atria_dock_panel import get_source
+        from GUIFreeCad.integration.atria_dock_panel import get_source
         src = get_source()
         if src is not None and src._panel is not None:
             src._panel.SetTheme(settings.theme)
@@ -52,7 +52,7 @@ def apply_saved_settings(app=None) -> None:
     try:
         import FreeCAD  # noqa: F401
 
-        from integration.freecad_voice_setup import install_freecad_integration
+        from GUIFreeCad.integration.freecad_voice_setup import install_freecad_integration
 
         install_freecad_integration()
     except ImportError:
@@ -61,7 +61,7 @@ def apply_saved_settings(app=None) -> None:
     try:
         import FreeCAD  # noqa: F401
 
-        from integration.freecad_voice_setup import install_freecad_integration
+        from GUIFreeCad.integration.freecad_voice_setup import install_freecad_integration
 
         install_freecad_integration()
     except ImportError:
