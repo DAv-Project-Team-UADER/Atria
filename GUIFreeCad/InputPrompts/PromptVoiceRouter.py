@@ -1,0 +1,109 @@
+﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
+# Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
+# Bajo la direcciÃ³n de Ernesto Ledesma
+# Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
+#
+# Este programa es software libre: usted puede redistribuirlo y/o modificarlo
+# bajo los tÃ©rminos de la Licencia PÃºblica General GNU tal como fue publicada
+# por la FundaciÃ³n para el Software Libre, en la versiÃ³n 3 de la Licencia.
+#
+# Este programa se distribuye con la esperanza de que sea Ãºtil,
+# pero SIN NINGUNA GARANTÃA; incluso sin la garantÃ­a implÃ­cita de
+# MERCANTIBILIDAD o APTITUD PARA UN PROPÃ“SITO PARTICULAR. Consulte la
+# Licencia PÃºblica General GNU para mÃ¡s detalles.
+#
+# DeberÃ­as haber recibido una copia de la Licencia PÃºblica General GNU
+# junto con este programa. Si no es asÃ­, consulte <http://www.gnu.org/licenses/>.
+
+"""Route shared ATRIA voice recognition to the currently active input prompt."""
+
+from __future__ import annotations
+
+import threading
+from typing import Any
+
+from InputPrompts.NumericGrammarSwitcher import NumericGrammarSwitcher
+
+
+def _RequiresNumericGrammar(Prompt: Any) -> bool:
+    """Return True when the prompt needs the numeric Vosk grammar.
+
+    Delegates to the prompt itself (BaseInputPrompt.RequiresNumericGrammar)
+    instead of checking concrete types, so a new numeric prompt class does
+    not require changes here.
+    """
+    if Prompt is None:
+        return False
+    return bool(getattr(Prompt, "RequiresNumericGrammar", lambda: False)())
+
+
+class PromptVoiceRouter:
+    """Thread-safe registry for the prompt currently collecting voice input."""
+
+    _Lock = threading.RLock()
+    _ActivePrompt: Any | None = None
+
+    @classmethod
+    def SetActivePrompt(cls, Prompt: Any) -> None:
+        """Register a prompt as the active voice input target.
+
+        When the prompt requires numeric grammar, the Vosk grammar is
+        switched to include number words so the recognizer can hear digits
+        and decimal separators.
+        """
+        with cls._Lock:
+            cls._ActivePrompt = Prompt
+        if _RequiresNumericGrammar(Prompt):
+            NumericGrammarSwitcher.ActivateNumericGrammar()
+
+    @classmethod
+    def ClearActivePrompt(cls, Prompt: Any | None = None) -> None:
+        """Clear the active prompt, optionally only if it matches Prompt.
+
+        When the cleared prompt required numeric grammar, the Vosk grammar
+        is restored to the CAD navigation context.
+        """
+        was_numeric = False
+        with cls._Lock:
+            if Prompt is None or cls._ActivePrompt is Prompt:
+                was_numeric = _RequiresNumericGrammar(cls._ActivePrompt)
+                cls._ActivePrompt = None
+        if was_numeric:
+            NumericGrammarSwitcher.RestoreCadGrammar()
+
+    @classmethod
+    def HasActivePrompt(cls) -> bool:
+        """Return True when a prompt is currently collecting voice input."""
+        with cls._Lock:
+            return cls._ActivePrompt is not None
+
+    @classmethod
+    def ProcessVoiceText(cls, Text: str, *, Final: bool) -> bool:
+        """Route recognized text to the active prompt.
+
+        Returns True when a prompt consumed the text and CAD command routing
+        should stop for this phrase.
+        """
+        with cls._Lock:
+            prompt = cls._ActivePrompt
+
+        if prompt is None:
+            return False
+
+        def _run() -> None:
+            if Final:
+                prompt.ProcessFinalText(Text)
+            else:
+                prompt.ProcessPartialText(Text)
+
+        cls._RunOnMainThread(_run)
+        return True
+
+    @staticmethod
+    def _RunOnMainThread(Function) -> None:
+        try:
+            from integration.freecad_gui_bridge import run_on_main_thread
+
+            run_on_main_thread(Function)
+        except Exception:
+            Function()
