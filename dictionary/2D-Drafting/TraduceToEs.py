@@ -16,20 +16,38 @@
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 """Mapa de voz (ES) para la seccion 2D-Drafting (consolidado)."""
 
-Arc = None  # TODO: sin implementacion en commands.py
-ArcFrom3Points = None  # TODO: sin implementacion en commands.py
-BSpline = None  # TODO: sin implementacion en commands.py
-BezierCurve = None  # TODO: sin implementacion en commands.py
-Circle = None  # TODO: sin implementacion en commands.py
-CubicBezierCurve = None  # TODO: sin implementacion en commands.py
-Ellipse = None  # TODO: sin implementacion en commands.py
-Fillet = None  # TODO: sin implementacion en commands.py
-Line = None  # TODO: sin implementacion en commands.py
-Point = None  # TODO: sin implementacion en commands.py
-Polygon = None  # TODO: sin implementacion en commands.py
-Polyline = None  # TODO: sin implementacion en commands.py
-Rectangle = None  # TODO: sin implementacion en commands.py
-Sketch = None  # TODO: sin implementacion en commands.py
+try:
+    from .commands import (
+        Arc,
+        ArcFrom3Points,
+        BSpline,
+        BezierCurve,
+        Circle,
+        CubicBezierCurve,
+        Ellipse,
+        Fillet,
+        Line,
+        Point,
+        Polygon,
+        Polyline,
+        Rectangle,
+        Sketch,
+    )
+except ImportError:
+    Arc = None
+    ArcFrom3Points = None
+    BSpline = None
+    BezierCurve = None
+    Circle = None
+    CubicBezierCurve = None
+    Ellipse = None
+    Fillet = None
+    Line = None
+    Point = None
+    Polygon = None
+    Polyline = None
+    Rectangle = None
+    Sketch = None
 
 TraduceToEs = {
     # Arc

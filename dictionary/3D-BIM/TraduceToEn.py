@@ -116,20 +116,38 @@ try:
     from .commands import Window
 except ImportError:
     Window = None
-ArchEquipment = None  # TODO: sin implementacion en commands.py
-ArchFence = None  # TODO: sin implementacion en commands.py
-ArchFrame = None  # TODO: sin implementacion en commands.py
-ArchPanel = None  # TODO: sin implementacion en commands.py
-ArchRebar = None  # TODO: sin implementacion en commands.py
-ArchRoof = None  # TODO: sin implementacion en commands.py
-ArchStairs = None  # TODO: sin implementacion en commands.py
-ArchTruss = None  # TODO: sin implementacion en commands.py
-BentShapeRebar = None  # TODO: sin implementacion en commands.py
-HelicalRebar = None  # TODO: sin implementacion en commands.py
-LShapeRebar = None  # TODO: sin implementacion en commands.py
-StirrupRebar = None  # TODO: sin implementacion en commands.py
-StraightRebar = None  # TODO: sin implementacion en commands.py
-UShapeRebar = None  # TODO: sin implementacion en commands.py
+try:
+    from .commands import (
+        ArchEquipment,
+        ArchFence,
+        ArchFrame,
+        ArchPanel,
+        ArchRebar,
+        ArchRoof,
+        ArchStairs,
+        ArchTruss,
+        BentShapeRebar,
+        HelicalRebar,
+        LShapeRebar,
+        StirrupRebar,
+        StraightRebar,
+        UShapeRebar,
+    )
+except ImportError:
+    ArchEquipment = None
+    ArchFence = None
+    ArchFrame = None
+    ArchPanel = None
+    ArchRebar = None
+    ArchRoof = None
+    ArchStairs = None
+    ArchTruss = None
+    BentShapeRebar = None
+    HelicalRebar = None
+    LShapeRebar = None
+    StirrupRebar = None
+    StraightRebar = None
+    UShapeRebar = None
 
 TraduceToEn = {
     # Beam

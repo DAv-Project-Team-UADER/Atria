@@ -581,3 +581,80 @@ Wall = {
 Window = {
     "window": lambda: Gui.runCommand('Arch_Window',0)
 }
+
+# --- ArchEquipment ---
+ArchEquipment = {
+    "arch equipment": lambda: Gui.runCommand('Arch_Equipment', 0)
+}
+
+# --- ArchFence ---
+ArchFence = {
+    "arch fence": lambda: Gui.runCommand('Arch_Fence', 0)
+}
+
+# --- ArchFrame ---
+ArchFrame = {
+    "arch frame": lambda: Gui.runCommand('Arch_Frame', 0)
+}
+
+# --- ArchPanel ---
+ArchPanel = {
+    "arch panel": lambda: Gui.runCommand('Arch_Panel', 0)
+}
+
+# --- ArchRebar ---
+ArchRebar = {
+    "arch rebar": lambda: Gui.runCommand('Arch_Rebar', 0)
+}
+
+# --- ArchRoof ---
+ArchRoof = {
+    "arch roof": lambda: Gui.runCommand('Arch_Roof', 0)
+}
+
+# --- ArchStairs ---
+def _stairs():
+    import Arch
+    import Draft
+    stairs = Arch.makeStairs(steps=17)
+    Draft.autogroup(stairs)
+
+ArchStairs = {
+    "arch stairs": _stairs
+}
+
+# --- ArchTruss ---
+ArchTruss = {
+    "arch truss": lambda: Gui.runCommand('Arch_Truss', 0)
+}
+
+# --- BentShapeRebar ---
+BentShapeRebar = {
+    "bent shape rebar": lambda: Gui.runCommand('Arch_RebarTools', 5)
+}
+
+# --- HelicalRebar ---
+HelicalRebar = {
+    "helical rebar": lambda: Gui.runCommand('Arch_RebarTools', 6)
+}
+
+# --- LShapeRebar ---
+LShapeRebar = {
+    "l shape rebar": lambda: Gui.runCommand('Arch_RebarTools', 3)
+}
+
+# --- StirrupRebar ---
+StirrupRebar = {
+    "stirrup rebar": lambda: Gui.runCommand('Arch_RebarTools', 4)
+}
+
+# --- StraightRebar ---
+StraightRebar = {
+    "straight rebar": lambda: Gui.runCommand('Arch_RebarTools', 1)
+}
+
+# --- UShapeRebar ---
+UShapeRebar = {
+    "u shape rebar": lambda: Gui.runCommand('Arch_RebarTools', 2)
+}
+
