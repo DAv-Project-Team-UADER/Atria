@@ -1,4 +1,4 @@
-﻿"""Logica del workbench ATRIA (importado como modulo Python normal)."""
+"""Logica del workbench ATRIA (importado como modulo Python normal)."""
 
 from __future__ import annotations
 
@@ -49,11 +49,20 @@ def apply_atria_toolbar(workbench) -> None:
     )
 
 
+def _get_atria_commands():
+    for mod_name in ("gui.atria_commands", "atria_commands", "scr.gui.atria_commands"):
+        try:
+            return importlib.import_module(mod_name)
+        except ImportError:
+            continue
+    raise ImportError("No se pudo cargar atria_commands")
+
+
 def install_gui_integration() -> None:
     """Carga GUIFreeCad: comandos de voz, tema y extension de la barra ATRIA."""
     import FreeCAD as App
 
-    atria_commands = importlib.import_module("scr.gui.atria_commands")
+    atria_commands = _get_atria_commands()
     atria_commands._ensure_gui_path()
     from integration.apply_settings import apply_saved_settings
 
@@ -66,7 +75,7 @@ def setup_workbench(workbench) -> None:
 
     setup_mod_path()
     try:
-        atria_commands = importlib.import_module("scr.gui.atria_commands")
+        atria_commands = _get_atria_commands()
         atria_commands._ensure_selection_path()
         atria_commands._ensure_validation_path()
         atria_commands.register_commands()
@@ -99,9 +108,12 @@ def _schedule_autoload_workbench() -> None:
         import FreeCADGui as Gui
 
         try:
-            Gui.activateWorkbench("ATRIAWorkbench")
+            Gui.activateWorkbench("AtriaWorkbench")
         except Exception:
-            pass
+            try:
+                Gui.activateWorkbench("ATRIAWorkbench")
+            except Exception:
+                pass
 
     QTimer.singleShot(400, _activate)
 
@@ -116,7 +128,7 @@ def _schedule_atria_ui_bootstrap() -> None:
 
     def _apply_ui() -> None:
         try:
-            atria_commands = importlib.import_module("scr.gui.atria_commands")
+            atria_commands = _get_atria_commands()
             atria_commands._ensure_gui_path()
             from integration.freecad_ui_setup import apply_atria_freecad_ui
 
@@ -156,7 +168,7 @@ def _auto_start_voice_if_needed() -> None:
         import sys
         from pathlib import Path
 
-        _atria_commands = importlib.import_module("scr.gui.atria_commands")
+        _atria_commands = _get_atria_commands()
         gui_root = _atria_commands._guifreecad_root()
         if str(gui_root) not in sys.path:
             sys.path.insert(0, str(gui_root))
@@ -192,7 +204,7 @@ def _schedule_toolbar_refresh() -> None:
             except Exception:
                 App.Console.PrintError("[ATRIA] Reintento GUIFreeCad fallo:\n")
                 App.Console.PrintError(traceback.format_exc())
-            wb = Gui.getWorkbench("ATRIAWorkbench")
+            wb = Gui.getWorkbench("AtriaWorkbench") or Gui.getWorkbench("ATRIAWorkbench")
             if wb is not None:
                 apply_atria_toolbar(wb)
             _force_show_atria_toolbar()
@@ -277,7 +289,7 @@ def _schedule_settings_watcher() -> None:
                     theme = data.get("theme", "light")
                     app = QApplication.instance()
                     if app is not None:
-                        atria_cmds = importlib.import_module("scr.gui.atria_commands")
+                        atria_cmds = _get_atria_commands()
                         atria_cmds._ensure_gui_path()
                         from ui.theme import apply_theme
                         apply_theme(app, theme)

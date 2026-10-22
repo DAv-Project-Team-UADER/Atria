@@ -1,4 +1,4 @@
-﻿"""Resolve GUIFreeCad root (launcher should set ATRIA_GUI_FREECAD_ROOT)."""
+"""Resolve GUIFreeCad root (launcher should set ATRIA_GUI_FREECAD_ROOT)."""
 
 from __future__ import annotations
 
@@ -28,10 +28,20 @@ def _first_gui_root(candidates: list[Path]) -> Path | None:
 
 
 def _mod_dir() -> Path | None:
-    from componentesATRIA.Atria.scr.gui.mod_paths import get_mod_dir
+    try:
+        from gui.mod_paths import get_mod_dir
 
-    text = get_mod_dir()
-    return Path(text) if text else None
+        text = get_mod_dir()
+        return Path(text) if text else None
+    except ImportError:
+        pass
+    try:
+        from mod_paths import get_mod_dir
+
+        text = get_mod_dir()
+        return Path(text) if text else None
+    except ImportError:
+        return None
 
 
 def guifreecad_root() -> Path:
