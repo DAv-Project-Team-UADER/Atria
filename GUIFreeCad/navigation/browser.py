@@ -312,6 +312,9 @@ class Browser:
                 if entry.IsSubContext():
                     if self._DescendToSubContext(entry):
                         return BrowserResult(True, "descend", f"Context set to {self._ActionLabel(entry)}")
+                    if entry.IsCallable():
+                        self._ExecuteEntry(entry)
+                        return BrowserResult(True, "execute", f"Executed {self._ActionLabel(entry)}")
                     return BrowserResult(False, "descend_failed", f"No se pudo entrar a {self._ActionLabel(entry)}")
                 if entry.IsCallable():
                     self._ExecuteEntry(entry)

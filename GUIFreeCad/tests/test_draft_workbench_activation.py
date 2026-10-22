@@ -49,6 +49,7 @@ class _FakeGui:
     def __init__(self) -> None:
         self.active = "StartWorkbench"
         self.calls: list[tuple] = []
+        self.Selection = types.SimpleNamespace(getSelection=lambda: [], getSelectionEx=lambda: [])
 
     def reset(self, active: str = "StartWorkbench") -> None:
         self.active = active
@@ -85,7 +86,11 @@ def _install_stubs(fake_gui: _FakeGui) -> None:
     draft.getType = lambda *a, **k: "Structure"
     sys.modules["Draft"] = draft
 
-    for mod in ("Part", "BIM", "WorkingPlane", "DraftVecUtils"):
+    wp = sys.modules.get("WorkingPlane") or types.ModuleType("WorkingPlane")
+    wp.get_working_plane = lambda: types.SimpleNamespace(get_placement=lambda: None)
+    sys.modules["WorkingPlane"] = wp
+
+    for mod in ("Part", "BIM", "DraftVecUtils"):
         sys.modules.setdefault(mod, types.ModuleType(mod))
     createobjects = types.ModuleType("selection.createobjects")
     createobjects.CreateObjects = _FakeCreateObjects  # type: ignore[attr-defined]
