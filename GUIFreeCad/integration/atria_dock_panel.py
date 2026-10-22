@@ -511,6 +511,7 @@ def install_dock_panel(browser, adapter):
     # cuando quiere, con el boton de la cabecera o arrastrando el titulo.
     dock.setFloating(True)
     dock.resize(560, 720)
+    dock.setMinimumSize(480, 640)
     _make_real_window(dock)
     _center_on(dock, main_window)
 

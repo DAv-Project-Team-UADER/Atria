@@ -1,4 +1,4 @@
-﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
+# Copyright (C) 2026 El Equipo del Proyecto Atria
 # Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
 # Bajo la direcciÃ³n de Ernesto Ledesma
 # Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
@@ -219,10 +219,10 @@ class TestPreferences(unittest.TestCase):
         p = Preferences()
         p.SetLanguage = LanguageCode.En
         self.assertEqual(p.SetLanguage, LanguageCode.En)
-        p.SetLanguage = LanguageCode.Es
-        self.assertEqual(p.SetLanguage, LanguageCode.Es)
         p.SetLanguage = LanguageCode.PT
         self.assertEqual(p.SetLanguage, LanguageCode.PT)
+        p.SetLanguage = LanguageCode.Es
+        self.assertEqual(p.SetLanguage, LanguageCode.Es)
 
     def test_language_change_callback_fires(self) -> None:
         from core.language_code import LanguageCode
@@ -235,6 +235,7 @@ class TestPreferences(unittest.TestCase):
         p.SetLanguage = LanguageCode.En
         self.assertEqual(len(fired), 1)
         self.assertEqual(fired[0][1], LanguageCode.En)
+        p.SetLanguage = LanguageCode.Es
 
 
 # ---------------------------------------------------------------------------

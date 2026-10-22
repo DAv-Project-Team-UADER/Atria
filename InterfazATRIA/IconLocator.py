@@ -99,6 +99,19 @@ class IconLocator:
         "circulo": "circle",
         "stdview": "standardviews",
         "vistaestandar": "standardviews",
+        "2ddrafting": "draft",
+        "drafting": "draft",
+        "3dbim": "workbenchsketcher",
+        "bim": "workbenchsketcher",
+        "annotation": "annotation",
+        "manage": "manage",
+        "modify": "modify",
+        "preferences": "preferences",
+        "snapping": "snaps",
+        "statusbar": "toolbars",
+        "utils": "tools",
+        "showatriapanel": "info",
+        "hideatriapanel": "salir",
     }
 
     def Find(self, Key: str) -> str:

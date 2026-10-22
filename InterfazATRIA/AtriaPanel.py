@@ -104,6 +104,7 @@ class AtriaPanel(QWidget):
         self._lang = Lang
         self._texts = TEXTS.get(Lang, TEXTS["es"])
 
+        self.setMinimumSize(480, 640)
         self._BuildUi()
         self.RenderContext(self._context)
 
@@ -466,23 +467,30 @@ class AtriaPanel(QWidget):
         hint.setAlignment(Qt.AlignCenter)
         self._toolAreaLayout.addWidget(hint)
 
-    def _MakeEntryButton(self, Entry) -> QPushButton | None:
+    def _MakeEntryButton(self, Entry) -> QPushButton:
         icon = self._locator.Find(Entry.InternalKey)
-        if not icon:
-            return None
+        if not icon and getattr(Entry, "Spoken", ""):
+            icon = self._locator.Find(Entry.Spoken)
 
         button = QPushButton()
         button.setFixedSize(self.BUTTON_SIZE, self.BUTTON_SIZE)
         button.setToolTip(Entry.Spoken)
         button.setStyleSheet(self._ButtonQss())
 
-        # setIcon en vez de un QSvgWidget embebido: Qt escala el SVG a un
-        # cuadrado exacto respetando su relacion de aspecto, con lo cual
-        # todos los botones quedan con el mismo tamaño visual. Con el
-        # widget embebido cada SVG se dibujaba segun su propio viewBox y
-        # unos se veian mas grandes que otros.
-        button.setIcon(QIcon(icon))
-        button.setIconSize(QSize(self.ICON_SIZE, self.ICON_SIZE))
+        if icon:
+            button.setIcon(QIcon(icon))
+            button.setIconSize(QSize(self.ICON_SIZE, self.ICON_SIZE))
+        else:
+            # Fallback cuando no hay icono SVG: mostrar texto/abreviatura
+            label = Entry.Spoken or Entry.InternalKey
+            if len(label) > 6:
+                words = label.split()
+                if len(words) > 1:
+                    label = "".join(w[0].upper() for w in words[:3])
+                else:
+                    label = label[:4].capitalize()
+            button.setText(label)
+            button.setFont(QFont(FONT_SANS, 9, QFont.Bold))
 
         spoken = Entry.Spoken
         button.clicked.connect(lambda _checked=False, s=spoken: self._OnEntryClicked(s))
