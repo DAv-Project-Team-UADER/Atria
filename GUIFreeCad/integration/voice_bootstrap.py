@@ -1,4 +1,4 @@
-﻿"""Start/stop the ATRIA voice engine (Browser + BrowserVoiceAdapter) from GUIFreeCad."""
+"""Start/stop the ATRIA voice engine (Browser + BrowserVoiceAdapter) from GUIFreeCad."""
 
 from __future__ import annotations
 
@@ -98,15 +98,15 @@ def show_dock_panel() -> bool:
 def _resolve_dictionary_root() -> Path:
     """Localiza la carpeta de diccionarios respetando ATRIA_DICTIONARY_ROOT.
 
-    Orden de resoluciÃ³n (igual criterio que atria_commands._dictionary_root):
+    Orden de resolución (igual criterio que atria_commands._dictionary_root):
       1. Variable de entorno ATRIA_DICTIONARY_ROOT (la setea el launcher).
-      2. Candidatos relativos subiendo desde este archivo: layout AtriaCore
-         (``Atria/dic``) y layout previo (``DiccionariosEnBruto``).
+      2. Candidatos relativos subiendo desde este archivo: 'dictionary' (layout consolidado),
+         'Atria/dictionary', 'Atria/dic', 'dic' y 'DiccionariosEnBruto'.
 
     Returns:
         Ruta a la carpeta de diccionarios; si no se encuentra ninguna,
-        devuelve el mejor candidato del layout AtriaCore (DictionaryLoader
-        tolera que no exista y arranca con contextos vacÃ­os sin romper).
+        devuelve el mejor candidato (DictionaryLoader tolera que no exista y
+        arranca con contextos vacíos sin romper).
     """
     env = os.environ.get("ATRIA_DICTIONARY_ROOT", "").strip()
     if env:
@@ -116,20 +116,25 @@ def _resolve_dictionary_root() -> Path:
 
     here = Path(__file__).resolve()
     for ancestor in here.parents:
-        for candidate in (ancestor / "Atria" / "dic", ancestor / "DiccionariosEnBruto"):
+        for candidate in (
+            ancestor / "dictionary",
+            ancestor / "Atria" / "dictionary",
+            ancestor / "dic",
+            ancestor / "Atria" / "dic",
+            ancestor / "DiccionariosEnBruto",
+        ):
             if _is_dictionary_dir(candidate):
                 return candidate.resolve()
 
-    # parents[5]=ATRIA-root con el nuevo layout (.../Atria/scr/ComponentesATRIA/IntegracionGUI/GUIFreeCad/integration)
-    return here.parents[5] / "Atria" / "dic"
+    # Fallback relativo a GUIFreeCad/integration
+    fallback = here.parents[1] / "dictionary"
+    if fallback.is_dir():
+        return fallback.resolve()
+    return here.parents[1] / "dic"
 
 
 def _is_dictionary_dir(path: Path) -> bool:
-    """True si la carpeta es un diccionario real (no un placeholder vacÃ­o).
-
-    Evita confundir ``ComponentesATRIA/Atria/dic`` (solo placeholder) con el
-    ``Atria/dic`` real que contiene base.py y los TraduceTo*.py.
-    """
+    """True si la carpeta es un diccionario real (no un placeholder vacío)."""
     return (path / "base.py").is_file() or (path / "TraduceToEs.py").is_file()
 
 

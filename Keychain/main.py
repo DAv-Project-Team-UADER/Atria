@@ -30,12 +30,19 @@ def main():
     """Main program entry point."""
     # Get the directory where this script is located
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    dic_folder = os.path.join(script_dir, "dic")
+    parent_dir = os.path.dirname(script_dir)
+    candidates = [
+        os.path.join(parent_dir, "dictionary"),
+        os.path.join(script_dir, "dictionary"),
+        os.path.join(parent_dir, "dic"),
+        os.path.join(script_dir, "dic"),
+    ]
+    dic_folder = next((p for p in candidates if os.path.isdir(p)), None)
 
-    # Verify the 'dic' folder exists
-    if not os.path.isdir(dic_folder):
-        print(f"Error: 'dic' folder not found in {script_dir}")
-        print("Please create a 'dic' folder next to this script.")
+    # Verify a dictionary folder exists
+    if not dic_folder:
+        print(f"Error: dictionary folder not found in {parent_dir} or {script_dir}")
+        print("Please ensure 'dictionary' or 'dic' folder exists.")
         return
 
     # Ask user for the dictionary file name

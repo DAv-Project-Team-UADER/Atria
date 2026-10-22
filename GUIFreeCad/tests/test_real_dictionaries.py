@@ -1,4 +1,4 @@
-﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
+# Copyright (C) 2026 El Equipo del Proyecto Atria
 # Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
 # Bajo la direcciÃ³n de Ernesto Ledesma
 # Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
@@ -41,8 +41,8 @@ if str(GUI_ROOT) not in sys.path:
 from integration.atria_paths import atria_repo_root, ensure_atria_repo_on_path  # noqa: E402
 
 ensure_atria_repo_on_path()
-ATRIA_DIR = atria_repo_root().parent
-DIC_ROOT = ATRIA_DIR / "dic"
+ATRIA_DIR = atria_repo_root()
+DIC_ROOT = ATRIA_DIR / "dictionary"
 
 if str(DIC_ROOT) not in sys.path:
     sys.path.insert(0, str(DIC_ROOT))
@@ -79,7 +79,7 @@ def _install_freecad_stub() -> None:
 
 
 class TestRealDictionariesConvention(unittest.TestCase):
-    """Audits Atria/dic for mandatory nesting convention and navigation integrity."""
+    """Audits ATRIA dictionary for mandatory nesting convention and navigation integrity."""
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -87,7 +87,7 @@ class TestRealDictionariesConvention(unittest.TestCase):
 
     def test_no_flattened_updates_in_dic(self) -> None:
         """
-        Rule 4: Verify that no .update() call in Atria/dic flattens a sub-dictionary.
+        Rule 4: Verify that no .update() call in ATRIA/dictionary flattens a sub-dictionary.
         All update calls must pass a dict literal mapping a key string to a sub-dict,
         e.g., dict.update({'key': sub_dict}).
         """
@@ -135,27 +135,24 @@ class TestRealDictionariesConvention(unittest.TestCase):
         self.assertTrue(loader.IsReady, f"DictionaryLoader should find DIC_ROOT at {DIC_ROOT}")
 
         base_dict = loader.LoadBaseModuleDict()
-        self.assertIn("explorer", base_dict)
-        self.assertIn("stdview", base_dict)
-        self.assertIn("workbench", base_dict)
-        self.assertIn("lineattributes", base_dict)
-        self.assertIn("preferences", base_dict)
+        self.assertIn("2D-Drafting", base_dict)
+        self.assertIn("3D-BIM", base_dict)
+        self.assertIn("Annotation", base_dict)
+        self.assertIn("Manage", base_dict)
+        self.assertIn("Modify", base_dict)
+        self.assertIn("Preferences", base_dict)
+        self.assertIn("Snapping", base_dict)
+        self.assertIn("StatusBar", base_dict)
+        self.assertIn("Utils", base_dict)
 
     def test_top_level_workbenches_are_nested(self) -> None:
-        """Verify that workbench.py contains nested workbenches as subcontext dicts."""
+        """Verify that 2D-Drafting and 3D-BIM sections exist at top level."""
         from navigation.dictionary_loader import DictionaryLoader
 
         loader = DictionaryLoader(DIC_ROOT)
         base_dict = loader.LoadBaseModuleDict()
-        workbench = base_dict.get("workbench", {})
-
-        expected_submenus = ["assembly", "draft", "part", "partdesign", "sketcher", "techdraw"]
-        for submenu in expected_submenus:
-            self.assertIn(
-                submenu,
-                workbench,
-                f"Workbench missing nested key '{submenu}'. Check workbench.py nesting!",
-            )
+        self.assertIn("2D-Drafting", base_dict)
+        self.assertIn("3D-BIM", base_dict)
 
     def test_atria_panel_visibility_commands_are_global_in_spanish(self) -> None:
         """Verify Spanish panel visibility aliases resolve from the base dictionary."""
@@ -175,27 +172,38 @@ class TestRealDictionariesConvention(unittest.TestCase):
             self.assertIs(spanish[phrase], base_dict["show_atria_panel"])
 
     def test_techdraw_and_geometry_translations_populated(self) -> None:
-        """Verify that TechDraw and Sketcher/Geometry translations are populated and not empty stubs."""
+        """Verify that 2D-Drafting and 3D-BIM translations are populated and not empty stubs."""
         from navigation.dictionary_loader import DictionaryLoader
         from core.language_code import LanguageCode
 
         loader = DictionaryLoader(DIC_ROOT)
 
-        techdraw_dir = DIC_ROOT / "Workbench" / "TechDraw"
-        es_map = loader.LoadTranslateMap(techdraw_dir, LanguageCode.Es)
+        drafting_dir = DIC_ROOT / "2D-Drafting"
+        es_map = loader.LoadTranslateMap(drafting_dir, LanguageCode.Es)
         self.assertGreater(
             len(es_map),
             0,
-            "TechDraw TraduceToEs.py is empty or invalid! Spoken commands in Spanish won't work.",
+            "2D-Drafting TraduceToEs.py is empty or invalid! Spoken commands in Spanish won't work.",
         )
-        self.assertIn("vistas", es_map)
-        self.assertIn("cotas", es_map)
+        norm_es = [DictionaryLoader.NormalizeSpoken(k) for k in es_map]
+        self.assertIn("arco", norm_es)
+        self.assertIn("circulo", norm_es)
 
-        geometry_dir = DIC_ROOT / "Workbench" / "Sketcher" / "Geometry"
-        en_geo_map = loader.LoadTranslateMap(geometry_dir, LanguageCode.En)
-        pt_geo_map = loader.LoadTranslateMap(geometry_dir, LanguageCode.PT)
-        self.assertGreater(len(en_geo_map), 0, "Sketcher/Geometry TraduceToEn.py is empty!")
-        self.assertGreater(len(pt_geo_map), 0, "Sketcher/Geometry TraduceToPt.py is empty!")
+        en_map = loader.LoadTranslateMap(drafting_dir, LanguageCode.En)
+        self.assertGreater(len(en_map), 0, "2D-Drafting TraduceToEn.py is empty!")
+        norm_en = [DictionaryLoader.NormalizeSpoken(k) for k in en_map]
+        self.assertIn("arc", norm_en)
+        self.assertIn("circle", norm_en)
+
+        bim_dir = DIC_ROOT / "3D-BIM"
+        es_bim_map = loader.LoadTranslateMap(bim_dir, LanguageCode.Es)
+        en_bim_map = loader.LoadTranslateMap(bim_dir, LanguageCode.En)
+        self.assertGreater(len(es_bim_map), 0, "3D-BIM TraduceToEs.py is empty!")
+        self.assertGreater(len(en_bim_map), 0, "3D-BIM TraduceToEn.py is empty!")
+        norm_bim_es = [DictionaryLoader.NormalizeSpoken(k) for k in es_bim_map]
+        norm_bim_en = [DictionaryLoader.NormalizeSpoken(k) for k in en_bim_map]
+        self.assertIn("crear muro", norm_bim_es)
+        self.assertIn("create wall", norm_bim_en)
 
 
 if __name__ == "__main__":

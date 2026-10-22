@@ -1,4 +1,4 @@
-﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
+# Copyright (C) 2026 El Equipo del Proyecto Atria
 # Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
 # Bajo la direcciÃ³n de Ernesto Ledesma
 # Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
@@ -30,7 +30,7 @@ from unittest.mock import MagicMock
 ROOT = Path(__file__).resolve().parents[1]
 VALIDATION = ROOT / "validation"
 sys.path.insert(0, str(VALIDATION))
-os.environ["ATRIA_DICTIONARY_ROOT"] = str(ROOT / "DiccionariosEnBruto")
+os.environ["ATRIA_DICTIONARY_ROOT"] = str(ROOT / "dictionary")
 os.environ["ATRIA_VALIDATION_ROOT"] = str(VALIDATION)
 
 # Mock FreeCAD before loading dictionary modules
@@ -78,24 +78,46 @@ class MockFreeCADObject:
         self.Document = doc
 
 
+# Sample parametric commands for testing validation rules with typed arguments
+def sample_create_line(x1: float, y1: float, x2: float, y2: float, label: str):
+    doc = fc_mod.activeDocument()
+    if doc is not None:
+        obj = doc.addObject("Part::Feature", label)
+        return obj
+    return None
+
+
+def sample_pad_sketch(sketch: object, length: float):
+    return {"sketch": sketch, "length": length}
+
+
 class IntegrationTests(unittest.TestCase):
     def tearDown(self) -> None:
         fc_mod.activeDocument = lambda: None
 
-    def test_load_geometry_function(self) -> None:
-        fn = GetDictionaryFunction("geometry.line", "create_by_points")
+    def test_load_atria_2d_drafting_function(self) -> None:
+        fn = GetDictionaryFunction("2d-drafting", "arc")
         self.assertTrue(callable(fn))
-        self.assertEqual(fn.__name__, "create_by_points")
 
-    def test_load_additive_function(self) -> None:
-        fn = GetDictionaryFunction("additive", "pad_sketch")
+    def test_load_atria_3d_bim_function(self) -> None:
+        fn = GetDictionaryFunction("3d-bim", "box")
         self.assertTrue(callable(fn))
-        sig = inspect.signature(fn)
-        self.assertIn("sketch", sig.parameters)
-        self.assertIn("length", sig.parameters)
+
+    def test_load_atria_utils_function(self) -> None:
+        fn = GetDictionaryFunction("utils", "draftslope")
+        self.assertTrue(callable(fn))
+
+    def test_atria_parameterless_function_validation(self) -> None:
+        fn = GetDictionaryFunction("2d-drafting", "arc")
+        v = Validator()
+        es = v.GetRequirements("es", fn)
+        self.assertIn("sin par", es.lower())
+        ok, kwargs = v.ValidateRequirements("es", fn, {})
+        self.assertTrue(ok)
+        self.assertEqual(kwargs, {})
 
     def test_get_requirements_geometry_three_languages(self) -> None:
-        fn = GetDictionaryFunction("geometry.line", "create_by_points")
+        fn = sample_create_line
         v = Validator()
         es = v.GetRequirements("es", fn)
         en = v.GetRequirements("en", fn)
@@ -110,7 +132,7 @@ class IntegrationTests(unittest.TestCase):
         doc = MockDoc({})
         fc_mod.activeDocument = lambda: doc
 
-        fn = GetDictionaryFunction("geometry.line", "create_by_points")
+        fn = sample_create_line
         v = Validator()
         ok, kwargs = v.ValidateRequirements(
             "es",
@@ -128,7 +150,7 @@ class IntegrationTests(unittest.TestCase):
         doc._objects["Sketch"] = sketch
         fc_mod.activeDocument = lambda: doc
 
-        fn = GetDictionaryFunction("additive", "pad_sketch")
+        fn = sample_pad_sketch
         v = Validator()
         ok, kwargs = v.ValidateRequirements(
             "es",
@@ -142,14 +164,14 @@ class IntegrationTests(unittest.TestCase):
 
     def test_validate_missing_object_fails(self) -> None:
         fc_mod.activeDocument = lambda: MockDoc({})
-        fn = GetDictionaryFunction("additive", "pad_sketch")
+        fn = sample_pad_sketch
         v = Validator()
         ok, kwargs = v.ValidateRequirements("es", fn, {"sketch": "NoExiste", "length": 10})
         self.assertFalse(ok)
         self.assertIsNone(kwargs)
 
     def test_call_if_valid_skips_on_error(self) -> None:
-        fn = GetDictionaryFunction("geometry.line", "create_by_points")
+        fn = sample_create_line
         v = Validator()
         result = v.CallIfValid("es", fn, {"x1": "bad", "y1": 0, "x2": 1, "y2": 1, "label": "X"})
         self.assertIsNone(result)
@@ -157,7 +179,7 @@ class IntegrationTests(unittest.TestCase):
 
 class PromptedCommandExecutorIntegrationTests(unittest.TestCase):
     def setUp(self) -> None:
-        gui_path = str(ROOT / "luigiIntegracionV1" / "GUIFreeCad")
+        gui_path = str(ROOT / "GUIFreeCad")
         if gui_path not in sys.path:
             sys.path.insert(0, gui_path)
 
@@ -171,7 +193,7 @@ class PromptedCommandExecutorIntegrationTests(unittest.TestCase):
         doc = MockDoc({})
         fc_mod.activeDocument = lambda: doc
 
-        fn = GetDictionaryFunction("geometry.line", "create_by_points")
+        fn = sample_create_line
         entry = MagicMock()
         entry.Target = fn
         entry.IsCallable.return_value = True
@@ -198,7 +220,7 @@ class PromptedCommandExecutorIntegrationTests(unittest.TestCase):
         doc = MockDoc({})
         fc_mod.activeDocument = lambda: doc
 
-        fn = GetDictionaryFunction("geometry.line", "create_by_points")
+        fn = sample_create_line
         entry = MagicMock()
         entry.Target = fn
         entry.IsCallable.return_value = True

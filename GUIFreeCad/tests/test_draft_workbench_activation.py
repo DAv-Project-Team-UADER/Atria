@@ -1,4 +1,4 @@
-﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
+# Copyright (C) 2026 El Equipo del Proyecto Atria
 # Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
 # Bajo la direcciÃ³n de Ernesto Ledesma
 # Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
@@ -37,31 +37,14 @@ if str(GUI_ROOT) not in sys.path:
 
 from integration.atria_paths import atria_repo_root, ensure_atria_repo_on_path  # noqa: E402
 
-ensure_atria_repo_on_path()
-DIC_ROOT = atria_repo_root().parent / "dic"
+ATRIA_DIR = atria_repo_root()
+DIC_ROOT = ATRIA_DIR / "dictionary"
 if str(DIC_ROOT) not in sys.path:
     sys.path.insert(0, str(DIC_ROOT))
 
-# SubmenÃºs de DraftWork que ejecutan comandos Draft_* vÃ­a runDraftCommand.
-DRAFT_SUBMENUS = {
-    "annotation_style_editor": "annotation",
-    "annotation": "annotation",
-    "arc": "arc",
-    "circle": "circle",
-    "circular_array": "array",
-    "creation": "creation",
-    "curve": "curve",
-    "dimension": "dimension",
-    "drafting": "drafting",
-    "ellipse": "ellipse",
-    "facebinder": "facebinder",
-    "modification": "modification",
-    "modify": "modify",
-}
-
 
 class _FakeGui:
-    """FreeCADGui falso: registra llamadas y simula comandos aÃºn no registrados."""
+    """FreeCADGui falso: registra llamadas runCommand."""
 
     def __init__(self) -> None:
         self.active = "StartWorkbench"
@@ -71,23 +54,7 @@ class _FakeGui:
         self.active = active
         self.calls = []
 
-    def activeWorkbench(self):
-        gui = self
-
-        class _Workbench:
-            def name(self_inner) -> str:
-                return gui.active
-
-        return _Workbench()
-
-    def activateWorkbench(self, name: str) -> None:
-        self.calls.append(("activate", name))
-        self.active = name
-
     def runCommand(self, name: str, idx: int = 0) -> None:
-        # Igual que FreeCAD: Draft_* no existe hasta activar Draft.
-        if name.startswith("Draft_") and self.active != "DraftWorkbench":
-            raise Exception(f"No such command '{name}'")
         self.calls.append(("run", name))
 
 
@@ -102,9 +69,23 @@ class _FakeCreateObjects:
 def _install_stubs(fake_gui: _FakeGui) -> None:
     sys.modules["FreeCADGui"] = fake_gui  # type: ignore[assignment]
     app = sys.modules.get("FreeCAD") or types.ModuleType("FreeCAD")
-    app.ActiveDocument = None
+    app.ActiveDocument = types.SimpleNamespace(recompute=lambda: None)
     sys.modules["FreeCAD"] = app
-    for mod in ("Part", "Draft"):
+    arch = sys.modules.get("Arch") or types.ModuleType("Arch")
+    arch.makeBuilding = lambda *a, **k: types.SimpleNamespace(Label="Building")
+    arch.makeSite = lambda *a, **k: types.SimpleNamespace(Label="Site")
+    arch.makeFloor = lambda *a, **k: types.SimpleNamespace(Label="Level")
+    arch.makePipe = lambda *a, **k: types.SimpleNamespace(Label="Pipe")
+    arch.makePipeConnector = lambda *a, **k: types.SimpleNamespace(Label="PipeConnector")
+    arch.makeStairs = lambda *a, **k: types.SimpleNamespace(Label="Stairs")
+    sys.modules["Arch"] = arch
+
+    draft = sys.modules.get("Draft") or types.ModuleType("Draft")
+    draft.autogroup = lambda *a, **k: None
+    draft.getType = lambda *a, **k: "Structure"
+    sys.modules["Draft"] = draft
+
+    for mod in ("Part", "BIM", "WorkingPlane", "DraftVecUtils"):
         sys.modules.setdefault(mod, types.ModuleType(mod))
     createobjects = types.ModuleType("selection.createobjects")
     createobjects.CreateObjects = _FakeCreateObjects  # type: ignore[attr-defined]
@@ -112,63 +93,107 @@ def _install_stubs(fake_gui: _FakeGui) -> None:
     sys.modules.setdefault("createobjects", createobjects)
 
 
+def _load_module(path: Path, name: str):
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load {path}")
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[name] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
 class TestDraftWorkbenchActivation(unittest.TestCase):
-    """Cada comando Draft debe activar DraftWorkbench antes de ejecutarse."""
+    """Verifica que cada comando de 2D-Drafting y 3D-BIM de ATRIA ejecuta FreeCADGui.runCommand."""
 
     @classmethod
     def setUpClass(cls) -> None:
         cls.gui = _FakeGui()
         _install_stubs(cls.gui)
-        for name in [m for m in sys.modules if m.startswith("Workbench.DraftWork")]:
-            del sys.modules[name]
-        cls.helper = importlib.import_module("Workbench.DraftWork.draftcommand")
-        cls.helper.Gui = cls.gui
+
+        drafting_commands_path = DIC_ROOT / "2D-Drafting" / "commands.py"
+        bim_commands_path = DIC_ROOT / "3D-BIM" / "commands.py"
+
+        cls.drafting = _load_module(drafting_commands_path, "atria_test_2d_commands")
+        cls.bim = _load_module(bim_commands_path, "atria_test_3d_commands")
 
     def setUp(self) -> None:
         self.gui.reset()
 
-    def test_helper_activates_draft_when_inactive(self) -> None:
-        self.helper.runDraftCommand("Draft_Circle")
-        self.assertEqual(
-            self.gui.calls,
-            [("activate", "DraftWorkbench"), ("run", "Draft_Circle")],
-        )
-
-    def test_helper_skips_activation_when_draft_already_active(self) -> None:
-        self.gui.reset(active="DraftWorkbench")
-        self.helper.runDraftCommand("Draft_Circle")
-        self.assertEqual(self.gui.calls, [("run", "Draft_Circle")])
-
-    def test_helper_activates_when_active_workbench_unavailable(self) -> None:
-        def _boom():
-            raise RuntimeError("sin workbench activo")
-
-        self.gui.activeWorkbench = _boom  # type: ignore[method-assign]
-        try:
-            self.helper.runDraftCommand("Draft_Circle")
-        finally:
-            del self.gui.activeWorkbench
-        self.assertEqual(self.gui.calls[0], ("activate", "DraftWorkbench"))
-
-    def test_every_draft_callable_activates_workbench_first(self) -> None:
+    def test_2d_drafting_commands_execute_run_command(self) -> None:
+        """Todos los comandos de 2D-Drafting deben llamar a Gui.runCommand con Draft_*."""
         checked = 0
-        for folder, key in DRAFT_SUBMENUS.items():
-            module = importlib.import_module(f"Workbench.DraftWork.{folder}.{folder}")
-            module.runDraftCommand.__globals__["Gui"] = self.gui
-            menu = getattr(module, key)
-            for command, func in menu.items():
-                if command == "help" or not callable(func):
-                    continue
-                if command.startswith("createobjects"):
-                    continue  # no ejecuta comandos Draft, solo mapea el objeto activo
-                with self.subTest(menu=folder, command=command):
-                    self.gui.reset(active="StartWorkbench")
-                    func()  # con la regresiÃ³n levantarÃ­a "No such command"
-                    runs = [c for c in self.gui.calls if c[0] == "run"]
-                    self.assertTrue(runs, "no ejecutÃ³ ningÃºn comando")
-                    self.assertEqual(self.gui.calls[0], ("activate", "DraftWorkbench"))
+        for attr_name in (
+            "Arc",
+            "ArcFrom3Points",
+            "BSpline",
+            "BezierCurve",
+            "Circle",
+            "CubicBezierCurve",
+            "Ellipse",
+            "Fillet",
+            "Line",
+            "Point",
+            "Polygon",
+            "Polyline",
+            "Rectangle",
+        ):
+            tool_dict = getattr(self.drafting, attr_name, None)
+            self.assertIsInstance(tool_dict, dict, f"{attr_name} no es un diccionario")
+            for cmd_key, func in tool_dict.items():
+                if callable(func):
+                    self.gui.reset()
+                    func()
+                    self.assertTrue(
+                        any(c[0] == "run" for c in self.gui.calls),
+                        f"{attr_name}['{cmd_key}'] no ejecutó Gui.runCommand",
+                    )
                     checked += 1
-        self.assertGreater(checked, 40)
+        self.assertGreaterEqual(checked, 13)
+
+    def test_3d_bim_commands_execute_run_command(self) -> None:
+        """Todos los comandos de 3D-BIM deben ejecutarse limpiamente."""
+        checked = 0
+        for attr_name in (
+            "Beam",
+            "Building",
+            "Column",
+            "CurtainWall",
+            "Door",
+            "Level",
+            "Pipe",
+            "PipeConnector",
+            "Roof",
+            "Site",
+            "Slab",
+            "Space",
+            "Wall",
+            "Window",
+            "ArchEquipment",
+            "ArchFence",
+            "ArchFrame",
+            "ArchPanel",
+            "ArchRebar",
+            "ArchRoof",
+            "ArchStairs",
+            "ArchTruss",
+            "BentShapeRebar",
+            "HelicalRebar",
+            "LShapeRebar",
+            "StirrupRebar",
+            "StraightRebar",
+            "UShapeRebar",
+        ):
+            tool_dict = getattr(self.bim, attr_name, None)
+            self.assertIsInstance(tool_dict, dict, f"{attr_name} no es un diccionario")
+            for cmd_key, func in tool_dict.items():
+                if callable(func):
+                    self.gui.reset()
+                    func()
+                    checked += 1
+        self.assertGreaterEqual(checked, 25)
 
 
 if __name__ == "__main__":

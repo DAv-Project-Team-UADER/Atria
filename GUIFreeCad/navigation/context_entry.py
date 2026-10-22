@@ -49,7 +49,9 @@ class ContextEntry:
         return isinstance(self.Target, dict)
 
     def IsCallable(self) -> bool:
-        return callable(self.Target)
+        if callable(self.Target):
+            return True
+        return isinstance(self.Target, dict) and any(callable(v) for v in self.Target.values())
 
     def NormalizeSpoken(self) -> str:
         return _Normalize(self.Spoken)

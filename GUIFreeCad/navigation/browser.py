@@ -1,4 +1,4 @@
-﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
+# Copyright (C) 2026 El Equipo del Proyecto Atria
 # Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
 # Bajo la direcciÃ³n de Ernesto Ledesma
 # Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
@@ -332,6 +332,9 @@ class Browser:
             if entry.IsSubContext():
                 if self._DescendToSubContext(entry):
                     return BrowserResult(True, "descend", f"Context set to {self._ActionLabel(entry)}")
+                if entry.IsCallable():
+                    self._ExecuteEntry(entry)
+                    return BrowserResult(True, "execute", f"Executed {self._ActionLabel(entry)}")
                 return BrowserResult(False, "descend_failed", f"No se pudo entrar a {self._ActionLabel(entry)}")
             if entry.IsCallable():
                 self._ExecuteEntry(entry)
@@ -632,8 +635,9 @@ class Browser:
         """Jump directly to a BaseContext entry."""
         if entry.IsSubContext():
             self._stack = [self._stack[0]]
-            self._DescendToSubContext(entry)
-        elif entry.IsCallable():
+            if self._DescendToSubContext(entry):
+                return
+        if entry.IsCallable():
             self._ExecuteEntry(entry)
 
     def _DescendToSubContext(self, entry: ContextEntry) -> bool:
@@ -641,17 +645,18 @@ class Browser:
 
         Returns:
             True si se pudo resolver y apilar el subcontexto. False si
-            ResolveSubFolder no encontrÃ³ una carpeta real para la clave
+            ResolveSubFolder no encontró una carpeta real para la clave
             (dato roto en el diccionario): se registra el error y el
             Browser se queda en el contexto actual en vez de apilar un
-            frame que apuntarÃ­a a la misma carpeta que su padre.
+            frame que apuntaría a la misma carpeta que su padre.
         """
         try:
             folder = self._loader.ResolveSubFolder(
                 self._stack[-1].Folder, entry.InternalKey, entry.Target
             )
         except FileNotFoundError as error:
-            print(f"[ATRIA-Browser] {error}")
+            if not entry.IsCallable():
+                print(f"[ATRIA-Browser] {error}")
             return False
         frame = _ContextFrame(
             Folder=folder,
@@ -678,36 +683,48 @@ class Browser:
             parent_context = self._BuildContextForFrame(parent_frame)
 
             entry, _is_fuzzy = self._FindWithFallback(parent_context, normalized_spoken)
-            # en el frame raÃ­z solo se busca entrar a subcontextos: sus comandos son
+            # en el frame raíz solo se busca entrar a subcontextos: sus comandos son
             # globales y los ejecuta _ExecuteGlobalCallable sin mover el contexto
-            if entry is not None and entry.IsCallable() and len(temp_stack) == 1:
+            if entry is not None and not entry.IsSubContext() and entry.IsCallable() and len(temp_stack) == 1:
                 entry = None
             if entry is not None:
-                if entry.IsCallable():
-                    self._ExecuteEntry(entry)
-                    self._stack = temp_stack
-                    self.Context = parent_context
-                    self.OriginalContext = parent_context
-                    self._NotifyContextChanged()
-                    return BrowserResult(True, "execute", f"Ascending: executed {self._ActionLabel(entry)}")
-                elif entry.IsSubContext():
+                if entry.IsSubContext():
                     self._stack = temp_stack
                     self.Context = parent_context
                     descended = self._DescendToSubContext(entry)
                     self.OriginalContext = self.Context
                     if descended:
                         return BrowserResult(True, "descend", f"Ascending: descended into {self._ActionLabel(entry)}")
+                    if entry.IsCallable():
+                        self._ExecuteEntry(entry)
+                        self._NotifyContextChanged()
+                        return BrowserResult(True, "execute", f"Ascending: executed {self._ActionLabel(entry)}")
                     return BrowserResult(False, "descend_failed", f"No se pudo entrar a {self._ActionLabel(entry)}")
+                elif entry.IsCallable():
+                    self._ExecuteEntry(entry)
+                    self._stack = temp_stack
+                    self.Context = parent_context
+                    self.OriginalContext = parent_context
+                    self._NotifyContextChanged()
+                    return BrowserResult(True, "execute", f"Ascending: executed {self._ActionLabel(entry)}")
         
         self.Context = self.OriginalContext
         return BrowserResult(False, "not_found", "Command not found in upward search")
 
     def _ExecuteEntry(self, entry: ContextEntry) -> None:
         """Execute a leaf command entry."""
+        target = entry.Target
+        if isinstance(target, dict):
+            for v in target.values():
+                if callable(v):
+                    target = v
+                    break
+
         if self._on_execute is not None:
-            self._on_execute(entry)
-        elif entry.IsCallable():
-            entry.Target()
+            unwrapped = ContextEntry(Spoken=entry.Spoken, InternalKey=entry.InternalKey, Target=target)
+            self._on_execute(unwrapped)
+        elif callable(target):
+            target()
 
     @staticmethod
     def _SnapshotContext(entries: list[ContextEntry]) -> list[ContextEntry]:

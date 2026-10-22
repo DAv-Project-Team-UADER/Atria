@@ -1,4 +1,4 @@
-﻿"""FreeCAD commands that bridge to GUIFreeCad."""
+"""FreeCAD commands that bridge to GUIFreeCad."""
 
 from __future__ import annotations
 
@@ -180,21 +180,26 @@ def _dictionary_root() -> Path:
     try:
         here = Path(__file__).resolve()
         for ancestor in here.parents:
-            for candidate in (ancestor / "Atria" / "dic", ancestor / "DiccionariosEnBruto"):
+            for candidate in (
+                ancestor / "dictionary",
+                ancestor / "Atria" / "dictionary",
+                ancestor / "dic",
+                ancestor / "Atria" / "dic",
+                ancestor / "DiccionariosEnBruto",
+            ):
                 if _is_dictionary_dir(candidate):
                     return candidate.resolve()
     except (IndexError, NameError):
         pass
 
-    return Path("DiccionariosEnBruto")
+    fallback = Path("dictionary")
+    if fallback.is_dir():
+        return fallback.resolve()
+    return Path("dic")
 
 
 def _is_dictionary_dir(path: Path) -> bool:
-    """True si la carpeta es un diccionario real (no un placeholder vacÃ­o).
-
-    Evita confundir ``ComponentesATRIA/Atria/dic`` (solo placeholder) con el
-    ``Atria/dic`` real que contiene base.py y los TraduceTo*.py.
-    """
+    """True si la carpeta es un diccionario real (no un placeholder vacío)."""
     return (path / "base.py").is_file() or (path / "TraduceToEs.py").is_file()
 
 
@@ -202,10 +207,12 @@ def _dictionary_candidates(repo: Path | None) -> tuple[Path, ...]:
     if repo is None:
         return ()
     return (
-        # Layout AtriaCore: los diccionarios viven en Atria/dic.
+        repo / "dictionary",
+        repo / "Atria" / "dictionary",
+        repo.parent / "Atria" / "dictionary",
+        repo / "dic",
         repo / "Atria" / "dic",
         repo.parent / "Atria" / "dic",
-        # Layout previo (plano en la raÃ­z del repo).
         repo / "DiccionariosEnBruto",
         repo.parent / "DiccionariosEnBruto",
     )
