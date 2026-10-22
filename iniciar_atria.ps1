@@ -52,7 +52,7 @@ foreach ($modDir in $modDirs) {
             New-Item -ItemType Junction -Path $targetLink -Target $repoRoot | Out-Null
             Write-Host "[OK] Enlace creado en: $targetLink" -ForegroundColor Green
         } catch {
-            Write-Host "[WARN] No se pudo crear junction en $targetLink: $_" -ForegroundColor Yellow
+            Write-Host "[WARN] No se pudo crear junction en $($targetLink): $_" -ForegroundColor Yellow
         }
     }
 }
