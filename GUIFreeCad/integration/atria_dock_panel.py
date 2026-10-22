@@ -1,4 +1,4 @@
-﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
+# Copyright (C) 2026 El Equipo del Proyecto Atria
 # Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
 # Bajo la direcciÃ³n de Ernesto Ledesma
 # Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
@@ -149,14 +149,22 @@ def show_atria_panel() -> bool:
 
 def _ensure_interfaz_on_path() -> None:
     """Make ``InterfazATRIA`` importable (it lives outside GUIFreeCad)."""
+    env = os.environ.get("ATRIA_INTERFAZ_ROOT", "").strip()
+    if env and Path(env).is_dir():
+        text = str(Path(env).resolve())
+        if text not in sys.path:
+            sys.path.insert(0, text)
+        return
+
     here = Path(__file__).resolve()
-    for ancestor in here.parents:
-        candidate = ancestor / "InterfazATRIA"
-        if candidate.is_dir() and (candidate / "AtriaPanel.py").is_file():
-            text = str(candidate)
-            if text not in sys.path:
-                sys.path.insert(0, text)
-            return
+    for ancestor in (here.parents[1], *here.parents):
+        for candidate_name in ("InterfazATRIA", "interfaz_atria", "InterfazDAV"):
+            candidate = ancestor / candidate_name
+            if candidate.is_dir() and (candidate / "AtriaPanel.py").is_file():
+                text = str(candidate)
+                if text not in sys.path:
+                    sys.path.insert(0, text)
+                return
 
 
 class BrowserPanelSource:

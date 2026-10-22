@@ -49,7 +49,10 @@ for %%V in ("%APPDATA%\FreeCAD\Mod" "%APPDATA%\FreeCAD\v1-1\Mod" "%APPDATA%\Free
 set "ATRIA_MOD_ROOT=%REPO_ROOT%"
 set "ATRIA_GUI_FREECAD_ROOT=%REPO_ROOT%\GUIFreeCad"
 set "ATRIA_DICTIONARY_ROOT=%REPO_ROOT%\dictionary"
+set "ATRIA_MODELS_DIR=%REPO_ROOT%\models"
 set "ATRIA_AUTOLOAD_WORKBENCH=1"
+set "ATRIA_AUTO_START_VOICE=1"
+set "ATRIA_AUTO_PANEL=1"
 
 echo.
 echo Iniciando FreeCAD con el Workbench ATRIA...

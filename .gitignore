@@ -33,3 +33,11 @@ env/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Modelos Vosk (se descargan en runtime)
+models/vosk-model*
+*.zip
+
+# Runtime logs y status
+*.log
+**/voice_status.json

@@ -167,6 +167,7 @@ def _auto_start_voice_if_needed() -> None:
     try:
         import sys
         from pathlib import Path
+        import FreeCAD as App
 
         _atria_commands = _get_atria_commands()
         gui_root = _atria_commands._guifreecad_root()
@@ -176,15 +177,28 @@ def _auto_start_voice_if_needed() -> None:
         from core.settings import settings
 
         settings.load()
-        if not (os.environ.get("ATRIA_AUTO_START_VOICE") == "1" or settings.auto_voice or settings.startup_enabled):
+        auto_env = os.environ.get("ATRIA_AUTO_START_VOICE", "").strip()
+        should_start = (
+            auto_env == "1"
+            or (auto_env != "0" and (settings.auto_voice or settings.startup_enabled))
+        )
+        if not should_start:
             return
 
-        from integration.voice_bootstrap import start_voice_engine
+        from integration.voice_bootstrap import show_dock_panel, start_voice_engine
 
-        start_voice_engine()
-        # InterfazATRIA launch handled by _schedule_interfaz_atria_launch()
+        started = start_voice_engine()
+        if started:
+            App.Console.PrintMessage("[ATRIA] Motor de voz iniciado automáticamente.\n")
+            show_dock_panel()
+        else:
+            App.Console.PrintWarning("[ATRIA] No se pudo iniciar el motor de voz automáticamente.\n")
     except Exception:
-        pass
+        import FreeCAD as App
+        import traceback
+
+        App.Console.PrintError("[ATRIA] Error iniciando voz automáticamente:\n")
+        App.Console.PrintError(traceback.format_exc())
 
 
 def _schedule_toolbar_refresh() -> None:
@@ -216,9 +230,9 @@ def _schedule_toolbar_refresh() -> None:
         _refresh()
         _auto_start_voice_if_needed()
 
-    for delay_ms in (600, 1500):
+    for delay_ms in (500, 1000):
         QTimer.singleShot(delay_ms, _refresh)
-    QTimer.singleShot(2000, _auto_start_voice_if_needed)
+    QTimer.singleShot(1200, _auto_start_voice_if_needed)
 
 
 def _schedule_report_view() -> None:

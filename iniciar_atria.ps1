@@ -61,7 +61,10 @@ foreach ($modDir in $modDirs) {
 $env:ATRIA_MOD_ROOT = $repoRoot
 $env:ATRIA_GUI_FREECAD_ROOT = Join-Path $repoRoot "GUIFreeCad"
 $env:ATRIA_DICTIONARY_ROOT = Join-Path $repoRoot "dictionary"
+$env:ATRIA_MODELS_DIR = Join-Path $repoRoot "models"
 $env:ATRIA_AUTOLOAD_WORKBENCH = "1"
+$env:ATRIA_AUTO_START_VOICE = "1"
+$env:ATRIA_AUTO_PANEL = "1"
 
 Write-Host ""
 Write-Host "Iniciando FreeCAD con el Workbench ATRIA..." -ForegroundColor Cyan
