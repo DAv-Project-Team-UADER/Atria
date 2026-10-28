@@ -1,4 +1,4 @@
-﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
+# Copyright (C) 2026 El Equipo del Proyecto Atria
 # Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
 # Bajo la dirección de Ernesto Ledesma
 # Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
@@ -174,18 +174,22 @@ class DictionaryLoader:
         # ("vista estándar"), que no es nombre de carpeta ni de módulo.
         # Por eso primero resolvemos por identidad de objeto: cada carpeta
         # hermana expone su dict maestro con el mismo nombre (StdView/
-        # StdView.py â†’ StdView, Sketcher/sketcher.py â†’ sketcher), así que
+        # StdView.py → StdView, Sketcher/sketcher.py → sketcher), así que
         # comparamos `is target`. Esto aplica en cualquier profundidad del
         # árbol, no solo al descender desde la raíz.
+        if isinstance(target, dict) and isinstance(target.get("name"), str):
+            by_name = self._FindChildCaseInsensitive(parent_folder, target["name"])
+            if by_name is not None:
+                return by_name
+        # Carpeta hermana directa por nombre (case-insensitive), útil cuando
+        # internal_key sí es confiable (p. ej. "explorer", "sketcher", "2D-Drafting").
+        direct = self._FindChildCaseInsensitive(parent_folder, internal_key)
+        if direct is not None:
+            return direct
         if target is not None:
             by_identity = self._FindChildByTargetIdentity(parent_folder, target)
             if by_identity is not None:
                 return by_identity
-        # Carpeta hermana directa por nombre (case-insensitive), útil cuando
-        # internal_key sí es confiable (p. ej. "explorer", "sketcher").
-        direct = self._FindChildCaseInsensitive(parent_folder, internal_key)
-        if direct is not None:
-            return direct
         if parent_folder == self.DictionaryRoot:
             # Caso especial: los submenús propios de Explorer (file, edit,
             # windows...) viven anidados dentro de la carpeta Explorer/.
@@ -246,7 +250,11 @@ class DictionaryLoader:
         resolved_root = self.DictionaryRoot.resolve()
         rel = resolved_path.relative_to(resolved_root).with_suffix("")
         module_name = ".".join(rel.parts)
-        return self._ImportFreshModule(module_name)
+        try:
+            return self._ImportFreshModule(module_name)
+        except ModuleNotFoundError:
+            pkg_name = f"{resolved_root.name}.{module_name}"
+            return self._ImportFreshModule(pkg_name)
 
     @staticmethod
     def _ImportFreshModule(module_name: str) -> ModuleType:

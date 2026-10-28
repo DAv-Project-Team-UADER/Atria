@@ -1,4 +1,4 @@
-﻿"""Open ATRIA preferences inside FreeCAD (or standalone for tests)."""
+"""Open ATRIA preferences inside FreeCAD (or standalone for tests)."""
 
 from __future__ import annotations
 
@@ -31,13 +31,12 @@ def open_preferences(parent=None) -> None:
         except Exception:
             pass
         try:
-            from GUIFreeCad.integration.apply_settings import apply_report_palette
+            from GUIFreeCad.integration.apply_settings import (
+                apply_report_palette,
+                sync_freecad_theme_state,
+            )
             apply_report_palette(settings.theme)
-        except Exception:
-            pass
-        try:
-            from GUIFreeCad.integration.apply_settings import apply_report_palette
-            apply_report_palette(settings.theme)
+            sync_freecad_theme_state(settings.theme)
         except Exception:
             pass
 
@@ -61,7 +60,7 @@ def _hint_after_preferences() -> None:
         if is_voice_running():
             App.Console.PrintMessage(
                 "[ATRIA] Preferencias cerradas. Voz CAD reanudada "
-                "(Â«archivo enviarÂ», Â«preferencias enviarÂ», etc.).\n"
+                "(«archivo enviar», «preferencias enviar», etc.).\n"
             )
     except ImportError:
         pass

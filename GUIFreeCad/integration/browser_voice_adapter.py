@@ -4,6 +4,10 @@ BrowserVoiceAdapter: connects Vosk spoken phrases to the new Browser navigation 
 
 from __future__ import annotations
 
+import sys
+sys.modules.setdefault("integration.browser_voice_adapter", sys.modules[__name__])
+sys.modules.setdefault("GUIFreeCad.integration.browser_voice_adapter", sys.modules[__name__])
+
 import io
 import sys
 import unicodedata

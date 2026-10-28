@@ -1,4 +1,4 @@
-﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
+# Copyright (C) 2026 El Equipo del Proyecto Atria
 # Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
 # Bajo la dirección de Ernesto Ledesma
 # Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
@@ -54,11 +54,11 @@ class SpellingInputPrompt(BaseInputPrompt):
             "oh": "O", "pea": "P", "queue": "Q", "zed": "Z", "pug": "U",
         },
         "pt": {
-            "a": "A", "bÃª": "B", "cÃª": "C", "dÃª": "D", "e": "E", "gÃª": "G", "agá": "H",
-            "i": "I", "jota": "J", "cá": "K", "éle": "L", "Ãªme": "M", "o": "O",
-            "pÃª": "P", "quÃª": "Q", "érre": "R", "ésse": "S", "tÃª": "T", "u": "U",
-            "vÃª": "V", "xis": "X", "ípsilon": "Y", "zÃª": "Z", "fÃª": "F", "efe": "F", "ene": "N",
-            "dáblio": "W", "dábliu": "W", "dÃ¢blio": "W", "capa": "K", "guÃª": "G",
+            "a": "A", "bê": "B", "cê": "C", "dê": "D", "e": "E", "gê": "G", "agá": "H",
+            "i": "I", "jota": "J", "cá": "K", "éle": "L", "ême": "M", "o": "O",
+            "pê": "P", "quê": "Q", "érre": "R", "ésse": "S", "tê": "T", "u": "U",
+            "vê": "V", "xis": "X", "ípsilon": "Y", "zê": "Z", "fê": "F", "efe": "F", "ene": "N",
+            "dáblio": "W", "dábliu": "W", "dâblio": "W", "capa": "K", "guê": "G",
         },
     }
     # letras y simbolos de dos palabras: (primera, segunda) -> caracter
@@ -101,7 +101,7 @@ class SpellingInputPrompt(BaseInputPrompt):
         "T": "te", "U": "u", "V": "uve", "W": "doble uve", "X": "equis", "Y": "i griega",
         "Z": "zeta",
     }
-    SpaceWords: dict[str, str] = {"es": "espacio", "en": "space", "pt": "espaÃ§o"}
+    SpaceWords: dict[str, str] = {"es": "espacio", "en": "space", "pt": "espaço"}
     DeleteWords: dict[str, str] = {"es": "borrar", "en": "delete", "pt": "apagar"}
 
     SpaceTokens: set[str] = {_Prep(word) for word in SpaceWords.values()}

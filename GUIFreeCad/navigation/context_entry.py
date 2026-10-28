@@ -46,10 +46,16 @@ class ContextEntry:
     Target: Any
 
     def IsSubContext(self) -> bool:
-        return isinstance(self.Target, dict)
+        if not isinstance(self.Target, dict):
+            return False
+        if len(self.Target) == 1 and callable(next(iter(self.Target.values()))):
+            return False
+        return True
 
     def IsCallable(self) -> bool:
-        return callable(self.Target)
+        if callable(self.Target):
+            return True
+        return isinstance(self.Target, dict) and any(callable(v) for v in self.Target.values())
 
     def NormalizeSpoken(self) -> str:
         return _Normalize(self.Spoken)

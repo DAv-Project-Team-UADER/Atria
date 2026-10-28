@@ -183,7 +183,7 @@ class SpokenNumberParser:
     NegativeWords: set[str] = {"menos", "minus", "negative", "negativo"}
 
     # Estas dos se completan al final del modulo con lo que haya en
-    # Atria/dic/NavCommands/TraduceTo*.py, para que sumar un sinonimo sea editar
+    # Atria/dictionary/NavCommands/TraduceTo*.py, para que sumar un sinonimo sea editar
     # el diccionario y no tres archivos de codigo. Lo que queda escrito aca es
     # el respaldo por si el diccionario no se puede cargar.
     #

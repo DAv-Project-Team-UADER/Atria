@@ -1,4 +1,4 @@
-﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
+# Copyright (C) 2026 El Equipo del Proyecto Atria
 # Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
 # Bajo la dirección de Ernesto Ledesma
 # Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
@@ -37,7 +37,7 @@ _PHRASES = {
            "no", "negativo", "cancelar", "cancela", "abortar", "anular", "descartar"],
     "en": ["yes", "yep", "okey", "ok", "accept", "confirm", "no", "nope", "negative",
            "cancel", "abort", "discard"],
-    "pt": ["sim", "okey", "ok", "aceitar", "confirmar", "pronto", "nÃ£o", "nao", "negativo",
+    "pt": ["sim", "okey", "ok", "aceitar", "confirmar", "pronto", "não", "nao", "negativo",
            "cancelar", "cancelamento", "abortar", "anular"],
 }
 
@@ -47,7 +47,7 @@ class YesNoInputPrompt(BaseInputPrompt):
 
     def __init__(self, Title: str = "ATRIA", Message: str = "", Parent=None) -> None:
         super().__init__(Title, Message, Parent)
-        # el botón Aceptar responde Â«síÂ» en vez de devolver el texto escuchado
+        # el botón Aceptar responde «sí» en vez de devolver el texto escuchado
         self._OkButton.clicked.disconnect()
         self._OkButton.clicked.connect(lambda: self.AcceptValue(True))
 

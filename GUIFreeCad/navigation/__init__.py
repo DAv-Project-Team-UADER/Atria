@@ -16,6 +16,10 @@
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 """Voice dictionary navigation (Browser)."""
+import sys as _sys
+
+_sys.modules.setdefault("navigation", _sys.modules[__name__])
+_sys.modules.setdefault("GUIFreeCad.navigation", _sys.modules[__name__])
 
 from navigation.browser import Browser
 

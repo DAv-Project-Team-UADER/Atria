@@ -28,9 +28,7 @@ class IconLocator:
 
     The previous implementation walked the whole dictionary tree **per button
     and per re-render**, with no cache. Here the index is built lazily on the
-    first lookup and reused, over the two places icons actually live:
-
-    ``InterfazATRIA/Icons`` (own icons, win ties) · ``Atria/dic`` (494 files)
+    first lookup and reused over ``InterfazATRIA/Icons`` (centralized icon store).
 
     Args:
         SearchRoots: directories to index, highest priority first. When
@@ -50,18 +48,20 @@ class IconLocator:
     def _DefaultRoots() -> list[Path]:
         """Icon directories, resolved relative to this file."""
         here = Path(__file__).resolve().parent
+        roots: list[Path] = []
 
-        roots = [here / "Icons"]
+        env = os.environ.get("ATRIA_ICONS_ROOT", "").strip()
+        if env and Path(env).is_dir():
+            roots.append(Path(env).resolve())
 
-        # Atria/dic: subir ancestros hasta encontrarlo (layout AtriaCore). Se
-        # valida el contenido porque ComponentesATRIA/Atria/dic es un placeholder
-        # vacio que aparece antes en la cadena y no tiene iconos — la misma
-        # trampa que resuelve _is_dictionary_dir() en atria_commands.py.
-        for ancestor in here.parents:
-            candidate = ancestor / "Atria" / "dic"
-            if candidate.is_dir() and (candidate / "base.py").is_file():
+        for ancestor in (here, *here.parents):
+            candidate = ancestor / "InterfazATRIA" / "Icons"
+            if candidate.is_dir() and candidate not in roots:
                 roots.append(candidate)
                 break
+
+        if (here / "Icons").is_dir() and (here / "Icons") not in roots:
+            roots.append(here / "Icons")
 
         return [r for r in roots if r.is_dir()]
 
@@ -99,6 +99,58 @@ class IconLocator:
         "circulo": "circle",
         "stdview": "standardviews",
         "vistaestandar": "standardviews",
+        "2ddrafting": "draft",
+        "drafting": "draft",
+        "3dbim": "workbenchsketcher",
+        "bim": "workbenchsketcher",
+        "annotation": "annotation",
+        "manage": "manage",
+        "modify": "modify",
+        "preferences": "preferences",
+        "snapping": "snaps",
+        "statusbar": "toolbars",
+        "utils": "tools",
+        "showatriapanel": "info",
+        "hideatriapanel": "salir",
+        # 2D-Drafting
+        "arcfrom3points": "3points",
+        "beziercurve": "bezier",
+        "cubicbeziercurve": "cubic",
+        # Annotation
+        "2ddrawing": "createobjects2d",
+        "aligneddimension": "dimension",
+        "axissystem": "axis",
+        "horizontaldimension": "horizontal",
+        "leader": "leaderline",
+        "newpage": "pagedefault",
+        "sectioncut": "section",
+        "sectionplane": "section",
+        "verticaldimension": "vertical",
+        # Manage
+        "draftannotationstyleeditor": "annotationstyleeditor",
+        "archschedule": "spreadsheet",
+        "bimreport": "spreadsheet",
+        "bimmaterial": "material",
+        # Modify
+        "addcomponent": "create",
+        "compound": "makecompound",
+        "drafttosketch": "crearsketch",
+        "patharray": "array",
+        "removecomponent": "delete",
+        "simplecopy": "copy",
+        # Snapping
+        "workingplanefront": "front",
+        "workingplane": "draftwork",
+        "workingplaneside": "right",
+        "workingplanetop": "top",
+        # Utils
+        "unclone": "unlink",
+        "bimtrash": "delete",
+        "draftslope": "slope",
+        "draftworkingplaneproxy": "draftwork",
+        "bimwpview": "view",
+        "archsurvey": "measure",
+        "draftselectgroup": "group",
     }
 
     def Find(self, Key: str) -> str:

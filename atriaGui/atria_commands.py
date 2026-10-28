@@ -1,4 +1,4 @@
-﻿"""FreeCAD commands that bridge to GUIFreeCad."""
+"""FreeCAD commands that bridge to GUIFreeCad."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ def _atria_repo_root() -> Path | None:
     try:
         here = Path(__file__).resolve()
         # ComponentesATRIA tiene prioridad: al subir ancestros aparece "Atria"
-        # antes que "ComponentesATRIA", así­ que se busca primero el repo de
+        # antes que "ComponentesATRIA", así que se busca primero el repo de
         # componentes en toda la cadena y solo se cae a "ATRIA" si no aparece.
         for ancestor in here.parents:
             if ancestor.name.upper() == "COMPONENTESATRIA":
@@ -32,7 +32,7 @@ def _atria_repo_root() -> Path | None:
 
 
 def _guifreecad_root() -> Path:
-    env = os.environ.get("atriaGui_FREECAD_ROOT", "").strip()
+    env = os.environ.get("ATRIA_GUI_FREECAD_ROOT", "").strip()
     if env:
         path = Path(env)
         if path.is_dir():
@@ -66,7 +66,7 @@ def _ensure_gui_path() -> Path:
     if not root.is_dir():
         raise FileNotFoundError(
             f"No se encontro GUIFreeCad en '{root}'. "
-            "Usa iniciar_atria.bat o define atriaGui_FREECAD_ROOT."
+            "Usa iniciar_atria.bat o define ATRIA_GUI_FREECAD_ROOT."
         )
     if text not in sys.path:
         sys.path.insert(0, text)
@@ -122,7 +122,7 @@ def RunAlexSelectionPrueba(sketch_name: str | None = None):
     Prueba completa selection/ para consola FreeCAD (sin configurar rutas).
 
     Uso tras git pull + iniciar_atria.bat:
-        from atriaGui.atria_commands import RunAlexSelectionPrueba
+        from scr.gui.atria_commands import RunAlexSelectionPrueba
         selector = RunAlexSelectionPrueba()
         selector.SelectOther = True
     """
@@ -180,21 +180,26 @@ def _dictionary_root() -> Path:
     try:
         here = Path(__file__).resolve()
         for ancestor in here.parents:
-            for candidate in (ancestor / "Atria" / "dic", ancestor / "DiccionariosEnBruto"):
+            for candidate in (
+                ancestor / "dictionary",
+                ancestor / "Atria" / "dictionary",
+                ancestor / "dic",
+                ancestor / "Atria" / "dic",
+                ancestor / "DiccionariosEnBruto",
+            ):
                 if _is_dictionary_dir(candidate):
                     return candidate.resolve()
     except (IndexError, NameError):
         pass
 
-    return Path("DiccionariosEnBruto")
+    fallback = Path("dictionary")
+    if fallback.is_dir():
+        return fallback.resolve()
+    return Path("dic")
 
 
 def _is_dictionary_dir(path: Path) -> bool:
-    """True si la carpeta es un diccionario real (no un placeholder vacío).
-
-    Evita confundir ``ComponentesATRIA/Atria/dic`` (solo placeholder) con el
-    ``Atria/dic`` real que contiene base.py y los TraduceTo*.py.
-    """
+    """True si la carpeta es un diccionario real (no un placeholder vacío)."""
     return (path / "base.py").is_file() or (path / "TraduceToEs.py").is_file()
 
 
@@ -202,10 +207,12 @@ def _dictionary_candidates(repo: Path | None) -> tuple[Path, ...]:
     if repo is None:
         return ()
     return (
-        # Layout AtriaCore: los diccionarios viven en Atria/dic.
+        repo / "dictionary",
+        repo / "Atria" / "dictionary",
+        repo.parent / "Atria" / "dictionary",
+        repo / "dic",
         repo / "Atria" / "dic",
         repo.parent / "Atria" / "dic",
-        # Layout previo (plano en la raí­z del repo).
         repo / "DiccionariosEnBruto",
         repo.parent / "DiccionariosEnBruto",
     )
@@ -229,7 +236,7 @@ def RunValidatorPrueba(sketch_name: str = "Sketch") -> None:
     Demo Validator en consola FreeCAD (sin configurar rutas).
 
     Uso tras git pull + iniciar_atria.bat:
-        from atriaGui.atria_commands import RunValidatorPrueba
+        from scr.gui.atria_commands import RunValidatorPrueba
         RunValidatorPrueba()
     """
     _ensure_validation_path()

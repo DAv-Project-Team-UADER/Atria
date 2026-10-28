@@ -1,4 +1,4 @@
-﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
+# Copyright (C) 2026 El Equipo del Proyecto Atria
 # Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
 # Bajo la dirección de Ernesto Ledesma
 # Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
@@ -19,7 +19,7 @@
 Browser: voice navigation engine over dictionary folders.
 
 Implemented so far (Developer 1 + Developer 2):
-  - Preferences.SetLanguage â†’ En / Es / PT
+  - Preferences.SetLanguage → En / Es / PT
   - BaseContext: fixed top-level commands loaded from base.py via Keychain
   - Context:     current-level spoken commands (TraduceTo*)
   - Language-change callback: reloads from base.py automatically
@@ -36,7 +36,7 @@ shot ("nuevo archivo" without first saying "archivo") are NOT resolved
 automatically: the user must descend explicitly, then say the leaf command.
 
 Navigation words (subir/volver/contexto/...) are NOT hardcoded here: they
-live in Atria/dic/NavCommands/TraduceTo*.py like any other spoken dictionary,
+live in Atria/dictionary/NavCommands/TraduceTo*.py like any other spoken dictionary,
 and are matched by identity against NavActions.GoUp / NavActions.ShowContext.
 """
 
@@ -180,7 +180,7 @@ class Browser:
         if self._IsDescended():
             up_word = self._FirstSpokenForNavAction("up")
             if up_word:
-                lines.append(f"  Decí Â«{up_word}Â» para subir un nivel.")
+                lines.append(f"  Decí «{up_word}» para subir un nivel.")
         if not submenus and not commands:
             lines.append("  (sin comandos en este contexto)")
         return "\n".join(lines)
@@ -280,12 +280,12 @@ class Browser:
         Handle one voice token.
 
         Developer 2 (implemented):
-          - If spoken matches a BaseContext command â†’ jump directly (Req. 2)
+          - If spoken matches a BaseContext command → jump directly (Req. 2)
 
         TODO Developer 3:
-          - If spoken matches current Context and target is a sub-context â†’ descend
-          - If spoken matches current Context and target is callable â†’ execute
-          - If not found in Context â†’ save OriginalContext, search upward,
+          - If spoken matches current Context and target is a sub-context → descend
+          - If spoken matches current Context and target is callable → execute
+          - If not found in Context → save OriginalContext, search upward,
             execute if found, restore if not found (Req. 1)
         """
         normalized = DictionaryLoader.NormalizeSpoken(spoken)
@@ -293,7 +293,7 @@ class Browser:
             return BrowserResult(False, "empty", "Empty phrase")
 
         # Comandos de navegación (subir, mostrar contexto, ...): se resuelven
-        # contra Atria/dic/NavCommands/TraduceTo*.py, no contra un set fijo en
+        # contra Atria/dictionary/NavCommands/TraduceTo*.py, no contra un set fijo en
         # código. Funcionan en cualquier contexto, sin depender de en qué
         # nivel del árbol de comandos FreeCAD esté parado el usuario.
         nav_action = self._ResolveNavAction(normalized)
@@ -304,7 +304,7 @@ class Browser:
         # descendimos a un subcontexto, una palabra que también existe en el
         # Base (p. ej. "archivo" sirve para entrar a explorer y, dentro de
         # explorer, para bajar a "file") debe resolverse contra el nivel
-        # actual primero. Así "archivo â†’ archivo â†’ nuevo" baja por niveles en
+        # actual primero. Así "archivo → archivo → nuevo" baja por niveles en
         # vez de quedar saltando siempre al mismo contexto base.
         if self._IsDescended():
             entry, _is_fuzzy = self._FindWithFallback(self.Context, normalized)
@@ -312,6 +312,9 @@ class Browser:
                 if entry.IsSubContext():
                     if self._DescendToSubContext(entry):
                         return BrowserResult(True, "descend", f"Context set to {self._ActionLabel(entry)}")
+                    if entry.IsCallable():
+                        self._ExecuteEntry(entry)
+                        return BrowserResult(True, "execute", f"Executed {self._ActionLabel(entry)}")
                     return BrowserResult(False, "descend_failed", f"No se pudo entrar a {self._ActionLabel(entry)}")
                 if entry.IsCallable():
                     self._ExecuteEntry(entry)
@@ -332,6 +335,9 @@ class Browser:
             if entry.IsSubContext():
                 if self._DescendToSubContext(entry):
                     return BrowserResult(True, "descend", f"Context set to {self._ActionLabel(entry)}")
+                if entry.IsCallable():
+                    self._ExecuteEntry(entry)
+                    return BrowserResult(True, "execute", f"Executed {self._ActionLabel(entry)}")
                 return BrowserResult(False, "descend_failed", f"No se pudo entrar a {self._ActionLabel(entry)}")
             if entry.IsCallable():
                 self._ExecuteEntry(entry)
@@ -346,10 +352,10 @@ class Browser:
     def _ExecuteGlobalCallable(self, normalized_spoken: str) -> BrowserResult | None:
         """Run a root-level command from any context, without leaving the current one.
 
-        Las frases de ``Atria/dic/TraduceTo*.py`` entran en la gramática de Vosk en
+        Las frases de ``Atria/dictionary/TraduceTo*.py`` entran en la gramática de Vosk en
         todos los contextos, pero la búsqueda ascendente solo las encontraba al
         llegar al frame raíz, y al ejecutarlas mandaba al usuario a la raíz.
-        Esto las ejecuta en el lugar: un Â«deshacerÂ» o una Â«cotaÂ» no debería
+        Esto las ejecuta en el lugar: un «deshacer» o una «cota» no debería
         cambiar dónde está parado.
 
         Returns:
@@ -410,7 +416,7 @@ class Browser:
 
     # ------------------------------------------------------------------
     # Navigation words (NavCommands) — not hardcoded, read from
-    # Atria/dic/NavCommands/TraduceTo*.py and matched by identity against
+    # Atria/dictionary/NavCommands/TraduceTo*.py and matched by identity against
     # NavActions.GoUp / NavActions.ShowContext.
     # ------------------------------------------------------------------
 
@@ -472,6 +478,8 @@ class Browser:
 
         translate = self._loader.LoadTranslateMap(frame.Folder, self._language)
         for spoken, target in translate.items():
+            if target is None:
+                continue
             key = self._InferInternalKey(spoken, target, frame.ModuleDict)
             entries.append(ContextEntry(Spoken=spoken, InternalKey=key, Target=target))
             seen_spoken.add(DictionaryLoader.NormalizeSpoken(spoken))
@@ -484,6 +492,8 @@ class Browser:
         # _InferInternalKey), no se debe repetir como entrada aparte: eso es
         # lo que hacía aparecer "explorer" junto a "explorador" en el log.
         for internal_key, target in frame.ModuleDict.items():
+            if not callable(target) and not isinstance(target, dict):
+                continue
             norm_word = DictionaryLoader.NormalizeSpoken(internal_key)
             if norm_word in seen_spoken or norm_word in seen_keys:
                 continue
@@ -511,7 +521,9 @@ class Browser:
         if a is b:
             return True
         if isinstance(a, dict) and isinstance(b, dict):
-            return a.keys() == b.keys()
+            if "name" in a or "name" in b:
+                return a == b
+            return bool(a) and a.keys() == b.keys()
         return False
 
     #: Alias publico de _SameTarget. Quien recorre Context desde afuera (la GUI,
@@ -520,7 +532,7 @@ class Browser:
     IsSameTarget = _SameTarget
 
     #: Etiquetas en español para el log cuando InternalKey es la clave canónica
-    #: en inglés de StandardViews (p. ej. iso â†’ isometric â†’ Â«isometricaÂ»).
+    #: en inglés de StandardViews (p. ej. iso → isometric → «isometrica»).
     _STANDARD_VIEW_LABEL_ES: dict[str, str] = {
         "bottom": "abajo",
         "boxzoom": "zoom caja",
@@ -561,6 +573,14 @@ class Browser:
             for key, value in views.items():
                 if value is target:
                     return key
+        if isinstance(target, dict) and len(target) == 1:
+            only_key, only_val = next(iter(target.items()))
+            if isinstance(only_key, str) and callable(only_val):
+                return only_key
+        if callable(target):
+            func_name = getattr(target, "__name__", "")
+            if func_name and not func_name.startswith("<") and not func_name.startswith("_"):
+                return func_name
         return spoken
 
     @staticmethod
@@ -632,8 +652,9 @@ class Browser:
         """Jump directly to a BaseContext entry."""
         if entry.IsSubContext():
             self._stack = [self._stack[0]]
-            self._DescendToSubContext(entry)
-        elif entry.IsCallable():
+            if self._DescendToSubContext(entry):
+                return
+        if entry.IsCallable():
             self._ExecuteEntry(entry)
 
     def _DescendToSubContext(self, entry: ContextEntry) -> bool:
@@ -651,7 +672,8 @@ class Browser:
                 self._stack[-1].Folder, entry.InternalKey, entry.Target
             )
         except FileNotFoundError as error:
-            print(f"[ATRIA-Browser] {error}")
+            if not entry.IsCallable():
+                print(f"[ATRIA-Browser] {error}")
             return False
         frame = _ContextFrame(
             Folder=folder,
@@ -680,34 +702,46 @@ class Browser:
             entry, _is_fuzzy = self._FindWithFallback(parent_context, normalized_spoken)
             # en el frame raíz solo se busca entrar a subcontextos: sus comandos son
             # globales y los ejecuta _ExecuteGlobalCallable sin mover el contexto
-            if entry is not None and entry.IsCallable() and len(temp_stack) == 1:
+            if entry is not None and not entry.IsSubContext() and entry.IsCallable() and len(temp_stack) == 1:
                 entry = None
             if entry is not None:
-                if entry.IsCallable():
-                    self._ExecuteEntry(entry)
-                    self._stack = temp_stack
-                    self.Context = parent_context
-                    self.OriginalContext = parent_context
-                    self._NotifyContextChanged()
-                    return BrowserResult(True, "execute", f"Ascending: executed {self._ActionLabel(entry)}")
-                elif entry.IsSubContext():
+                if entry.IsSubContext():
                     self._stack = temp_stack
                     self.Context = parent_context
                     descended = self._DescendToSubContext(entry)
                     self.OriginalContext = self.Context
                     if descended:
                         return BrowserResult(True, "descend", f"Ascending: descended into {self._ActionLabel(entry)}")
+                    if entry.IsCallable():
+                        self._ExecuteEntry(entry)
+                        self._NotifyContextChanged()
+                        return BrowserResult(True, "execute", f"Ascending: executed {self._ActionLabel(entry)}")
                     return BrowserResult(False, "descend_failed", f"No se pudo entrar a {self._ActionLabel(entry)}")
+                elif entry.IsCallable():
+                    self._ExecuteEntry(entry)
+                    self._stack = temp_stack
+                    self.Context = parent_context
+                    self.OriginalContext = parent_context
+                    self._NotifyContextChanged()
+                    return BrowserResult(True, "execute", f"Ascending: executed {self._ActionLabel(entry)}")
         
         self.Context = self.OriginalContext
         return BrowserResult(False, "not_found", "Command not found in upward search")
 
     def _ExecuteEntry(self, entry: ContextEntry) -> None:
         """Execute a leaf command entry."""
+        target = entry.Target
+        if isinstance(target, dict):
+            for v in target.values():
+                if callable(v):
+                    target = v
+                    break
+
         if self._on_execute is not None:
-            self._on_execute(entry)
-        elif entry.IsCallable():
-            entry.Target()
+            unwrapped = ContextEntry(Spoken=entry.Spoken, InternalKey=entry.InternalKey, Target=target)
+            self._on_execute(unwrapped)
+        elif callable(target):
+            target()
 
     @staticmethod
     def _SnapshotContext(entries: list[ContextEntry]) -> list[ContextEntry]:

@@ -1,4 +1,4 @@
-﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
+# Copyright (C) 2026 El Equipo del Proyecto Atria
 # Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
 # Bajo la dirección de Ernesto Ledesma
 # Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
@@ -19,6 +19,11 @@
 
 from __future__ import annotations
 
+import sys
+sys.modules.setdefault("integration.atria_dock_panel", sys.modules[__name__])
+sys.modules.setdefault("GUIFreeCad.integration.atria_dock_panel", sys.modules[__name__])
+
+import os
 import sys
 from pathlib import Path
 
@@ -115,7 +120,10 @@ def show_atria_panel() -> bool:
 
     # Dock not yet mounted — reuse the existing bootstrap flow.
     try:
-        from GUIFreeCad.integration.voice_bootstrap import show_dock_panel
+        try:
+            from integration.voice_bootstrap import show_dock_panel
+        except ImportError:
+            from GUIFreeCad.integration.voice_bootstrap import show_dock_panel
     except ImportError as exc:
         _notify_panel_failure(f"No se pudo montar el panel ATRIA: {exc}")
         return False
@@ -148,10 +156,23 @@ def show_atria_panel() -> bool:
 
 
 def _ensure_interfaz_on_path() -> None:
-    """Añade la carpeta ui al path para que funcionen las importaciones del panel."""
-    ui_dir = Path(__file__).resolve().parent.parent / "ui"
-    if str(ui_dir) not in sys.path:
-        sys.path.insert(0, str(ui_dir))
+    """Make ``InterfazATRIA`` importable (it lives outside GUIFreeCad)."""
+    env = os.environ.get("ATRIA_INTERFAZ_ROOT", "").strip()
+    if env and Path(env).is_dir():
+        text = str(Path(env).resolve())
+        if text not in sys.path:
+            sys.path.insert(0, text)
+        return
+
+    here = Path(__file__).resolve()
+    for ancestor in (here.parents[1], *here.parents):
+        for candidate_name in ("InterfazATRIA", "interfaz_atria", "InterfazDAV"):
+            candidate = ancestor / candidate_name
+            if candidate.is_dir() and (candidate / "AtriaPanel.py").is_file():
+                text = str(candidate)
+                if text not in sys.path:
+                    sys.path.insert(0, text)
+                return
 
 
 class BrowserPanelSource:
@@ -456,7 +477,10 @@ def install_dock_panel(browser, adapter):
         return None
 
     _ensure_interfaz_on_path()
-    from GUIFreeCad.ui.AtriaPanel import AtriaPanel
+    try:
+        from InterfazATRIA.AtriaPanel import AtriaPanel
+    except ImportError:
+        from GUIFreeCad.ui.AtriaPanel import AtriaPanel
 
     source = BrowserPanelSource(browser, adapter)
 
@@ -497,6 +521,7 @@ def install_dock_panel(browser, adapter):
     # cuando quiere, con el boton de la cabecera o arrastrando el titulo.
     dock.setFloating(True)
     dock.resize(560, 720)
+    dock.setMinimumSize(480, 640)
     _make_real_window(dock)
     _center_on(dock, main_window)
 

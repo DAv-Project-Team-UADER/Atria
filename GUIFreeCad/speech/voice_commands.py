@@ -1,4 +1,4 @@
-﻿"""Voice command listener using Vosk small model."""
+"""Voice command listener using Vosk small model."""
 
 from __future__ import annotations
 
@@ -31,14 +31,14 @@ def _buffer_to_bytes(indata) -> bytes:
 # Phrases mapped to internal command ids (multi-language)
 COMMAND_MAP: dict[str, list[str]] = {
     "lang_en": [
-        "english", "inglés", "ingles", "inglÃªs", "inglesh",
+        "english", "inglés", "ingles", "inglês", "inglesh",
     ],
     "lang_es": [
         "spanish", "español", "espanol", "espanhol", "castellano",
     ],
     "lang_pt": [
-        "portuguese", "portugués", "portugues", "portuguÃªs", "portuguesa",
-        "brasil", "brazil", "idioma portugues", "idioma portuguÃªs",
+        "portuguese", "portugués", "portugues", "português", "portuguesa",
+        "brasil", "brazil", "idioma portugues", "idioma português",
     ],
     "model_small": [
         "small model", "modelo pequeño", "modelo pequeno",
@@ -55,14 +55,14 @@ COMMAND_MAP: dict[str, list[str]] = {
         "tema escuro", "escuro", "preto", "tema preto",
     ],
     "startup_on": [
-        "startup on", "arranque activado", "inicializaÃ§Ã£o ativada", "activado", "ativado",
+        "startup on", "arranque activado", "inicialização ativada", "activado", "ativado",
     ],
     "startup_off": [
         "startup off", "arranque desactivado", "arranque desactivado",
-        "inicializaÃ§Ã£o desativada", "desactivado", "desativado",
+        "inicialização desativada", "desactivado", "desativado",
     ],
     "yes": ["yes", "sí", "si", "sim", "yeah", "confirmar", "confirmar sim", "quero sim"],
-    "no": ["no", "nÃ£o", "nao", "nop", "negativo", "cancelar", "nao quero", "nÃ£o quero"],
+    "no": ["no", "não", "nao", "nop", "negativo", "cancelar", "nao quero", "não quero"],
     "apply": ["apply", "aplicar", "aplicar"],
     "ok": ["ok", "aceptar", "accept", "confirmar"],
     "open_preferences": [

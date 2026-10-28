@@ -30,12 +30,19 @@ def main():
     """Main program entry point."""
     # Get the directory where this script is located
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    dic_folder = os.path.join(script_dir, "dic")
+    parent_dir = os.path.dirname(script_dir)
+    candidates = [
+        os.path.join(parent_dir, "dictionary"),
+        os.path.join(script_dir, "dictionary"),
+        os.path.join(parent_dir, "dic"),
+        os.path.join(script_dir, "dic"),
+    ]
+    dic_folder = next((p for p in candidates if os.path.isdir(p)), None)
 
-    # Verify the 'dic' folder exists
-    if not os.path.isdir(dic_folder):
-        print(f"Error: 'dic' folder not found in {script_dir}")
-        print("Please create a 'dic' folder next to this script.")
+    # Verify a dictionary folder exists
+    if not dic_folder:
+        print(f"Error: dictionary folder not found in {parent_dir} or {script_dir}")
+        print("Please ensure 'dictionary' or 'dic' folder exists.")
         return
 
     # Ask user for the dictionary file name
@@ -65,8 +72,13 @@ def main():
         print("\nProcessing file...")
         keys = keychain.GetAllKeys()
 
-        # Get icons, checking existence in the same directory as the dictionary file
-        dict_dir = os.path.dirname(full_path)
+        # Get icons, checking existence in centralized InterfazATRIA/Icons (or dictionary dir as fallback)
+        icons_candidates = [
+            os.path.join(parent_dir, "InterfazATRIA", "Icons"),
+            os.path.join(script_dir, "InterfazATRIA", "Icons"),
+            os.path.dirname(full_path),
+        ]
+        dict_dir = next((p for p in icons_candidates if os.path.isdir(p)), os.path.dirname(full_path))
         icons = keychain.GetIcons(base_dir=dict_dir)
 
         # Display results header

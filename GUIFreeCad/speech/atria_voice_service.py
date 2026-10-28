@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import sys
+sys.modules.setdefault("speech.atria_voice_service", sys.modules[__name__])
+sys.modules.setdefault("GUIFreeCad.speech.atria_voice_service", sys.modules[__name__])
+
 import json
 import queue
 import threading

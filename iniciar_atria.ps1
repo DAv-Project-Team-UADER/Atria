@@ -1,29 +1,80 @@
-# Lanzador directo de Atria para FreeCAD
+# ATRIA - FreeCAD Launcher (PowerShell)
 $ErrorActionPreference = "Stop"
 
-$AtriaRoot = $PSScriptRoot
+Write-Host "===================================================" -ForegroundColor Cyan
+Write-Host "          ATRIA - FreeCAD Voice Assistant          " -ForegroundColor Cyan
+Write-Host "===================================================" -ForegroundColor Cyan
+Write-Host ""
 
-# Configurar variables de entorno para que el Workbench las lea en InitGui.py
-[Environment]::SetEnvironmentVariable("ATRIA_MOD_ROOT", $AtriaRoot, "Process")
-[Environment]::SetEnvironmentVariable("ATRIA_AUTOLOAD_WORKBENCH", "1", "Process")
+$repoRoot = $PSScriptRoot
 
-# Buscar FreeCAD dinámicamente en las rutas comunes de instalación
-$rutasComunes = @(
-    "$env:ProgramFiles\FreeCAD*\bin\FreeCAD.exe",
-    "$env:LOCALAPPDATA\Programs\FreeCAD*\bin\FreeCAD.exe"
+# 1. Detect FreeCAD executable
+$candidates = @(
+    "C:\Program Files\FreeCAD 1.1\bin\freecad.exe",
+    "C:\Program Files\FreeCAD 1.0\bin\freecad.exe",
+    "C:\Program Files\FreeCAD 0.21\bin\freecad.exe",
+    "C:\Program Files\FreeCAD\bin\freecad.exe",
+    "$env:LOCALAPPDATA\Programs\FreeCAD 1.1\bin\freecad.exe",
+    "$env:LOCALAPPDATA\Programs\FreeCAD 1.0\bin\freecad.exe"
 )
 
-# Obtiene la lista de ejecutables, los ordena por fecha y se queda con el más nuevo
-$FreeCADExe = (Get-ChildItem -Path $rutasComunes -ErrorAction SilentlyContinue | Sort-Object CreationTime -Descending | Select-Object -First 1).FullName
+$freecadExe = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
 
-if (-not $FreeCADExe -or -not (Test-Path -LiteralPath $FreeCADExe)) {
-    Write-Error "No se encontro FreeCAD.exe en las rutas estandar. Por favor, instala FreeCAD o especifica la ruta manualmente en iniciar_atria.ps1."
-    pause
+if (-not $freecadExe) {
+    $cmd = Get-Command "freecad.exe" -ErrorAction SilentlyContinue
+    if ($cmd) {
+        $freecadExe = $cmd.Source
+    }
+}
+
+if (-not $freecadExe) {
+    Write-Host "[ERROR] No se encontró FreeCAD instalado en las rutas habituales." -ForegroundColor Red
+    Write-Host "Por favor instala FreeCAD 1.0 o superior." -ForegroundColor Yellow
     exit 1
 }
 
-Write-Host "Iniciando FreeCAD con Atria cargado desde: $AtriaRoot"
-Write-Host "Ejecutable de FreeCAD detectado: $FreeCADExe"
+Write-Host "[OK] FreeCAD detectado en: $freecadExe" -ForegroundColor Green
 
-& $FreeCADExe @args
-exit $LASTEXITCODE
+# 2. Ensure Mod directory link
+$modDirs = @(
+    "$env:APPDATA\FreeCAD\Mod",
+    "$env:APPDATA\FreeCAD\v1-1\Mod",
+    "$env:APPDATA\FreeCAD\v1-0\Mod"
+)
+
+foreach ($modDir in $modDirs) {
+    if (-not (Test-Path $modDir)) {
+        New-Item -ItemType Directory -Path $modDir -Force | Out-Null
+    }
+    $targetLink = Join-Path $modDir "Atria"
+    if (-not (Test-Path $targetLink)) {
+        try {
+            New-Item -ItemType Junction -Path $targetLink -Target $repoRoot | Out-Null
+            Write-Host "[OK] Enlace creado en: $targetLink" -ForegroundColor Green
+        } catch {
+            Write-Host "[WARN] No se pudo crear junction en $($targetLink): $_" -ForegroundColor Yellow
+        }
+    }
+}
+
+# 3. Environment variables
+$env:ATRIA_MOD_ROOT = $repoRoot
+$env:ATRIA_GUI_FREECAD_ROOT = Join-Path $repoRoot "GUIFreeCad"
+$env:ATRIA_INTERFAZ_ROOT = Join-Path $repoRoot "InterfazATRIA"
+$interfazIcons = Join-Path $repoRoot "InterfazATRIA\Icons"
+if (Test-Path $interfazIcons) {
+    $env:ATRIA_ICONS_ROOT = $interfazIcons
+} else {
+    $env:ATRIA_ICONS_ROOT = Join-Path $repoRoot "GUIFreeCad\ui\Icons"
+}
+$env:ATRIA_DICTIONARY_ROOT = Join-Path $repoRoot "dictionary"
+$env:ATRIA_MODELS_DIR = Join-Path $repoRoot "models"
+$env:ATRIA_AUTOLOAD_WORKBENCH = "1"
+$env:ATRIA_AUTO_START_VOICE = "1"
+$env:ATRIA_AUTO_PANEL = "1"
+
+Write-Host ""
+Write-Host "Iniciando FreeCAD con el Workbench ATRIA..." -ForegroundColor Cyan
+Write-Host ""
+
+Start-Process -FilePath $freecadExe

@@ -1,4 +1,4 @@
-﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
+# Copyright (C) 2026 El Equipo del Proyecto Atria
 # Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
 # Bajo la dirección de Ernesto Ledesma
 # Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
@@ -54,7 +54,7 @@ _PLANE_PHRASES: dict[str, list[str]] = {
         "cima", "abaixo",
         "okey", "okay", "ok", "enviar", "aceitar", "confirmar", "entrar",
         "pronto", "feito", "sim",
-        "cancelar", "cancelamento", "descartar", "anular", "abortar", "nao", "nÃ£o",
+        "cancelar", "cancelamento", "descartar", "anular", "abortar", "nao", "não",
     ],
 }
 

@@ -1,4 +1,4 @@
-﻿"""Register ATRIA voice commands and hooks from GUIFreeCad."""
+"""Register ATRIA voice commands and hooks from GUIFreeCad."""
 
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ def install_freecad_integration() -> None:
         _INSTALLED = True
 
         App.Console.PrintMessage(
-            "[ATRIA] Workbench listo. Mensajes [ATRIA] van a esta pestaña Â«InformeÂ», "
+            "[ATRIA] Workbench listo. Mensajes [ATRIA] van a esta pestaña «Informe», "
             "no a la consola Python (>>>).\n"
         )
         _print_voice_startup_hint()
@@ -122,12 +122,12 @@ def _print_voice_startup_hint() -> None:
         auto = os.environ.get("ATRIA_AUTO_START_VOICE") == "1" or settings.startup_enabled
         if auto:
             App.Console.PrintMessage(
-                "[ATRIA] Arranque de voz programado (~1,5 s). Esperá Â«Voz activaÂ» en Informe.\n"
+                "[ATRIA] Arranque de voz programado (~1,5 s). Esperá «Voz activa» en Informe.\n"
             )
         else:
             App.Console.PrintMessage(
-                "[ATRIA] Micrófono inactivo. Activá Â«Iniciar ATRIA y FreeCAD al encender la PCÂ» "
-                "en Preferencias, o clic en Â«Iniciar voz ATRIAÂ».\n"
+                "[ATRIA] Micrófono inactivo. Activá «Iniciar ATRIA y FreeCAD al encender la PC» "
+                "en Preferencias, o clic en «Iniciar voz ATRIA».\n"
             )
     except Exception:
         pass
@@ -159,7 +159,7 @@ def _maybe_autostart_voice() -> None:
             if not start_voice_engine():
                 App.Console.PrintWarning(
                     "[ATRIA] No se pudo iniciar la voz. "
-                    "Probá Â«Iniciar voz ATRIAÂ» manualmente.\n"
+                    "Probá «Iniciar voz ATRIA» manualmente.\n"
                 )
             # InterfazATRIA launch handled by freecad_wb._schedule_interfaz_atria_launch()
 

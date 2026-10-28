@@ -1,6 +1,10 @@
-﻿"""Start/stop the ATRIA voice engine (Browser + BrowserVoiceAdapter) from GUIFreeCad."""
+"""Start/stop the ATRIA voice engine (Browser + BrowserVoiceAdapter) from GUIFreeCad."""
 
 from __future__ import annotations
+
+import sys
+sys.modules.setdefault("integration.voice_bootstrap", sys.modules[__name__])
+sys.modules.setdefault("GUIFreeCad.integration.voice_bootstrap", sys.modules[__name__])
 
 import os
 import traceback
@@ -77,7 +81,7 @@ def show_dock_panel() -> bool:
     adapter = _active_adapter(svc)
     if adapter is None:
         _print_message(
-            "[ATRIA] Primero activá la voz (Â«Iniciar voz ATRIAÂ»): el panel se "
+            "[ATRIA] Primero activá la voz («Iniciar voz ATRIA»): el panel se "
             "alimenta del motor en curso.\n"
         )
         return False
@@ -100,13 +104,13 @@ def _resolve_dictionary_root() -> Path:
 
     Orden de resolución (igual criterio que atria_commands._dictionary_root):
       1. Variable de entorno ATRIA_DICTIONARY_ROOT (la setea el launcher).
-      2. Candidatos relativos subiendo desde este archivo: layout AtriaCore
-         (``Atria/dic``) y layout previo (``DiccionariosEnBruto``).
+      2. Candidatos relativos subiendo desde este archivo: 'dictionary' (layout consolidado),
+         'Atria/dictionary', 'Atria/dic', 'dic' y 'DiccionariosEnBruto'.
 
     Returns:
         Ruta a la carpeta de diccionarios; si no se encuentra ninguna,
-        devuelve el mejor candidato del layout AtriaCore (DictionaryLoader
-        tolera que no exista y arranca con contextos vacíos sin romper).
+        devuelve el mejor candidato (DictionaryLoader tolera que no exista y
+        arranca con contextos vacíos sin romper).
     """
     env = os.environ.get("ATRIA_DICTIONARY_ROOT", "").strip()
     if env:
@@ -116,20 +120,25 @@ def _resolve_dictionary_root() -> Path:
 
     here = Path(__file__).resolve()
     for ancestor in here.parents:
-        for candidate in (ancestor / "Atria" / "dic", ancestor / "DiccionariosEnBruto"):
+        for candidate in (
+            ancestor / "dictionary",
+            ancestor / "Atria" / "dictionary",
+            ancestor / "dic",
+            ancestor / "Atria" / "dic",
+            ancestor / "DiccionariosEnBruto",
+        ):
             if _is_dictionary_dir(candidate):
                 return candidate.resolve()
 
-    # parents[5]=ATRIA-root con el nuevo layout (.../Atria/scr/ComponentesATRIA/IntegracionGUI/GUIFreeCad/integration)
-    return here.parents[5] / "Atria" / "dic"
+    # Fallback relativo a GUIFreeCad/integration
+    fallback = here.parents[1] / "dictionary"
+    if fallback.is_dir():
+        return fallback.resolve()
+    return here.parents[1] / "dic"
 
 
 def _is_dictionary_dir(path: Path) -> bool:
-    """True si la carpeta es un diccionario real (no un placeholder vacío).
-
-    Evita confundir ``ComponentesATRIA/Atria/dic`` (solo placeholder) con el
-    ``Atria/dic`` real que contiene base.py y los TraduceTo*.py.
-    """
+    """True si la carpeta es un diccionario real (no un placeholder vacío)."""
     return (path / "base.py").is_file() or (path / "TraduceToEs.py").is_file()
 
 
@@ -194,7 +203,7 @@ def _start_voice_engine(*, debug: bool = False) -> bool:
 
         from GUIFreeCad.core.language_code import LanguageCode
         from GUIFreeCad.core.preferences import preferences
-        from navigation.browser import Browser
+        from GUIFreeCad.navigation.browser import Browser
         from GUIFreeCad.integration.browser_voice_adapter import BrowserVoiceAdapter
         from InputPrompts.PromptedCommandExecutor import PromptedCommandExecutor
 
@@ -223,8 +232,8 @@ def _start_voice_engine(*, debug: bool = False) -> bool:
 
         export_voice_status("active", "Voz activa")
         _print_message(
-            "[ATRIA] Voz activa (motor unificado). Ejemplos: Â«preferencias enviarÂ», "
-            "Â«archivo enviarÂ» â†’ Â«nuevo enviarÂ».\n"
+            "[ATRIA] Voz activa (motor unificado). Ejemplos: «preferencias enviar», "
+            "«archivo enviar» → «nuevo enviar».\n"
         )
         return True
     except Exception:
@@ -240,7 +249,7 @@ def stop_voice_engine(*, wait: bool = True, timeout: float = 4.0) -> None:
         _print_message("[ATRIA] El motor de voz no está activo.\n")
         export_voice_status("inactive", "Voz inactiva")
         return
-    _print_message("[ATRIA] Deteniendo voz”¦ (puede tardar un instante).\n")
+    _print_message("[ATRIA] Deteniendo voz… (puede tardar un instante).\n")
     svc.stop(wait=wait, timeout=timeout)
     export_voice_status("inactive", "Voz inactiva")
     _print_message("[ATRIA] Motor de voz detenido.\n")

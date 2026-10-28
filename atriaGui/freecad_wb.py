@@ -1,4 +1,4 @@
-﻿"""Logica del workbench ATRIA (importado como modulo Python normal)."""
+"""Logica del workbench ATRIA (importado como modulo Python normal)."""
 
 from __future__ import annotations
 
@@ -34,19 +34,43 @@ def setup_mod_path() -> str:
             mod_dir = user
     if mod_dir and mod_dir not in sys.path:
         sys.path.insert(0, mod_dir)
+    if mod_dir:
+        for rel_icons in (("InterfazATRIA", "Icons"), ("GUIFreeCad", "ui", "Icons")):
+            icons_dir = os.path.join(mod_dir, *rel_icons)
+            if os.path.isdir(icons_dir):
+                os.environ.setdefault("ATRIA_ICONS_ROOT", icons_dir)
+                try:
+                    import FreeCADGui as Gui
+
+                    Gui.addIconPath(icons_dir)
+                    sys_icons = os.path.join(icons_dir, "system")
+                    if os.path.isdir(sys_icons):
+                        Gui.addIconPath(sys_icons)
+                except Exception:
+                    pass
     return mod_dir
 
 
-def apply_atria_toolbar(workbench) -> None:
+def apply_atria_toolbar(workbench, *, quiet: bool = False) -> None:
     """Menu y barra ATRIA (siempre los 3 comandos; FreeCAD los registra en setup)."""
     import FreeCAD as App
 
     workbench.appendMenu("ATRIA", list(_ATRIA_TOOLBAR_COMMANDS))
     workbench.appendToolbar("ATRIA", list(_ATRIA_TOOLBAR_COMMANDS))
-    App.Console.PrintMessage(
-        "[ATRIA] Barra ATRIA: Preferencias, Iniciar voz, Detener voz. "
-        "Si no la ves: workbench ATRIA + Ver > Barras de herramientas > ATRIA.\n"
-    )
+    if not quiet:
+        App.Console.PrintMessage(
+            "[ATRIA] Barra ATRIA: Preferencias, Iniciar voz, Detener voz. "
+            "Si no la ves: workbench ATRIA + Ver > Barras de herramientas > ATRIA.\n"
+        )
+
+
+def _get_atria_commands():
+    for mod_name in ("gui.atria_commands", "atria_commands", "scr.gui.atria_commands"):
+        try:
+            return importlib.import_module(mod_name)
+        except ImportError:
+            continue
+    raise ImportError("No se pudo cargar atria_commands")
 
 
 def install_gui_integration() -> None:
@@ -155,6 +179,7 @@ def _auto_start_voice_if_needed() -> None:
     try:
         import sys
         from pathlib import Path
+        import FreeCAD as App
 
         _atria_commands = importlib.import_module("atriaGui.atria_commands")
         gui_root = _atria_commands._guifreecad_root()
@@ -164,7 +189,12 @@ def _auto_start_voice_if_needed() -> None:
         from GUIFreeCad.core.settings import settings
 
         settings.load()
-        if not (os.environ.get("ATRIA_AUTO_START_VOICE") == "1" or settings.auto_voice or settings.startup_enabled):
+        auto_env = os.environ.get("ATRIA_AUTO_START_VOICE", "").strip()
+        should_start = (
+            auto_env == "1"
+            or (auto_env != "0" and (settings.auto_voice or settings.startup_enabled))
+        )
+        if not should_start:
             return
 
         from GUIFreeCad.integration.voice_bootstrap import start_voice_engine
@@ -172,7 +202,11 @@ def _auto_start_voice_if_needed() -> None:
         start_voice_engine()
         # InterfazATRIA launch handled by _schedule_interfaz_atria_launch()
     except Exception:
-        pass
+        import FreeCAD as App
+        import traceback
+
+        App.Console.PrintError("[ATRIA] Error iniciando voz automáticamente:\n")
+        App.Console.PrintError(traceback.format_exc())
 
 
 def _schedule_toolbar_refresh() -> None:
@@ -194,19 +228,15 @@ def _schedule_toolbar_refresh() -> None:
                 App.Console.PrintError(traceback.format_exc())
             wb = Gui.getWorkbench("AtriaWorkbench")
             if wb is not None:
-                apply_atria_toolbar(wb)
+                apply_atria_toolbar(wb, quiet=True)
             _force_show_atria_toolbar()
         except Exception:
             App.Console.PrintError("[ATRIA] Error refrescando barra ATRIA:\n")
             App.Console.PrintError(traceback.format_exc())
 
-    def _refresh_and_autovoice() -> None:
-        _refresh()
-        _auto_start_voice_if_needed()
-
-    for delay_ms in (600, 1500):
+    for delay_ms in (500, 1000):
         QTimer.singleShot(delay_ms, _refresh)
-    QTimer.singleShot(2000, _auto_start_voice_if_needed)
+    QTimer.singleShot(1200, _auto_start_voice_if_needed)
 
 
 def _schedule_report_view() -> None:
@@ -225,12 +255,26 @@ def _schedule_report_view() -> None:
             mw = Gui.getMainWindow()
             if mw is None:
                 return
+            shown = False
             for dock in mw.findChildren(QDockWidget):
                 if dock.objectName() in ("Std_ReportView", "Report view", "Informe"):
                     dock.show()
                     dock.raise_()
-                    return
-            Gui.runCommand("Std_ReportView", 0)
+                    shown = True
+                    break
+            if not shown:
+                Gui.runCommand("Std_ReportView", 0)
+
+            from GUIFreeCad.core.settings import settings
+            from GUIFreeCad.integration.apply_settings import (
+                apply_report_palette,
+                hook_welcome_theme_selector,
+                sync_freecad_theme_state,
+            )
+
+            apply_report_palette(settings.theme)
+            sync_freecad_theme_state(settings.theme)
+            hook_welcome_theme_selector()
         except Exception:
             pass
 
@@ -238,7 +282,7 @@ def _schedule_report_view() -> None:
 
 
 def _schedule_settings_watcher() -> None:
-    """Watch IntegracionGUI settings.json so changes from InterfazATRIA apply to FreeCAD."""
+    """Watch settings.json and FreeCAD's MainWindow/Theme so theme changes sync immediately."""
     try:
         from PySide6.QtCore import QTimer
     except ImportError:
@@ -254,20 +298,79 @@ def _schedule_settings_watcher() -> None:
                 from PySide2.QtWidgets import QApplication  # type: ignore[no-redef]
 
             from pathlib import Path
+
+            atria_cmds = importlib.import_module("atriaGui.atria_commands")
+            atria_cmds._ensure_gui_path()
+
+            from GUIFreeCad.core.settings import settings
+            from GUIFreeCad.integration.apply_settings import (
+                apply_report_palette,
+                hook_welcome_theme_selector,
+                sync_freecad_theme_state,
+            )
+            from GUIFreeCad.ui.theme import apply_theme
+
             here = Path(__file__).resolve()
             settings_path = None
             for ancestor in here.parents:
-                candidate = ancestor / "IntegracionGUI" / "GUIFreeCad" / "config" / "settings.json"
-                if candidate.exists():
-                    settings_path = candidate
+                for rel in (
+                    ("GUIFreeCad", "config", "settings.json"),
+                    ("IntegracionGUI", "GUIFreeCad", "config", "settings.json"),
+                ):
+                    candidate = ancestor.joinpath(*rel)
+                    if candidate.exists():
+                        settings_path = candidate
+                        break
+                if settings_path is not None:
                     break
             if settings_path is None:
-                settings_path = here.parents[3] / "IntegracionGUI" / "GUIFreeCad" / "config" / "settings.json"
+                settings_path = here.parents[1] / "GUIFreeCad" / "config" / "settings.json"
 
             last_mtime: list[float] = [settings_path.stat().st_mtime if settings_path.exists() else 0.0]
+            mw_grp = App.ParamGet("User parameter:BaseApp/Preferences/MainWindow")
+            last_fc_theme: list[str] = [mw_grp.GetString("Theme", "")]
+
+            def _apply_synced_theme(theme: str, language: str | None = None, announce: bool = False) -> None:
+                app = QApplication.instance()
+                if app is not None:
+                    apply_theme(app, theme)
+                apply_report_palette(theme)
+                sync_freecad_theme_state(theme)
+                last_fc_theme[0] = mw_grp.GetString("Theme", "")
+                from GUIFreeCad.integration.atria_dock_panel import get_source
+
+                src = get_source()
+                if src is not None and src._panel is not None:
+                    src._panel.SetTheme(theme)
+                    if language is not None:
+                        src._panel.SetLanguage(language)
+                if announce:
+                    App.Console.PrintMessage(
+                        f"[ATRIA] Preferencias actualizadas "
+                        f"(idioma={language or settings.language}, tema={theme}).\n"
+                    )
 
             def _poll() -> None:
                 try:
+                    hook_welcome_theme_selector()
+
+                    # 1. Check if FreeCAD's MainWindow/Theme changed (e.g. from Welcome screen or FreeCAD prefs)
+                    fc_theme = mw_grp.GetString("Theme", "")
+                    if fc_theme and fc_theme != last_fc_theme[0]:
+                        last_fc_theme[0] = fc_theme
+                        mapped = "dark" if ("dark" in fc_theme.lower() or "oscuro" in fc_theme.lower()) else "light"
+                        if mapped != settings.theme:
+                            settings.theme = mapped
+                            try:
+                                settings.save()
+                            except Exception:
+                                pass
+                            if settings_path.exists():
+                                last_mtime[0] = settings_path.stat().st_mtime
+                            _apply_synced_theme(mapped, settings.language, announce=True)
+                            return
+
+                    # 2. Check if settings.json changed on disk
                     mtime = settings_path.stat().st_mtime if settings_path.exists() else 0.0
                     if mtime == last_mtime[0]:
                         return
@@ -275,28 +378,17 @@ def _schedule_settings_watcher() -> None:
                     with open(settings_path, encoding="utf-8") as fh:
                         data = json.load(fh)
                     theme = data.get("theme", "light")
-                    app = QApplication.instance()
-                    if app is not None:
-                        atria_cmds = importlib.import_module("atriaGui.atria_commands")
-                        atria_cmds._ensure_gui_path()
-                        from GUIFreeCad.ui.theme import apply_theme
-                        apply_theme(app, theme)
-                    from GUIFreeCad.integration.atria_dock_panel import get_source
-                    src = get_source()
-                    if src is not None and src._panel is not None:
-                        src._panel.SetTheme(theme)
-                        src._panel.SetLanguage(data.get("language", "es"))
-                    App.Console.PrintMessage(
-                        f"[ATRIA] Preferencias actualizadas "
-                        f"(idioma={data.get('language','?')}, tema={theme}).\n"
-                    )
+                    lang = data.get("language", "es")
+                    settings.theme = theme
+                    settings.language = lang
+                    _apply_synced_theme(theme, lang, announce=True)
                 except Exception:
                     pass
 
             poll_timer = QTimer()
             poll_timer.timeout.connect(_poll)
-            poll_timer.start(1000)
-            App.__atria_settings_poll_timer = poll_timer  
+            poll_timer.start(500)
+            App.__atria_settings_poll_timer = poll_timer
         except Exception:
             pass
 

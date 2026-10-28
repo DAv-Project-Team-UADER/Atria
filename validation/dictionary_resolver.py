@@ -28,8 +28,13 @@ from typing import Any, Callable
 
 
 _KNOWN_DICTIONARIES: dict[str, Path] = {
-    "additive": Path("Workbench") / "PartDesign" / "additive" / "additive.py",
-    "geometry.line": Path("Workbench") / "Sketcher" / "Geometry" / "line" / "line.py",
+    "2d-drafting": Path("2D-Drafting") / "commands.py",
+    "3d-bim": Path("3D-BIM") / "commands.py",
+    "annotation": Path("Annotation") / "commands.py",
+    "manage": Path("Manage") / "commands.py",
+    "modify": Path("Modify") / "commands.py",
+    "snapping": Path("Snapping") / "commands.py",
+    "utils": Path("Utils") / "commands.py",
 }
 
 
@@ -42,11 +47,11 @@ def _DictionaryRoot() -> Path:
 
     here = Path(__file__).resolve()
     for ancestor in here.parents:
-        candidate = ancestor / "DiccionariosEnBruto"
-        if candidate.is_dir():
-            return candidate.resolve()
+        for candidate in (ancestor / "dictionary", ancestor / "dic", ancestor / "DiccionariosEnBruto"):
+            if candidate.is_dir():
+                return candidate.resolve()
 
-    return Path("DiccionariosEnBruto")
+    return Path("dictionary")
 
 
 def EnsureDictionaryPath() -> Path:
@@ -108,18 +113,34 @@ def _LoadLeafDictionary(module_path: Path, dict_name: str) -> dict[str, Any]:
         parent=parent,
     )
     table = getattr(module, dict_name, None)
-    if not isinstance(table, dict):
-        raise ValueError(f"El módulo {module_path} no expone dict '{dict_name}'")
-    return table
+    if isinstance(table, dict):
+        return table
+
+    # Recolectar callables y diccionarios del módulo de comandos
+    combined: dict[str, Any] = {}
+    for k, v in vars(module).items():
+        if k.startswith("__"):
+            continue
+        if callable(v):
+            combined[k.lower()] = v
+        elif isinstance(v, dict):
+            for sub_k, sub_v in v.items():
+                if callable(sub_v):
+                    combined[sub_k.lower()] = sub_v
+            if k.lower() not in combined:
+                combined[k.lower()] = v
+    if not combined:
+        raise ValueError(f"El módulo {module_path} no expone funciones ni comandos")
+    return combined
 
 
 def GetDictionaryFunction(dictionary_name: str, command_key: str) -> Callable[..., Any]:
     """
-    Load a command callable from DiccionariosEnBruto.
+    Load a command callable from ATRIA dictionary.
 
     Examples:
-        GetDictionaryFunction("additive", "pad_sketch")
-        GetDictionaryFunction("geometry.line", "create_by_points")
+        GetDictionaryFunction("2d-drafting", "arc")
+        GetDictionaryFunction("3d-bim", "box")
     """
     key = dictionary_name.strip().lower()
     if key not in _KNOWN_DICTIONARIES:
@@ -132,13 +153,14 @@ def GetDictionaryFunction(dictionary_name: str, command_key: str) -> Callable[..
     dict_name = module_path.stem
     table = _LoadLeafDictionary(module_path, dict_name)
 
-    if command_key not in table:
+    cmd_key = command_key.strip().lower()
+    if cmd_key not in table:
         raise KeyError(
             f"Comando '{command_key}' no existe en '{dictionary_name}'. "
             f"Claves: {', '.join(sorted(table))}"
         )
 
-    command = table[command_key]
+    command = table[cmd_key]
     if not callable(command):
         raise TypeError(f"'{command_key}' no es callable.")
     return command
