@@ -21,9 +21,6 @@ except ImportError:
 
 TraduceToEs = {
     # Atrapacaras
-    'crear atrapacaras':             Facebinder,
-    'atrapacaras':                   Facebinder,
-    'facebinder':                    Facebinder,
     'crear facebinder':              Facebinder,
     'superficie desde caras':        Facebinder,
     'crear superficie desde caras':  Facebinder,

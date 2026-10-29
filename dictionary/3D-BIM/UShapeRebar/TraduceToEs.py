@@ -5,10 +5,4 @@ try:
 except ImportError:
     UShapeRebar = None
 
-TraduceToEs = {
-    "crear armadura en U":           UShapeRebar,
-    "nueva barra en U":              UShapeRebar,
-    "generar armadura en U":         UShapeRebar,
-    "añadir barra de refuerzo en U": UShapeRebar,
-    "crear rebar en U":              UShapeRebar,
-}
+TraduceToEs = {}

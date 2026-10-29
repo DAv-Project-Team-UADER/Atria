@@ -30,7 +30,4 @@ TraduceToEs = {
     'agregar bloque':       Box,
     'caja por dimensiones': Box,
     'crear caja por dimensiones' :Box,
-    'cubo':                 Box,
-    'crear cubo':           Box,
-    'insertar cubo':        Box,
 }

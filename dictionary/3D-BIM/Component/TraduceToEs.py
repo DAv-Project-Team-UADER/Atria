@@ -24,7 +24,6 @@ TraduceToEs = {
     'convertir en componente':          Component,
     'crear componente':                 Component,
     'hacer componente':                 Component,
-    'hacer componente Arch':            Component,
     'convertir en componente Arch':     Component,
     'componente generico':              Component,
     'componente genérico':              Component,
