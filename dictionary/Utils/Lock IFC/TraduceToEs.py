@@ -1,8 +1,8 @@
 from .LockIfc import lock_ifc
 
 TraduceToEs = {
-    "bloquear IFC": lock_ifc,
-    "alternar modo IFC estricto": lock_ifc,
-    "activar modo IFC": lock_ifc,
-    "bloquear modo IFC": lock_ifc,
+    "bloquear BIM": lock_ifc,
+    "alternar modo BIM estricto": lock_ifc,
+    "activar modo BIM": lock_ifc,
+    "bloquear modo BIM": lock_ifc,
 }

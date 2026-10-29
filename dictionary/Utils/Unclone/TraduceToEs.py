@@ -21,11 +21,8 @@ except ImportError:
     unclone = None
 
 TraduceToEs = {
-    # Unclone
-    'desclonar':               unclone,
-    'desclonar objeto':        unclone,
-    'independizar clon':       unclone,
-    'separar del original':    unclone,
-    'romper vínculo de clon':  unclone,
-    'romper vinculo de clon':  unclone,
+    "independizar clon": unclone,
+    "separar del original": unclone,
+    "romper vínculo de clon": unclone,
+    "romper vinculo de clon": unclone,
 }

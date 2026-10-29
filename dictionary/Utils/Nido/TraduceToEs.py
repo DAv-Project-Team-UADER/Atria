@@ -2,7 +2,7 @@ from .Nest import nest
 
 TraduceToEs = {
     "crear nido": nest,
-    "nestear piezas": nest,
+    "anidar formas": nest,
     "organizar piezas": nest,
     "anidar piezas": nest,
 }

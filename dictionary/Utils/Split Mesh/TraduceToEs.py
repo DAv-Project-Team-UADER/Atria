@@ -1,8 +1,8 @@
 from .SplitMesh import split_mesh
 
 TraduceToEs = {
-    "separar malla": split_mesh,
-    "dividir malla": split_mesh,
-    "dividir el mesh": split_mesh,
-    "separar componentes de la malla": split_mesh,
+    "separar red": split_mesh,
+    "dividir red": split_mesh,
+    "dividir el modelo": split_mesh,
+    "separar componentes del modelo": split_mesh,
 }

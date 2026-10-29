@@ -1,8 +1,8 @@
 from .IFCExplorer import ifc_explorer
 
 TraduceToEs = {
-    "explorador IFC": ifc_explorer,
-    "abrir explorador IFC": ifc_explorer,
-    "ver contenido IFC": ifc_explorer,
-    "inspeccionar archivo IFC": ifc_explorer,
+    "explorador BIM": ifc_explorer,
+    "abrir explorador BIM": ifc_explorer,
+    "ver contenido BIM": ifc_explorer,
+    "inspeccionar archivo BIM": ifc_explorer,
 }
