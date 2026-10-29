@@ -151,7 +151,6 @@ except ImportError:
 
 TraduceToEs = {
     # Beam
-    'crear viga': Beam,
     'nueva viga': Beam,
     'generar haz': Beam,
     'añadir viga': Beam,
@@ -173,9 +172,6 @@ TraduceToEs = {
     'agregar bloque': Box,
     'caja por dimensiones': Box,
     'crear caja por dimensiones': Box,
-    'cubo': Box,
-    'crear cubo': Box,
-    'insertar cubo': Box,
     # Building
     'crear edificio': Building,
     'nuevo edificio': Building,
@@ -199,7 +195,6 @@ TraduceToEs = {
     'convertir en componente': Component,
     'crear componente': Component,
     'hacer componente': Component,
-    'hacer componente Arch': Component,
     'convertir en componente Arch': Component,
     'componente generico': Component,
     'componente genérico': Component,
@@ -227,9 +222,10 @@ TraduceToEs = {
     'enlazar documento': External_Reference,
     'vincular documento': External_Reference,
     # Facebinder
-    'crear atrapacaras': Facebinder,
-    'atrapacaras': Facebinder,
-    'facebinder': Facebinder,
+    'superficie desde caras': Facebinder,
+    'crear superficie desde caras': Facebinder,
+    'revestimiento de caras': Facebinder,
+    'crear revestimiento de caras': Facebinder,
     'crear facebinder': Facebinder,
     'superficie desde caras': Facebinder,
     'crear superficie desde caras': Facebinder,
@@ -386,12 +382,6 @@ TraduceToEs = {
     'generar armadura en espiral': HelicalRebar,
     'añadir barra helicoidal': HelicalRebar,
     'crear rebar helicoidal': HelicalRebar,
-    # LShapeRebar
-    'crear armadura en L': LShapeRebar,
-    'nueva barra en L': LShapeRebar,
-    'generar armadura en L': LShapeRebar,
-    'añadir barra de refuerzo en L': LShapeRebar,
-    'crear rebar en L': LShapeRebar,
     # StirrupRebar
     'crear estribo': StirrupRebar,
     'nuevo estribo': StirrupRebar,
@@ -405,9 +395,4 @@ TraduceToEs = {
     'añadir barra de refuerzo recta': StraightRebar,
     'crear rebar recto': StraightRebar,
     # UShapeRebar
-    'crear armadura en U': UShapeRebar,
-    'nueva barra en U': UShapeRebar,
-    'generar armadura en U': UShapeRebar,
-    'añadir barra de refuerzo en U': UShapeRebar,
-    'crear rebar en U': UShapeRebar,
 }
