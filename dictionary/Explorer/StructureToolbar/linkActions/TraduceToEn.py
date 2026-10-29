@@ -1,0 +1,158 @@
+# Copyright (C) 2026 El Equipo del Proyecto Atria
+# Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
+# Bajo la dirección de Ernesto Ledesma
+# Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
+#
+# Este programa es software libre: usted puede redistribuirlo y/o modificarlo
+# bajo los términos de la Licencia Pública General GNU tal como fue publicada
+# por la Fundación para el Software Libre, en la versión 3 de la Licencia.
+#
+# Este programa se distribuye con la esperanza de que sea útil,
+# pero SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de
+# MERCANTIBILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. Consulte la
+# Licencia Pública General GNU para más detalles.
+#
+# Deberías haber recibido una copia de la Licencia Pública General GNU
+# junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
+
+from .linkActions import link
+
+TraduceToEn = {
+    # MakeLink
+    "make link":     link["makelink"],
+    "create link":  link["makelink"],
+    "generate link":link["makelink"],
+    "new link":     link["makelink"],
+
+    # RelativeLink
+    "relative link":link["relativelink"],
+    "linked relative": link["relativelink"],
+    "attach relative": link["relativelink"],
+
+    # ImportLink
+    "import link":  link["importlink"],
+    "bring link":   link["importlink"],
+    "load link":    link["importlink"],
+
+    # ImportAllLinks
+    "import all":     link["importalllinks"],
+    "load all links": link["importalllinks"],
+    "bring all links":link["importalllinks"],
+
+    # ReplaceLink
+    "replace link": link["replacelink"],
+    "substitute link": link["replacelink"],
+    "change link":  link["replacelink"],
+
+    # LinkGroups
+    "link groups":   link["linkgroups"],
+    "group links":  link["linkgroups"],
+    "link set":     link["linkgroups"],
+    "link cluster": link["linkgroups"],
+
+    # Help
+    "help":         link["help"],
+    "info":         link["help"],
+    "options":      link["help"]
+}
+
+from dictionary.StdView.StandardViews.StandardViews import *
+
+TraduceToEn.update ({
+    # Bottom
+    'bottom': StandardViews['bottom'],
+    'below': StandardViews['bottom'],
+    'down': StandardViews['bottom'],
+    'lower': StandardViews['bottom'],
+
+    # Top
+    'top': StandardViews['top'],
+    'above': StandardViews['top'],
+    'upper': StandardViews['top'],
+
+    # Front
+    'front': StandardViews['front'],
+    'forward': StandardViews['front'],
+
+    # Rear
+    'rear': StandardViews['rear'],
+    'back': StandardViews['rear'],
+    'behind': StandardViews['rear'],
+
+    # Left
+    'left': StandardViews['left'],
+    'left view': StandardViews['left'],
+    'left side': StandardViews['left'],
+    'from the left': StandardViews['left'],
+    'view from the left': StandardViews['left'],
+
+    # Right
+    'right': StandardViews['right'],
+    'right view': StandardViews['right'],
+    'right side': StandardViews['right'],
+    'from the right': StandardViews['right'],
+    'view from the right': StandardViews['right'],
+
+    # Isometric
+    'isometric': StandardViews['isometric'],
+    'iso': StandardViews['isometric'],
+
+    # Dimetric
+    'dimetric': StandardViews['dimetric'],
+    'dimetric view': StandardViews['dimetric'],
+    'dimetric projection': StandardViews['dimetric'],
+    'dimetric perspective': StandardViews['dimetric'],
+
+    # Trimetric
+    'trimetric': StandardViews['trimetric'],
+    'trimetric view': StandardViews['trimetric'],
+    'trimetric projection': StandardViews['trimetric'],
+    'trimetric perspective': StandardViews['trimetric'],
+
+    # Fit All
+    'fit all': StandardViews['fitall'],
+    'fit': StandardViews['fitall'],
+    'fitview': StandardViews['fitall'],
+    'zoomfit': StandardViews['fitall'],
+
+    # Fit Selection
+    'fit selection': StandardViews['fitselection'],
+    'fit selected': StandardViews['fitselection'],
+    'zoom selection': StandardViews['fitselection'],
+
+    # Zoom in
+    'zoom in': StandardViews['zoomin'],
+    'zoom in view': StandardViews['zoomin'],
+
+    # Zoom out
+    'zoom out': StandardViews['zoomout'],
+    'zoom out view': StandardViews['zoomout'],
+
+    # Box Zoom
+    'box zoom': StandardViews['boxzoom'],
+    'window zoom': StandardViews['boxzoom'],
+    'zoom window': StandardViews['boxzoom'],
+
+    # New View
+    'new view': StandardViews['newview'],
+    'create view': StandardViews['newview'],
+
+    # Home
+    'home': StandardViews['home'],
+    'default view': StandardViews['home'],
+    'reset view': StandardViews['home'],
+
+    # Fullscreen
+    'full screen': StandardViews['fullscreen'],
+    'full screenmode': StandardViews['fullscreen'],
+
+    # Help
+    "help":            StandardViews['help'],
+    "info":            StandardViews['help'],
+    "options":         StandardViews['help']
+})
+
+# Mover la vista (centra la cámara en un punto)
+from moveview import MoveView, MOVE_VIEW_PHRASES
+for _phrase in MOVE_VIEW_PHRASES['en']:
+    TraduceToEn.setdefault(_phrase, MoveView)

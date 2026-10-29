@@ -72,8 +72,13 @@ def main():
         print("\nProcessing file...")
         keys = keychain.GetAllKeys()
 
-        # Get icons, checking existence in the same directory as the dictionary file
-        dict_dir = os.path.dirname(full_path)
+        # Get icons, checking existence in centralized InterfazATRIA/Icons (or dictionary dir as fallback)
+        icons_candidates = [
+            os.path.join(parent_dir, "InterfazATRIA", "Icons"),
+            os.path.join(script_dir, "InterfazATRIA", "Icons"),
+            os.path.dirname(full_path),
+        ]
+        dict_dir = next((p for p in icons_candidates if os.path.isdir(p)), os.path.dirname(full_path))
         icons = keychain.GetIcons(base_dir=dict_dir)
 
         # Display results header

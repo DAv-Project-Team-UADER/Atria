@@ -60,6 +60,13 @@ foreach ($modDir in $modDirs) {
 # 3. Environment variables
 $env:ATRIA_MOD_ROOT = $repoRoot
 $env:ATRIA_GUI_FREECAD_ROOT = Join-Path $repoRoot "GUIFreeCad"
+$env:ATRIA_INTERFAZ_ROOT = Join-Path $repoRoot "InterfazATRIA"
+$interfazIcons = Join-Path $repoRoot "InterfazATRIA\Icons"
+if (Test-Path $interfazIcons) {
+    $env:ATRIA_ICONS_ROOT = $interfazIcons
+} else {
+    $env:ATRIA_ICONS_ROOT = Join-Path $repoRoot "GUIFreeCad\ui\Icons"
+}
 $env:ATRIA_DICTIONARY_ROOT = Join-Path $repoRoot "dictionary"
 $env:ATRIA_MODELS_DIR = Join-Path $repoRoot "models"
 $env:ATRIA_AUTOLOAD_WORKBENCH = "1"

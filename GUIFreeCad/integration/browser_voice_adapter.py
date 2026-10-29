@@ -4,13 +4,17 @@ BrowserVoiceAdapter: connects Vosk spoken phrases to the new Browser navigation 
 
 from __future__ import annotations
 
+import sys
+sys.modules.setdefault("integration.browser_voice_adapter", sys.modules[__name__])
+sys.modules.setdefault("GUIFreeCad.integration.browser_voice_adapter", sys.modules[__name__])
+
 import io
 import sys
 import unicodedata
 from typing import Any
 
 from navigation.browser import Browser
-from integration.voice_history import append_voice_history
+from GUIFreeCad.integration.voice_history import append_voice_history
 
 
 def _normalize(text: str) -> str:
@@ -92,7 +96,7 @@ class BrowserVoiceAdapter:
 
     def _update_grammar(self) -> None:
         try:
-            from speech.atria_voice_service import AtriaVoiceService
+            from GUIFreeCad.speech.atria_voice_service import AtriaVoiceService
             phrases = self._browser.GetSpokenPhrases()
             AtriaVoiceService.get().set_grammar(phrases)
         except Exception as e:
@@ -159,7 +163,7 @@ class BrowserVoiceAdapter:
             self._export_state()
 
         try:
-            from integration.freecad_gui_bridge import run_on_main_thread
+            from GUIFreeCad.integration.freecad_gui_bridge import run_on_main_thread
             run_on_main_thread(_run)
         except ImportError:
             _run()
@@ -196,7 +200,7 @@ class BrowserVoiceAdapter:
         if not cls._on_gui_thread():
             return
         try:
-            from integration.atria_dock_panel import get_source
+            from GUIFreeCad.integration.atria_dock_panel import get_source
         except ImportError:
             return
         source = get_source()
@@ -212,7 +216,7 @@ class BrowserVoiceAdapter:
         if not cls._on_gui_thread():
             return
         try:
-            from integration.atria_dock_panel import get_source
+            from GUIFreeCad.integration.atria_dock_panel import get_source
         except ImportError:
             return
         source = get_source()

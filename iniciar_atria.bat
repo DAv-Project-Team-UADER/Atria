@@ -48,6 +48,12 @@ for %%V in ("%APPDATA%\FreeCAD\Mod" "%APPDATA%\FreeCAD\v1-1\Mod" "%APPDATA%\Free
 :: 3. Configure Environment Variables
 set "ATRIA_MOD_ROOT=%REPO_ROOT%"
 set "ATRIA_GUI_FREECAD_ROOT=%REPO_ROOT%\GUIFreeCad"
+set "ATRIA_INTERFAZ_ROOT=%REPO_ROOT%\InterfazATRIA"
+if exist "%REPO_ROOT%\InterfazATRIA\Icons" (
+    set "ATRIA_ICONS_ROOT=%REPO_ROOT%\InterfazATRIA\Icons"
+) else (
+    set "ATRIA_ICONS_ROOT=%REPO_ROOT%\GUIFreeCad\ui\Icons"
+)
 set "ATRIA_DICTIONARY_ROOT=%REPO_ROOT%\dictionary"
 set "ATRIA_MODELS_DIR=%REPO_ROOT%\models"
 set "ATRIA_AUTOLOAD_WORKBENCH=1"

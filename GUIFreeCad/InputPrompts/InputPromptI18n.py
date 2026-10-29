@@ -1,24 +1,11 @@
-﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
-# Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
-# Bajo la direcciÃ³n de Ernesto Ledesma
-# Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
-#
-# Este programa es software libre: usted puede redistribuirlo y/o modificarlo
-# bajo los tÃ©rminos de la Licencia PÃºblica General GNU tal como fue publicada
-# por la FundaciÃ³n para el Software Libre, en la versiÃ³n 3 de la Licencia.
-#
-# Este programa se distribuye con la esperanza de que sea Ãºtil,
-# pero SIN NINGUNA GARANTÃA; incluso sin la garantÃ­a implÃ­cita de
-# MERCANTIBILIDAD o APTITUD PARA UN PROPÃ“SITO PARTICULAR. Consulte la
-# Licencia PÃºblica General GNU para mÃ¡s detalles.
-#
-# DeberÃ­as haber recibido una copia de la Licencia PÃºblica General GNU
-# junto con este programa. Si no es asÃ­, consulte <http://www.gnu.org/licenses/>.
+﻿#  Copyright (C) 2026 The ATRIA Project Team
+#  Universidad Autónoma de Entre Ríos (UADER)
+#  SPDX-License-Identifier: GPL-3.0-or-later
 
 """Localized strings and live language resolution for ATRIA input prompts.
 
 The prompt windows must speak the same language selected in ATRIA options
-(``core.preferences`` â†’ ``SetLanguage``). The executor thread passes that
+(``core.preferences`` → ``SetLanguage``). The executor thread passes that
 language to the collector, and here every prompt resolves it at construction
 time so buttons, status lines and messages follow the configured language.
 """
@@ -106,6 +93,11 @@ _LABELS: dict[str, dict[str, str]] = {
         "object_select_error": "Could not select object: {error}",
         "object_selected": "Selected {name} ({current}/{total}).",
         "object_none": "No object is currently selected.",
+        "object_search_title": "Search by spelling",
+        "object_search_message": "Spell the object's name, letter by letter",
+        "object_search_none": "Nothing looks like \"{text}\". Say search by spelling to try again.",
+        "object_search_found": "Closest to \"{text}\": {name} ({current}/{total}).{others} Say send to pick it.",
+        "object_search_others": " Also: {names}.",
         "param_title": "ATRIA Parameter {index}",
         "param_message": "Say the {kind} value for '{name}', then say enter or send.",
         "kind_float": "float",
@@ -119,23 +111,28 @@ _LABELS: dict[str, dict[str, str]] = {
         "cancelled": "Cancelado",
         "ok": "Aceptar",
         "cancel": "Cancelar",
-        "value_not_empty": "El valor no puede estar vacÃ­o.",
-        "numeric_no_value": "No hay un nÃºmero para confirmar. DecÃ­ un nÃºmero primero.",
-        "numeric_prompt": "DecÃ­ un nÃºmero y luego decÃ­ ok o enviar.",
+        "value_not_empty": "El valor no puede estar vacío.",
+        "numeric_no_value": "No hay un número para confirmar. Decí un número primero.",
+        "numeric_prompt": "Decí un número y luego decí ok o enviar.",
         "string_waiting": "Esperando okey o enviar...",
-        "string_not_empty": "El texto no puede estar vacÃ­o.",
-        "object_unavailable": "La selecciÃ³n de objetos no estÃ¡ disponible: {error}",
+        "string_not_empty": "El texto no puede estar vacío.",
+        "object_unavailable": "La selección de objetos no está disponible: {error}",
         "object_no_doc": "No hay documento activo de FreeCAD.",
         "object_no_objects": "El documento activo de FreeCAD no tiene objetos.",
-        "object_browse_confirm": "DecÃ­ avanzar para recorrer objetos, luego decÃ­ enviar para confirmar.",
-        "object_browse": "DecÃ­ avanzar para recorrer, o decÃ­ enviar para confirmar.",
+        "object_browse_confirm": "Decí avanzar para recorrer objetos, luego decí enviar para confirmar.",
+        "object_browse": "Decí avanzar para recorrer, o decí enviar para confirmar.",
         "object_select_error": "No se pudo seleccionar el objeto: {error}",
         "object_selected": "Seleccionado {name} ({current}/{total}).",
-        "object_none": "No hay ningÃºn objeto seleccionado.",
-        "param_title": "ATRIA ParÃ¡metro {index}",
-        "param_message": "DecÃ­ el {kind} para '{name}' y luego decÃ­ enviar.",
-        "kind_float": "nÃºmero decimal",
-        "kind_int": "nÃºmero entero",
+        "object_none": "No hay ningún objeto seleccionado.",
+        "object_search_title": "Buscar por deletreo",
+        "object_search_message": "Deletreá el nombre del objeto, letra por letra",
+        "object_search_none": "Nada se parece a \"{text}\". Decí buscar por deletreo para probar de nuevo.",
+        "object_search_found": "Lo más parecido a \"{text}\": {name} ({current}/{total}).{others} Decí enviar para elegirlo.",
+        "object_search_others": " También: {names}.",
+        "param_title": "ATRIA Parámetro {index}",
+        "param_message": "Decí el {kind} para '{name}' y luego decí enviar.",
+        "kind_float": "número decimal",
+        "kind_int": "número entero",
         "kind_str": "texto",
         "kind_object": "objeto del documento",
     },
@@ -145,23 +142,28 @@ _LABELS: dict[str, dict[str, str]] = {
         "cancelled": "Cancelado",
         "ok": "OK",
         "cancel": "Cancelar",
-        "value_not_empty": "O valor nÃ£o pode estar vazio.",
-        "numeric_no_value": "NÃ£o hÃ¡ nÃºmero para confirmar. Diga um nÃºmero primeiro.",
-        "numeric_prompt": "Diga um nÃºmero e depois diga ok ou enviar.",
+        "value_not_empty": "O valor não pode estar vazio.",
+        "numeric_no_value": "Não há número para confirmar. Diga um número primeiro.",
+        "numeric_prompt": "Diga um número e depois diga ok ou enviar.",
         "string_waiting": "Aguardando enviar ou aceitar...",
-        "string_not_empty": "O texto nÃ£o pode estar vazio.",
-        "object_unavailable": "A seleÃ§Ã£o de objetos nÃ£o estÃ¡ disponÃ­vel: {error}",
-        "object_no_doc": "NÃ£o hÃ¡ documento ativo no FreeCAD.",
-        "object_no_objects": "O documento ativo do FreeCAD nÃ£o tem objetos.",
-        "object_browse_confirm": "Diga prÃ³ximo para percorrer objetos e depois diga enviar para confirmar.",
-        "object_browse": "Diga prÃ³ximo para percorrer, ou diga enviar para confirmar.",
-        "object_select_error": "NÃ£o foi possÃ­vel selecionar o objeto: {error}",
+        "string_not_empty": "O texto não pode estar vazio.",
+        "object_unavailable": "A seleção de objetos não está disponível: {error}",
+        "object_no_doc": "Não há documento ativo no FreeCAD.",
+        "object_no_objects": "O documento ativo do FreeCAD não tem objetos.",
+        "object_browse_confirm": "Diga próximo para percorrer objetos e depois diga enviar para confirmar.",
+        "object_browse": "Diga próximo para percorrer, ou diga enviar para confirmar.",
+        "object_select_error": "Não foi possível selecionar o objeto: {error}",
         "object_selected": "Selecionado {name} ({current}/{total}).",
-        "object_none": "Nenhum objeto estÃ¡ selecionado.",
-        "param_title": "ATRIA ParÃ¢metro {index}",
+        "object_none": "Nenhum objeto está selecionado.",
+        "object_search_title": "Buscar por soletração",
+        "object_search_message": "Soletre o nome do objeto, letra por letra",
+        "object_search_none": "Nada se parece com \"{text}\". Diga buscar por soletração para tentar de novo.",
+        "object_search_found": "O mais parecido com \"{text}\": {name} ({current}/{total}).{others} Diga enviar para escolhê-lo.",
+        "object_search_others": " Também: {names}.",
+        "param_title": "ATRIA Parâmetro {index}",
         "param_message": "Diga o {kind} para '{name}' e depois diga enviar.",
-        "kind_float": "nÃºmero decimal",
-        "kind_int": "nÃºmero inteiro",
+        "kind_float": "número decimal",
+        "kind_int": "número inteiro",
         "kind_str": "texto",
         "kind_object": "objeto do documento",
     },

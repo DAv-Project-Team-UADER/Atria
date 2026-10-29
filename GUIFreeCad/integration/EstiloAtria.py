@@ -1,19 +1,19 @@
 ﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
-# Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
-# Bajo la direcciÃ³n de Ernesto Ledesma
-# Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
+# Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
+# Bajo la dirección de Ernesto Ledesma
+# Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
 #
 # Este programa es software libre: usted puede redistribuirlo y/o modificarlo
-# bajo los tÃ©rminos de la Licencia PÃºblica General GNU tal como fue publicada
-# por la FundaciÃ³n para el Software Libre, en la versiÃ³n 3 de la Licencia.
+# bajo los términos de la Licencia Pública General GNU tal como fue publicada
+# por la Fundación para el Software Libre, en la versión 3 de la Licencia.
 #
-# Este programa se distribuye con la esperanza de que sea Ãºtil,
-# pero SIN NINGUNA GARANTÃA; incluso sin la garantÃ­a implÃ­cita de
-# MERCANTIBILIDAD o APTITUD PARA UN PROPÃ“SITO PARTICULAR. Consulte la
-# Licencia PÃºblica General GNU para mÃ¡s detalles.
+# Este programa se distribuye con la esperanza de que sea útil,
+# pero SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de
+# MERCANTIBILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. Consulte la
+# Licencia Pública General GNU para más detalles.
 #
-# DeberÃ­as haber recibido una copia de la Licencia PÃºblica General GNU
-# junto con este programa. Si no es asÃ­, consulte <http://www.gnu.org/licenses/>.
+# Deberías haber recibido una copia de la Licencia Pública General GNU
+# junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 """ATRIA visual style for the 3D view: white background, graph-paper grid and a clean look for solids.
 
@@ -35,7 +35,7 @@ from __future__ import annotations
 try:
     import FreeCAD
     import FreeCADGui
-except ImportError:  # fuera de FreeCAD (pruebas, documentaciÃ³n)
+except ImportError:  # fuera de FreeCAD (pruebas, documentación)
     FreeCAD = None
     FreeCADGui = None
 
@@ -80,7 +80,7 @@ def aplicarFondoBlanco() -> None:
     try:
         vista = FreeCADGui.ActiveDocument.ActiveView
         vista.setBackgroundColor(*FONDO)
-    except Exception:  # noqa: BLE001 - sin vista activa o versiÃ³n sin ese mÃ©todo
+    except Exception:  # noqa: BLE001 - sin vista activa o versión sin ese método
         pass
 
 
@@ -95,24 +95,24 @@ def aplicarRejilla() -> None:
     draft.SetBool("alwaysShowGrid", True)
     draft.SetString("gridSpacing", PASO_REJILLA)
     draft.SetUnsigned("gridColor", color)
-    # en Draft el parÃ¡metro es opacidad, no transparencia: 100 deja el color tal cual
+    # en Draft el parámetro es opacidad, no transparencia: 100 deja el color tal cual
     draft.SetInt("gridTransparency", 100)
-    # sin borde, sin figura humana y sin ejes de colores: la cuadrÃ­cula queda pareja
+    # sin borde, sin figura humana y sin ejes de colores: la cuadrícula queda pareja
     draft.SetBool("gridBorder", False)
     draft.SetBool("gridShowHuman", False)
     draft.SetBool("coloredGridAxes", False)
 
     sketcher = FreeCAD.ParamGet(_SKETCHER_PARAMS)
     sketcher.SetBool("ShowGrid", True)
-    # con el paso automÃ¡tico la cuadrÃ­cula crece con el zoom y deja de medir 2 mm
+    # con el paso automático la cuadrícula crece con el zoom y deja de medir 2 mm
     sketcher.SetBool("GridAuto", False)
     # el Sketcher guarda el paso como cantidad, en un subgrupo del mismo nombre
     sketcher.GetGroup("GridSize").SetString("GridSize", PASO_REJILLA)
-    # una sola familia de lÃ­neas: todos los cuadros iguales, sin lÃ­neas maestras
+    # una sola familia de líneas: todos los cuadros iguales, sin líneas maestras
     sketcher.SetInt("GridNumberSubdivision", 1)
     sketcher.SetUnsigned("GridLineColor", color)
     sketcher.SetUnsigned("GridDivLineColor", color)
-    # 0xffff es la lÃ­nea llena; el Sketcher trae las finas punteadas
+    # 0xffff es la línea llena; el Sketcher trae las finas punteadas
     sketcher.SetInt("GridLinePattern", 0xFFFF)
     sketcher.SetInt("GridDivLinePattern", 0xFFFF)
     sketcher.SetInt("GridTransparency", 0)
@@ -160,11 +160,11 @@ class _EstiloObserver:
     """Document observer: styles each solid once, right after it gets its shape."""
 
     def __init__(self):
-        # (documento, objeto) ya pintados: un recÃ¡lculo posterior no pisa los colores del usuario
+        # (documento, objeto) ya pintados: un recálculo posterior no pisa los colores del usuario
         self._pintados = set()
 
     def slotChangedObject(self, obj, prop):  # noqa: N802 - nombre fijo de FreeCAD
-        # la forma se calcula despuÃ©s de crear el objeto; reciÃ©n ahÃ­ hay algo que pintar
+        # la forma se calcula después de crear el objeto; recién ahí hay algo que pintar
         if prop != "Shape":
             return
         clave = (obj.Document.Name, obj.Name)

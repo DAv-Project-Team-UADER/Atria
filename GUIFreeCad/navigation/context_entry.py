@@ -46,7 +46,11 @@ class ContextEntry:
     Target: Any
 
     def IsSubContext(self) -> bool:
-        return isinstance(self.Target, dict)
+        if not isinstance(self.Target, dict):
+            return False
+        if len(self.Target) == 1 and callable(next(iter(self.Target.values()))):
+            return False
+        return True
 
     def IsCallable(self) -> bool:
         if callable(self.Target):

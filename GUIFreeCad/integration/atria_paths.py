@@ -73,9 +73,9 @@ def guifreecad_root() -> Path:
     return _GUI_ROOT
 
 
-# Carpetas que identifican a Atria/scr/ como raÃ­z. Antes se usaba
-# "PruebaIntegracion", que se retirÃ³ a Atria/docs/prototipos/; se marca por
-# "validation" y "selection", que estÃ¡n en el camino activo (el Validator de
+# Carpetas que identifican a Atria/scr/ como raíz. Antes se usaba
+# "PruebaIntegracion", que se retiró a Atria/docs/prototipos/; se marca por
+# "validation" y "selection", que están en el camino activo (el Validator de
 # PromptedCommandExecutor y CreateObjects de los diccionarios).
 _REPO_MARKERS = ("validation", "selection")
 
@@ -108,7 +108,7 @@ def atria_repo_root() -> Path:
         return found
 
     raise FileNotFoundError(
-        "No se encontrÃ³ el repo ATRIA (se buscÃ³ "
+        "No se encontró el repo ATRIA (se buscó "
         f"{' / '.join(_REPO_MARKERS)} en los ancestros)."
     )
 

@@ -1,4 +1,4 @@
-﻿"""Preferences dialog â€” click and voice configuration (FreeCAD style)."""
+﻿"""Preferences dialog — click and voice configuration (FreeCAD style)."""
 
 from __future__ import annotations
 
@@ -353,9 +353,9 @@ class PreferencesDialog(QDialog):
         )
 
     _AUTO_VOICE_LABELS: dict[str, tuple[str, str]] = {
-        "es": ("MicrÃ³fono: iniciar al abrir FreeCAD âœ“", "MicrÃ³fono: iniciar al abrir FreeCAD"),
-        "en": ("Microphone: start on FreeCAD open âœ“", "Microphone: start on FreeCAD open"),
-        "pt": ("Microfone: iniciar ao abrir FreeCAD âœ“", "Microfone: iniciar ao abrir FreeCAD"),
+        "es": ("Micrófono: iniciar al abrir FreeCAD ✓", "Micrófono: iniciar al abrir FreeCAD"),
+        "en": ("Microphone: start on FreeCAD open ✓", "Microphone: start on FreeCAD open"),
+        "pt": ("Microfone: iniciar ao abrir FreeCAD ✓", "Microfone: iniciar ao abrir FreeCAD"),
     }
 
     def _on_auto_voice_toggled(self, checked: bool) -> None:
@@ -407,7 +407,7 @@ class PreferencesDialog(QDialog):
             on_audio=self._voice_bridge.audio_activity.emit,
         )
         self._voice.start()
-        self._btn_toggle_voice.setText("â¸ " + tr("voice_pause", self._lang))
+        self._btn_toggle_voice.setText("⏸ " + tr("voice_pause", self._lang))
         self._voice_label.setText(tr("voice_starting", self._lang))
 
     def _restart_voice(self) -> None:
@@ -416,25 +416,25 @@ class PreferencesDialog(QDialog):
     def _toggle_voice(self) -> None:
         if self._voice and self._voice.is_running():
             self._voice.pause()
-            self._btn_toggle_voice.setText("â–¶ " + tr("voice_resume", self._lang))
+            self._btn_toggle_voice.setText("▶ " + tr("voice_resume", self._lang))
             self._refresh_voice_badge()
         elif self._voice:
             self._voice.resume()
-            self._btn_toggle_voice.setText("â¸ " + tr("voice_pause", self._lang))
+            self._btn_toggle_voice.setText("⏸ " + tr("voice_pause", self._lang))
             self._refresh_voice_badge()
         else:
             self._start_voice()
 
     def _refresh_voice_badge(self) -> None:
         if self._voice and self._voice.is_running():
-            self._voice_status_badge.setText("ðŸŸ¢ " + tr("voice_active", self._lang))
+            self._voice_status_badge.setText("🟢 " + tr("voice_active", self._lang))
             self._voice_status_badge.setStyleSheet("color: #1a7f37; font-weight: bold;")
             self._voice_label.setText(tr("voice_listening", self._lang))
         elif self._voice and self._voice.is_starting():
-            self._voice_status_badge.setText("ðŸŸ¡ " + tr("voice_starting", self._lang))
+            self._voice_status_badge.setText("🟡 " + tr("voice_starting", self._lang))
             self._voice_status_badge.setStyleSheet("color: #9a6700; font-weight: bold;")
         else:
-            self._voice_status_badge.setText("ðŸ”´ " + tr("voice_paused", self._lang))
+            self._voice_status_badge.setText("🔴 " + tr("voice_paused", self._lang))
             self._voice_status_badge.setStyleSheet("color: #cf222e; font-weight: bold;")
             self._voice_label.setText(tr("voice_paused_hint", self._lang))
 
@@ -450,18 +450,18 @@ class PreferencesDialog(QDialog):
             self._voice_heard.setText(tr("voice_unknown", self._lang, text=heard))
             return
         if status == "error:no_model":
-            self._voice_status_badge.setText("âš ï¸ " + tr("voice_error_model", self._lang))
+            self._voice_status_badge.setText("⚠️ " + tr("voice_error_model", self._lang))
             self._voice_label.setText(
                 tr("small_model_missing", self._lang, lang=self._current_language())
             )
             return
         if status.startswith("error:mic"):
-            self._voice_status_badge.setText("âš ï¸ " + tr("voice_error_mic", self._lang))
+            self._voice_status_badge.setText("⚠️ " + tr("voice_error_mic", self._lang))
             self._voice_label.setText(status.replace("error:mic:", ""))
             return
         if status.startswith("error:import:"):
             detail = status.split("error:import:", 1)[1]
-            self._voice_status_badge.setText("âš ï¸ " + tr("voice_error", self._lang))
+            self._voice_status_badge.setText("⚠️ " + tr("voice_error", self._lang))
             self._voice_label.setText(
                 detail
                 + "\n\npip en Python de FreeCAD:\n"
@@ -469,12 +469,12 @@ class PreferencesDialog(QDialog):
             )
             return
         if status.startswith("error:"):
-            self._voice_status_badge.setText("âš ï¸ " + tr("voice_error", self._lang))
+            self._voice_status_badge.setText("⚠️ " + tr("voice_error", self._lang))
             self._voice_label.setText(status.split(":", 2)[-1] if ":" in status else status)
 
     def _on_text_heard(self, text: str, is_final: bool) -> None:
         prefix = tr("voice_heard_final", self._lang) if is_final else tr("voice_heard_partial", self._lang)
-        self._voice_heard.setText(f"{prefix}: Â«{text}Â»")
+        self._voice_heard.setText(f"{prefix}: «{text}»")
 
     def _on_audio_activity(self) -> None:
         self._audio_pulse = 8
@@ -484,7 +484,7 @@ class PreferencesDialog(QDialog):
     def _tick_audio_pulse(self) -> None:
         if self._audio_pulse > 0:
             self._audio_pulse -= 1
-            bars = "â–â–‚â–ƒâ–„â–…â–†â–‡â–ˆ"[8 - self._audio_pulse : 8]
+            bars = "▁▂▃▄▅▆▇█"[8 - self._audio_pulse : 8]
             if self._voice and self._voice.is_running():
                 self._voice_label.setText(tr("voice_hearing_audio", self._lang) + " " + bars)
         else:
@@ -544,7 +544,7 @@ class PreferencesDialog(QDialog):
             "apply": tr("btn_apply", self._lang),
             "ok": tr("btn_ok", self._lang),
         }
-        self._voice_label.setText(f"âœ“ {labels.get(command, command)}")
+        self._voice_label.setText(f"✓ {labels.get(command, command)}")
 
         if command == "lang_en":
             self._apply_language("en")

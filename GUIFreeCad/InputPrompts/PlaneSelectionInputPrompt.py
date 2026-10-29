@@ -1,19 +1,19 @@
 ﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
-# Universidad AutÃ³noma de Entre RÃ­os (UADER FCYT, sede ConcepciÃ³n del Uruguay)
-# Bajo la direcciÃ³n de Ernesto Ledesma
-# Encargados: Micaela SaÃ¼l, Tadeo Rochas y Camila ViÃ±eg
+# Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
+# Bajo la dirección de Ernesto Ledesma
+# Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
 #
 # Este programa es software libre: usted puede redistribuirlo y/o modificarlo
-# bajo los tÃ©rminos de la Licencia PÃºblica General GNU tal como fue publicada
-# por la FundaciÃ³n para el Software Libre, en la versiÃ³n 3 de la Licencia.
+# bajo los términos de la Licencia Pública General GNU tal como fue publicada
+# por la Fundación para el Software Libre, en la versión 3 de la Licencia.
 #
-# Este programa se distribuye con la esperanza de que sea Ãºtil,
-# pero SIN NINGUNA GARANTÃA; incluso sin la garantÃ­a implÃ­cita de
-# MERCANTIBILIDAD o APTITUD PARA UN PROPÃ“SITO PARTICULAR. Consulte la
-# Licencia PÃºblica General GNU para mÃ¡s detalles.
+# Este programa se distribuye con la esperanza de que sea útil,
+# pero SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de
+# MERCANTIBILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. Consulte la
+# Licencia Pública General GNU para más detalles.
 #
-# DeberÃ­as haber recibido una copia de la Licencia PÃºblica General GNU
-# junto con este programa. Si no es asÃ­, consulte <http://www.gnu.org/licenses/>.
+# Deberías haber recibido una copia de la Licencia Pública General GNU
+# junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 """Voice-driven sketch plane orientation selector for ATRIA."""
 
@@ -74,16 +74,16 @@ class PlaneSelectionInputPrompt(BaseInputPrompt):
         "seguinte",
     }
 
-    # SinÃ³nimos extra de confirmaciÃ³n propios del selector; ahora
-    # SpokenNumberParser ya incluye "okey"/"okay", pero se mantienen acÃ¡
+    # Sinónimos extra de confirmación propios del selector; ahora
+    # SpokenNumberParser ya incluye "okey"/"okay", pero se mantienen acá
     # por compatibilidad y para que el selector siga aceptando "okey"
-    # aunque el mÃ³dulo de nÃºmeros no se haya cargado toatriaÃ­a.
+    # aunque el módulo de números no se haya cargado toatriaía.
     OkeyWords: set[str] = {"okey", "okay", "ok"}
 
     def __init__(
         self,
         Title: str = "ATRIA Sketch Orientation",
-        Message: str = "ElegÃ­ el plano del boceto (XY, XZ o YZ)",
+        Message: str = "Elegí el plano del boceto (XY, XZ o YZ)",
         Parent=None,
         ExtraOptions: list[tuple[str, str]] | None = None,
     ) -> None:
@@ -99,7 +99,7 @@ class PlaneSelectionInputPrompt(BaseInputPrompt):
         """
         super().__init__(Title, Message, Parent)
         # Los planos van primero, tal como estaban; las opciones extra
-        # (caras) se suman despuÃ©s sin cambiar el orden de los planos.
+        # (caras) se suman después sin cambiar el orden de los planos.
         self._Options: list[tuple[str, str]] = [(key, key) for key in self.PlaneKeys]
         self._Options.extend(ExtraOptions or [])
         self._CurrentIndex = 0
@@ -136,7 +136,7 @@ class PlaneSelectionInputPrompt(BaseInputPrompt):
         if tokens_set & self.OkeyWords or self._HasConfirmation(tokens):
             return self.AcceptValue(self._Plane)
 
-        self.SetStatus("DecÃ­ arriba o abajo, y despuÃ©s okey/enviar/listos para confirmar, cancelar para salir.")
+        self.SetStatus("Decí arriba o abajo, y después okey/enviar/listos para confirmar, cancelar para salir.")
         return self.GetResult()
 
     @property
@@ -164,5 +164,5 @@ class PlaneSelectionInputPrompt(BaseInputPrompt):
         name = f"Plano {self._Plane}" if self._Plane in self.PlaneKeys else self._Label()
         return (
             f"{name} ({self._CurrentIndex + 1}/{len(self._Options)})"
-            " â€” decÃ­ arriba o abajo, okey/enviar para confirmar, cancelar para salir."
+            " — decí arriba o abajo, okey/enviar para confirmar, cancelar para salir."
         )

@@ -28,9 +28,20 @@ if _d:
     _d_real = os.path.realpath(_d)
     if _d_real not in sys.path:
         sys.path.insert(0, _d_real)
+    for _rel_icons in (("InterfazATRIA", "Icons"), ("GUIFreeCad", "ui", "Icons")):
+        _icons_dir = os.path.join(_d_real, *_rel_icons)
+        if os.path.isdir(_icons_dir):
+            os.environ.setdefault("ATRIA_ICONS_ROOT", _icons_dir)
+            try:
+                Gui.addIconPath(_icons_dir)
+                _sys_icons = os.path.join(_icons_dir, "system")
+                if os.path.isdir(_sys_icons):
+                    Gui.addIconPath(_sys_icons)
+            except Exception:
+                pass
 
 try:
-    import gui.atria_commands as _atria_commands
+    import atriaGui.atria_commands as _atria_commands
 
     _atria_commands._ensure_selection_path()
     _atria_commands._ensure_validation_path()
@@ -43,9 +54,9 @@ class AtriaWorkbench(Gui.Workbench):
     ToolTip = "Atria (UADER)"
 
     def Initialize(self):
-        import gui.freecad_wb
+        import atriaGui.freecad_wb
 
-        gui.freecad_wb.setup_workbench(self)
+        atriaGui.freecad_wb.setup_workbench(self)
 
     def GetClassName(self):
         return "Gui::PythonWorkbench"

@@ -1,0 +1,42 @@
+# Copyright (C) 2026 El Equipo del Proyecto Atria
+# Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
+# Bajo la dirección de Ernesto Ledesma
+# Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
+#
+# Este programa es software libre: usted puede redistribuirlo y/o modificarlo
+# bajo los términos de la Licencia Pública General GNU tal como fue publicada
+# por la Fundación para el Software Libre, en la versión 3 de la Licencia.
+#
+# Este programa se distribuye con la esperanza de que sea útil,
+# pero SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de
+# MERCANTIBILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. Consulte la
+# Licencia Pública General GNU para más detalles.
+#
+# Deberías haber recibido una copia de la Licencia Pública General GNU
+# junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
+import FreeCADGui as Gui
+
+from .ayuda import ayuda
+
+def _single_expand():
+    """Modo de documento individual en el árbol y expandir ítems seleccionados."""
+    try:
+        Gui.runCommand('Std_TreeSingleDocument', 0)
+    except Exception:
+        pass
+    try:
+        Gui.runCommand('Std_TreeExpand', 0)
+    except Exception:
+        pass
+
+# Diccionario ATRIA - StdView / Tree
+tree = {
+    'collapse':        lambda: Gui.runCommand('Std_TreeCollapseDocument', 0),
+    'preselection':    lambda: Gui.runCommand('Std_TreePreSelection', 0),
+    'recordselection': lambda: Gui.runCommand('Std_TreeRecordSelection', 0),
+    'singleexpand':    _single_expand,
+    'syncplacement':   lambda: Gui.runCommand('Std_TreeSyncPlacement', 0),
+    'syncselection':   lambda: Gui.runCommand('Std_TreeSyncSelection', 0),
+    'syncview':        lambda: Gui.runCommand('Std_TreeSyncView', 0),
+    'help':            ayuda,
+}

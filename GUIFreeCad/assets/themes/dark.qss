@@ -223,3 +223,9 @@ QHeaderView::section {
     padding: 4px;
     color: #e0e0e0;
 }
+
+/* --- Report view & consoles: light text on dark background --- */
+QTextEdit, QPlainTextEdit, #ReportOutput, #PythonConsole {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
