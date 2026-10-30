@@ -27,6 +27,7 @@ TraduceToEn = {
     "snapping": Base.get("Snapping"),
     "status bar": Base.get("StatusBar"),
     "utils": Base.get("Utils"),
+    "explorer": Base.get("Explorer"),
 
     # Panel ATRIA
     "show panel": Base.get("show_atria_panel"),

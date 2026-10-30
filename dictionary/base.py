@@ -15,6 +15,7 @@ Preferences = {"name": "Preferences"}
 Snapping = {"name": "Snapping"}
 StatusBar = {"name": "StatusBar"}
 Utils = {"name": "Utils"}
+Explorer = {"name": "Explorer"}
 
 def show_atria_panel():
     try:
@@ -45,6 +46,7 @@ Base = {
     "Snapping": Snapping,
     "StatusBar": StatusBar,
     "Utils": Utils,
+    "Explorer": Explorer,
     "show_atria_panel": show_atria_panel,
     "hide_atria_panel": hide_atria_panel,
 }

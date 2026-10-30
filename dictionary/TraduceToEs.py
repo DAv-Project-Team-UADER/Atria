@@ -39,6 +39,8 @@ TraduceToEs = {
     "utilidades": Base.get("Utils"),
     "herramientas": Base.get("Utils"),
     "utils": Base.get("Utils"),
+    "explorador": Base.get("Explorer"),
+    "explorer": Base.get("Explorer"),
 
     # Panel ATRIA
     "mostrar panel": Base.get("show_atria_panel"),
