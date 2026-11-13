@@ -15,7 +15,7 @@
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 try:
-    from .Objects_Library import Objects_Library
+    from .Objects_Library import objects_library as Objects_Library
 except ImportError:
     Objects_Library = None  
 
@@ -28,8 +28,8 @@ TraduceToEn = {
     'insert library object':            Objects_Library,
     'add library object':               Objects_Library,
     'insert object from library':       Objects_Library,
-    'insert furniture':                 Objects_Library,
-    'add furniture':                    Objects_Library,
-    'insert equipment':                 Objects_Library,
-    'add equipment':                    Objects_Library,
+    'insert furniture from library':    Objects_Library,
+    'add furniture from library':       Objects_Library,
+    'insert equipment from library':    Objects_Library,
+    'add equipment from library':       Objects_Library,
 }

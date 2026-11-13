@@ -16,7 +16,7 @@
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 try:
-    from .Box import Box
+    from .Box import box as Box
 except ImportError:
     Box = None
 
@@ -28,6 +28,12 @@ TraduceToEs = {
     'crear bloque':         Box,
     'insertar bloque':      Box,
     'agregar bloque':       Box,
-    'caja por dimensiones': Box,
-    'crear caja por dimensiones' :Box,
+    'caja por dimensiones':        Box,
+    'crear caja por dimensiones':  Box,
+    'cubo':                        Box,
+    'crear cubo':                  Box,
+    'insertar cubo':               Box,
+    'agregar cubo':                Box,
+    'caja cúbica':                 Box,
+    'crear caja cúbica':           Box,
 }

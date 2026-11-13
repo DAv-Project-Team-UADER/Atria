@@ -16,7 +16,7 @@
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 try:
-    from .Shape_Builder import Shape_Builder
+    from .Shape_Builder import shape_builder as Shape_Builder
 except ImportError:
     Shape_Builder = None    
 

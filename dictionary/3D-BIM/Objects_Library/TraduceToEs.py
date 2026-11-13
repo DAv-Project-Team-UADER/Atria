@@ -15,7 +15,7 @@
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 try:
-    from .Objects_Library import Objects_Library
+    from .Objects_Library import objects_library as Objects_Library
 except ImportError:
     Objects_Library = None
 
@@ -26,8 +26,8 @@ TraduceToEs = {
     'insertar objeto de biblioteca':     Objects_Library,
     'agregar objeto de biblioteca':      Objects_Library,
     'insertar objeto desde biblioteca':  Objects_Library,
-    'insertar mobiliario':               Objects_Library,
-    'agregar mobiliario':                Objects_Library,
-    'insertar equipo':                   Objects_Library,
-    'agregar equipo':                    Objects_Library,
+    'insertar mobiliario de biblioteca': Objects_Library,
+    'agregar mobiliario de biblioteca':  Objects_Library,
+    'insertar equipo de biblioteca':     Objects_Library,
+    'agregar equipo de biblioteca':      Objects_Library,
 }

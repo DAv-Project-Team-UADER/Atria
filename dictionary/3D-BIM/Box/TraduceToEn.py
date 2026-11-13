@@ -15,22 +15,23 @@
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 try:
-    from .Box import Box
+    from .Box import box as Box
 except ImportError:
     Box = None
 
 TraduceToEn = {
-    'create ':             Box,
-    'insert ':             Box,
-    'add ':                Box,
-    'create block':           Box,
-    'insert block':           Box,
-    'add block':              Box,
-    ' by dimensions':      Box,
-    'create  by dimensions': Box,
-    'cube':                   Box,
-    'create cube':            Box,
-    'insert cube':            Box,
+    'create box':              Box,
+    'insert box':              Box,
+    'add box':                 Box,
+    'box by dimensions':       Box,
+    'create box by dimensions': Box,
+    'create block':            Box,
+    'insert block':            Box,
+    'add block':               Box,
+    'cube':                    Box,
+    'create cube':             Box,
+    'insert cube':             Box,
+    'add cube':                Box,
 }
 
 

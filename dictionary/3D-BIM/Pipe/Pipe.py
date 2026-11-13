@@ -24,5 +24,5 @@ def _pipe():
     Draft.autogroup(obj)
 
 Pipe = {
-    "pipe": _pipe()
+    "pipe": _pipe
 }

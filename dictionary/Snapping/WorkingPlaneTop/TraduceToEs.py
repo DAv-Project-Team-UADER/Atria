@@ -24,7 +24,7 @@ TraduceToEs = {
     # Working Plane Top
     'plano de trabajo superior':  working_plane_top,
     'vista de plano superior':    working_plane_top,
-    'fijar plano arriba':         working_plane_top,
-    'plano top':                  working_plane_top,
+    'fijar plano de arriba':      working_plane_top,
+    'plano de arriba':            working_plane_top,
     'plano superior':             working_plane_top,
 }

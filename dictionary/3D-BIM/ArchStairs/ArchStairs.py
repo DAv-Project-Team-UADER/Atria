@@ -24,5 +24,5 @@ def _stairs():
     Draft.autogroup(stairs)
 
 ArchStairs = {
-    "arch stairs": _stairs()
+    "arch stairs": _stairs
 }

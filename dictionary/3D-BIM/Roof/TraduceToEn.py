@@ -6,8 +6,8 @@ except ImportError:
     Roof = None
 
 TraduceToEn = {
-    "create roof":          Roof,
-    "new roof":             Roof,
-    "generate roof":        Roof,
-    "add sloped roof":      Roof,
+    "create covering":      Roof,
+    "new covering":         Roof,
+    "generate covering":    Roof,
+    "add sloped covering":  Roof,
 }

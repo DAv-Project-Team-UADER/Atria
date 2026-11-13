@@ -15,7 +15,7 @@
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 try:
-    from .External_Reference import External_Reference
+    from .External_Reference import external_reference as External_Reference
 except ImportError:
     External_Reference = None
 

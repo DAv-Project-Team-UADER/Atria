@@ -16,7 +16,7 @@
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 try:
-    from .Beam_Reinforcement import Beam_Reinforcement
+    from .Beam_Reinforcement import beam_reinforcement as Beam_Reinforcement
 except ImportError:
     Beam_Reinforcement = None
 

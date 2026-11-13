@@ -15,18 +15,17 @@
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 try:    
-    from .Component import Component
+    from .Component import component as Component
 except ImportError:
     Component = None
 
 TraduceToEs = {
     # Componente
-    'convertir en componente':          Component,
-    'crear componente':                 Component,
-    'hacer componente':                 Component,
-    'convertir en componente Arch':     Component,
-    'componente generico':              Component,
-    'componente genérico':              Component,
-    'crear componente generico':        Component,
-    'crear componente genérico':        Component,
+    'convertir en componente':                Component,
+    'crear componente':                       Component,
+    'hacer componente':                       Component,
+    'convertir en componente arquitectónico': Component,
+    'hacer componente arquitectónico':        Component,
+    'componente genérico':                    Component,
+    'crear componente genérico':              Component,
 }

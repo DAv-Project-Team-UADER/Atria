@@ -16,7 +16,7 @@
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 try:    
-    from .Component import Component
+    from .Component import component as Component
 except ImportError:
     Component = None
 

@@ -6,7 +6,10 @@ except ImportError:
     Beam = None
 
 TraduceToEs = {
-    "nueva viga":           Beam,
-    "generar haz":          Beam,
-    "añadir viga":          Beam,
+    "crear viga":                       Beam,
+    "crear haz":                        Beam,
+    "nueva viga":                       Beam,
+    "generar haz":                      Beam,
+    "añadir viga":                      Beam,
+    "crear elemento estructural horizontal": Beam,
 }

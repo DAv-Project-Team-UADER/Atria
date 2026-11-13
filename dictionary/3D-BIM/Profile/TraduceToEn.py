@@ -15,7 +15,7 @@
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 try:
-    from .Profile import Profile
+    from .Profile import profile as Profile
 except ImportError:
     Profile = None  
 

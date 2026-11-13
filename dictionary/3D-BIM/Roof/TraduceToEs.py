@@ -6,8 +6,9 @@ except ImportError:
     Roof = None
 
 TraduceToEs = {
-    "crear cubierta":       Roof,
-    "nuevo techo":          Roof,
-    "generar cubierta":     Roof,
+    "crear cubierta":         Roof,
+    "nueva cubierta":         Roof,
+    "generar cubierta":       Roof,
     "añadir techo inclinado": Roof,
+    "crear techo inclinado":  Roof,
 }

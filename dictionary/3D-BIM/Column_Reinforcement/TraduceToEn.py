@@ -16,7 +16,7 @@
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 try:
-    from .Column_Reinforcement import Column_Reinforcement
+    from .Column_Reinforcement import column_reinforcement as Column_Reinforcement
 except ImportError:
     Column_Reinforcement = None
 

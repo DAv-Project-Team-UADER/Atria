@@ -15,7 +15,7 @@
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 try:
-    from .Footing_Reinforcement import Footing_Reinforcement
+    from .Footing_Reinforcement import footing_reinforcement as Footing_Reinforcement
 except ImportError:
     Footing_Reinforcement = None    
 

@@ -16,7 +16,7 @@
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 try:
-    from .Shape_Builder import Shape_Builder
+    from .Shape_Builder import shape_builder as Shape_Builder
 except ImportError:
     Shape_Builder = None    
 
@@ -29,8 +29,6 @@ TraduceToEs = {
     'crear forma geométrica':      Shape_Builder,
     'construir forma geométrica':  Shape_Builder,
     'construir cara':              Shape_Builder,
-    'construir cascara':           Shape_Builder,
     'construir cáscara':           Shape_Builder,
-    'construir solido':            Shape_Builder,
     'construir sólido':            Shape_Builder,
 }

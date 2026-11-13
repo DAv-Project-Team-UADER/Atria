@@ -8,7 +8,7 @@ except ImportError:
 TraduceToEs = {
     "crear armadura personalizada": ArchRebar,
     "nueva barra de refuerzo":      ArchRebar,
-    "generar armadura":             ArchRebar,
+    "generar armadura personalizada": ArchRebar,
     "añadir rebar":                 ArchRebar,
     "crear barra personalizada":    ArchRebar,
 }

@@ -15,12 +15,16 @@
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 try:
-    from .Facebinder import Facebinder
+    from .Facebinder import facebinder as Facebinder
 except ImportError:
     Facebinder = None
 
 TraduceToEs = {
     # Atrapacaras
+    'crear atrapacaras':             Facebinder,
+    'atrapacaras':                   Facebinder,
+    'crear atrapa caras':            Facebinder,
+    'atrapa caras':                  Facebinder,
     'crear facebinder':              Facebinder,
     'superficie desde caras':        Facebinder,
     'crear superficie desde caras':  Facebinder,

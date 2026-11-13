@@ -16,7 +16,7 @@
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 try:
-    from .Profile import Profile
+    from .Profile import profile as Profile
 except ImportError:
     Profile = None  
     
@@ -28,7 +28,7 @@ TraduceToEs = {
     'crear perfil estructural':      Profile,
     'insertar perfil estructural':   Profile,
     'agregar perfil estructural':    Profile,
-    'crear perfil parametrico':      Profile,
-    'insertar perfil parametrico':   Profile,
-    'perfil parametrico':            Profile,
+    'crear perfil paramétrico':      Profile,
+    'insertar perfil paramétrico':   Profile,
+    'perfil paramétrico':            Profile,
 }

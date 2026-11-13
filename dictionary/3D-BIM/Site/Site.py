@@ -24,5 +24,5 @@ def _site():
     Draft.autogroup(obj)
 
 Site = {
-    "site": _site()
+    "site": _site
 }

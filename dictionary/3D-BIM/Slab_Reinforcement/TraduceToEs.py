@@ -16,7 +16,7 @@
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 try:
-    from .Slab_Reinforcement import Slab_Reinforcement
+    from .Slab_Reinforcement import slab_reinforcement as Slab_Reinforcement
 except ImportError:
     Slab_Reinforcement = None   
 

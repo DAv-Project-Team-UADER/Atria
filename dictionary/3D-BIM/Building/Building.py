@@ -24,5 +24,5 @@ def _building():
     Draft.autogroup(obj)
 
 Building = {
-    "building": _building()
+    "building": _building
 }

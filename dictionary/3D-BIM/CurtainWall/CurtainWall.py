@@ -17,6 +17,6 @@
 
 import FreeCADGui as Gui
 
-CuratainWall = {
+CurtainWall = {
     "curtainwall": lambda: Gui.runCommand('Arch_CurtainWall',0)
 }
