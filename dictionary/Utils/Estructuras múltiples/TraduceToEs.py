@@ -4,4 +4,5 @@ TraduceToEs = {
     "generar varias estructuras": multiple_structures,
     "generar estructuras múltiples": multiple_structures,
     "estructuras desde bordes": multiple_structures,
+    "crear múltiples elementos": multiple_structures,
 }

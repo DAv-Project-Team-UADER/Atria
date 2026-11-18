@@ -24,5 +24,5 @@ TraduceToEs = {
     "independizar clon": unclone,
     "separar del original": unclone,
     "romper vínculo de clon": unclone,
-    "romper vinculo de clon": unclone,
+    "desclonar": unclone,
 }

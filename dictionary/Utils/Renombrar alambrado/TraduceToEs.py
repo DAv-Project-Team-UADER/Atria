@@ -1,7 +1,7 @@
 from .RenameWire import rename_wire
 
 TraduceToEs = {
-    "renovar alambrado": rename_wire,
+    "renombrar alambrado": rename_wire,
     "recrear alambrado": rename_wire,
-    "renovar entorno": rename_wire,
+    "rebautizar alambrado": rename_wire,
 }
