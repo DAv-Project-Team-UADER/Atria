@@ -151,7 +151,6 @@ except ImportError:
 
 TraduceToEs = {
     # Beam
-    'crear viga': Beam,
     'nueva viga': Beam,
     'generar haz': Beam,
     'añadir viga': Beam,
@@ -173,9 +172,6 @@ TraduceToEs = {
     'agregar bloque': Box,
     'caja por dimensiones': Box,
     'crear caja por dimensiones': Box,
-    'cubo': Box,
-    'crear cubo': Box,
-    'insertar cubo': Box,
     # Building
     'crear edificio': Building,
     'nuevo edificio': Building,
@@ -199,7 +195,6 @@ TraduceToEs = {
     'convertir en componente': Component,
     'crear componente': Component,
     'hacer componente': Component,
-    'hacer componente Arch': Component,
     'convertir en componente Arch': Component,
     'componente generico': Component,
     'componente genérico': Component,
@@ -227,14 +222,11 @@ TraduceToEs = {
     'enlazar documento': External_Reference,
     'vincular documento': External_Reference,
     # Facebinder
-    'crear atrapacaras': Facebinder,
-    'atrapacaras': Facebinder,
-    'facebinder': Facebinder,
-    'crear facebinder': Facebinder,
     'superficie desde caras': Facebinder,
     'crear superficie desde caras': Facebinder,
     'revestimiento de caras': Facebinder,
     'crear revestimiento de caras': Facebinder,
+    'crear facebinder': Facebinder,
     # Footing_Reinforcement
     'reforzar zapata': Footing_Reinforcement,
     'agregar refuerzo de zapata': Footing_Reinforcement,

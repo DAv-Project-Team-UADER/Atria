@@ -50,8 +50,6 @@ TraduceToEs = {
     # WorkingPlaneSide
     'plano de trabajo lateral': working_plane_side,
     'vista de plano lateral': working_plane_side,
-    'fijar plano al costado': working_plane_side,
-    'plano side': working_plane_side,
     'plano lateral': working_plane_side,
     # WorkingPlaneTop
     'plano de trabajo superior': working_plane_top,
