@@ -60,14 +60,18 @@ def _get_or_create_doc():
 
 # --- Arc ---
 def arc(
-    x: float = 0.0,
-    y: float = 0.0,
-    radius: float = 50.0,
+    x: float = None,
+    y: float = None,
+    radius: float = None,
     start_angle: float = 0.0,
     end_angle: float = 90.0,
     z: float = 0.0,
 ):
     """Crea un arco de circunferencia a partir de centro, radio y angulos."""
+    if x is None or y is None or radius is None:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Draft_Arc", 0)
+        return None
     doc = _get_or_create_doc()
     try:
         import Draft
@@ -106,14 +110,18 @@ Arc = {"arc": arc}
 
 # --- ArcFrom3Points ---
 def arc_from_3_points(
-    x1: float = 0.0,
-    y1: float = 0.0,
-    x2: float = 50.0,
-    y2: float = 25.0,
-    x3: float = 100.0,
-    y3: float = 0.0,
+    x1: float = None,
+    y1: float = None,
+    x2: float = None,
+    y2: float = None,
+    x3: float = None,
+    y3: float = None,
 ):
     """Crea un arco a partir de tres puntos en el plano."""
+    if x1 is None or y1 is None or x2 is None or y2 is None or x3 is None or y3 is None:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Draft_Arc_3Points", 0)
+        return None
     doc = _get_or_create_doc()
     try:
         import Draft
@@ -145,22 +153,29 @@ ArcFrom3Points = {"arc from 3 points": arc_from_3_points}
 
 # --- BSpline ---
 def b_spline(
-    x1: float = 0.0,
-    y1: float = 0.0,
-    x2: float = 50.0,
-    y2: float = 50.0,
-    x3: float = 100.0,
-    y3: float = 0.0,
+    x1: float = None,
+    y1: float = None,
+    x2: float = None,
+    y2: float = None,
+    x3: float = None,
+    y3: float = None,
 ):
     """Crea una curva B-Spline a traves de puntos."""
+    if x1 is None or y1 is None or x2 is None or y2 is None:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Draft_BSpline", 0)
+        return None
     doc = _get_or_create_doc()
     try:
         import Draft
 
-        p1 = FreeCAD.Vector(x1, y1, 0.0) if FreeCAD else (x1, y1, 0.0)
-        p2 = FreeCAD.Vector(x2, y2, 0.0) if FreeCAD else (x2, y2, 0.0)
-        p3 = FreeCAD.Vector(x3, y3, 0.0) if FreeCAD else (x3, y3, 0.0)
-        obj = Draft.make_bspline([p1, p2, p3])
+        pts = [
+            FreeCAD.Vector(x1, y1, 0.0) if FreeCAD else (x1, y1, 0.0),
+            FreeCAD.Vector(x2, y2, 0.0) if FreeCAD else (x2, y2, 0.0),
+        ]
+        if x3 is not None and y3 is not None:
+            pts.append(FreeCAD.Vector(x3, y3, 0.0) if FreeCAD else (x3, y3, 0.0))
+        obj = Draft.make_bspline(pts)
         if doc and hasattr(doc, "recompute"):
             doc.recompute()
         return obj
@@ -184,22 +199,29 @@ BSpline = {"b spline": b_spline}
 
 # --- BezierCurve ---
 def bezier_curve(
-    x1: float = 0.0,
-    y1: float = 0.0,
-    x2: float = 50.0,
-    y2: float = 50.0,
-    x3: float = 100.0,
-    y3: float = 0.0,
+    x1: float = None,
+    y1: float = None,
+    x2: float = None,
+    y2: float = None,
+    x3: float = None,
+    y3: float = None,
 ):
     """Crea una curva Bezier a traves de puntos."""
+    if x1 is None or y1 is None or x2 is None or y2 is None:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Draft_BezCurve", 0)
+        return None
     doc = _get_or_create_doc()
     try:
         import Draft
 
-        p1 = FreeCAD.Vector(x1, y1, 0.0) if FreeCAD else (x1, y1, 0.0)
-        p2 = FreeCAD.Vector(x2, y2, 0.0) if FreeCAD else (x2, y2, 0.0)
-        p3 = FreeCAD.Vector(x3, y3, 0.0) if FreeCAD else (x3, y3, 0.0)
-        obj = Draft.make_bezcurve([p1, p2, p3])
+        pts = [
+            FreeCAD.Vector(x1, y1, 0.0) if FreeCAD else (x1, y1, 0.0),
+            FreeCAD.Vector(x2, y2, 0.0) if FreeCAD else (x2, y2, 0.0),
+        ]
+        if x3 is not None and y3 is not None:
+            pts.append(FreeCAD.Vector(x3, y3, 0.0) if FreeCAD else (x3, y3, 0.0))
+        obj = Draft.make_bezcurve(pts)
         if doc and hasattr(doc, "recompute"):
             doc.recompute()
         return obj
@@ -223,12 +245,16 @@ BezierCurve = {"bezier curve": bezier_curve}
 
 # --- Circle ---
 def circle(
-    x: float = 0.0,
-    y: float = 0.0,
-    radius: float = 50.0,
+    x: float = None,
+    y: float = None,
+    radius: float = None,
     z: float = 0.0,
 ):
     """Crea un circulo en el plano de trabajo a partir de su centro y radio."""
+    if x is None or y is None or radius is None:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Draft_Circle", 0)
+        return None
     doc = _get_or_create_doc()
     try:
         import Draft
@@ -260,16 +286,20 @@ Circle = {"circle": circle}
 
 # --- CubicBezierCurve ---
 def cubic_bezier_curve(
-    x1: float = 0.0,
-    y1: float = 0.0,
-    x2: float = 25.0,
-    y2: float = 50.0,
-    x3: float = 75.0,
-    y3: float = 50.0,
-    x4: float = 100.0,
-    y4: float = 0.0,
+    x1: float = None,
+    y1: float = None,
+    x2: float = None,
+    y2: float = None,
+    x3: float = None,
+    y3: float = None,
+    x4: float = None,
+    y4: float = None,
 ):
     """Crea una curva Bezier cubica con 4 puntos de control."""
+    if x1 is None or y1 is None or x2 is None or y2 is None:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Draft_CubicBezCurve", 0)
+        return None
     doc = _get_or_create_doc()
     try:
         import Draft
@@ -277,9 +307,11 @@ def cubic_bezier_curve(
         pts = [
             FreeCAD.Vector(x1, y1, 0.0) if FreeCAD else (x1, y1, 0.0),
             FreeCAD.Vector(x2, y2, 0.0) if FreeCAD else (x2, y2, 0.0),
-            FreeCAD.Vector(x3, y3, 0.0) if FreeCAD else (x3, y3, 0.0),
-            FreeCAD.Vector(x4, y4, 0.0) if FreeCAD else (x4, y4, 0.0),
         ]
+        if x3 is not None and y3 is not None:
+            pts.append(FreeCAD.Vector(x3, y3, 0.0) if FreeCAD else (x3, y3, 0.0))
+        if x4 is not None and y4 is not None:
+            pts.append(FreeCAD.Vector(x4, y4, 0.0) if FreeCAD else (x4, y4, 0.0))
         obj = Draft.make_bezcurve(pts)
         if doc and hasattr(doc, "recompute"):
             doc.recompute()
@@ -306,13 +338,17 @@ CubicBezierCurve = {"cubic bezier curve": cubic_bezier_curve}
 
 # --- Ellipse ---
 def ellipse(
-    major_radius: float = 100.0,
-    minor_radius: float = 50.0,
+    major_radius: float = None,
+    minor_radius: float = None,
     x: float = 0.0,
     y: float = 0.0,
     z: float = 0.0,
 ):
     """Crea una elipse a partir de sus radios mayor y menor."""
+    if major_radius is None or minor_radius is None:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Draft_Ellipse", 0)
+        return None
     doc = _get_or_create_doc()
     try:
         import Draft
@@ -342,8 +378,12 @@ Ellipse = {"ellipse": ellipse}
 
 
 # --- Fillet ---
-def fillet(radius: float = 10.0):
+def fillet(radius: float = None):
     """Crea un redondeo / chaflan con el radio especificado."""
+    if radius is None:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Draft_Fillet", 0)
+        return None
     doc = _get_or_create_doc()
     try:
         import Draft
@@ -370,14 +410,18 @@ Fillet = {"fillet": fillet}
 
 # --- Line ---
 def line(
-    x1: float = 0.0,
-    y1: float = 0.0,
-    x2: float = 100.0,
-    y2: float = 0.0,
+    x1: float = None,
+    y1: float = None,
+    x2: float = None,
+    y2: float = None,
     z1: float = 0.0,
     z2: float = 0.0,
 ):
     """Crea un segmento de linea recta entre (x1, y1, z1) y (x2, y2, z2)."""
+    if x1 is None or y1 is None or x2 is None or y2 is None:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Draft_Line", 0)
+        return None
     doc = _get_or_create_doc()
     try:
         import Draft
@@ -405,8 +449,12 @@ Line = {"line": line}
 
 
 # --- Point ---
-def point(x: float = 0.0, y: float = 0.0, z: float = 0.0):
+def point(x: float = None, y: float = None, z: float = 0.0):
     """Crea un punto en la posicion (x, y, z)."""
+    if x is None or y is None:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Draft_Point", 0)
+        return None
     doc = _get_or_create_doc()
     try:
         import Draft
@@ -432,13 +480,17 @@ Point = {"point": point}
 
 # --- Polygon ---
 def polygon(
-    nfaces: int = 6,
-    radius: float = 50.0,
+    nfaces: int = None,
+    radius: float = None,
     x: float = 0.0,
     y: float = 0.0,
     z: float = 0.0,
 ):
     """Crea un poligono regular de n caras y radio especificado."""
+    if nfaces is None or radius is None:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Draft_Polygon", 0)
+        return None
     doc = _get_or_create_doc()
     try:
         import Draft
@@ -469,14 +521,18 @@ Polygon = {"polygon": polygon}
 
 # --- Polyline ---
 def polyline(
-    x1: float = 0.0,
-    y1: float = 0.0,
-    x2: float = 50.0,
-    y2: float = 50.0,
-    x3: float = 100.0,
-    y3: float = 0.0,
+    x1: float = None,
+    y1: float = None,
+    x2: float = None,
+    y2: float = None,
+    x3: float = None,
+    y3: float = None,
 ):
     """Crea una polilinea / alambre conectando los puntos dados."""
+    if x1 is None or y1 is None or x2 is None or y2 is None:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Draft_Wire", 0)
+        return None
     doc = _get_or_create_doc()
     try:
         import Draft
@@ -484,8 +540,9 @@ def polyline(
         pts = [
             FreeCAD.Vector(x1, y1, 0.0) if FreeCAD else (x1, y1, 0.0),
             FreeCAD.Vector(x2, y2, 0.0) if FreeCAD else (x2, y2, 0.0),
-            FreeCAD.Vector(x3, y3, 0.0) if FreeCAD else (x3, y3, 0.0),
         ]
+        if x3 is not None and y3 is not None:
+            pts.append(FreeCAD.Vector(x3, y3, 0.0) if FreeCAD else (x3, y3, 0.0))
         obj = Draft.make_wire(pts)
         if doc and hasattr(doc, "recompute"):
             doc.recompute()
@@ -508,13 +565,17 @@ Polyline = {"polyline": polyline}
 
 # --- Rectangle ---
 def rectangle(
-    x: float = 0.0,
-    y: float = 0.0,
-    length: float = 100.0,
-    width: float = 50.0,
+    x: float = None,
+    y: float = None,
+    length: float = None,
+    width: float = None,
     z: float = 0.0,
 ):
     """Crea un rectangulo a partir de su origen (x, y) y dimensiones (largo, ancho)."""
+    if x is None or y is None or length is None or width is None:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Draft_Rectangle", 0)
+        return None
     doc = _get_or_create_doc()
     try:
         import Draft
