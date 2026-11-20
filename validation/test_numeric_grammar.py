@@ -156,6 +156,12 @@ class TestNumericGrammar(unittest.TestCase):
         self.assertTrue(p2.Success)
         self.assertEqual(p2.Value, (100.0, 200.0))
 
+    def test_intuitive_buttons_in_base_input_prompt(self) -> None:
+        prompt = FloatInputPrompt()
+        self.assertTrue(prompt._OkButton.text().startswith("✓"))
+        self.assertTrue(prompt._CancelButton.text().startswith("✕"))
+
 
 if __name__ == "__main__":
     unittest.main()
+

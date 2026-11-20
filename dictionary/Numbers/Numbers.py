@@ -25,3 +25,4 @@ from GUIFreeCad.InputPrompts.NumericGrammarSwitcher import NumericGrammarSwitche
 def get_numeric_grammar_phrases(language: str = "es") -> list[str]:
     """Return the list of spoken numeric phrases for Vosk grammar."""
     return NumericGrammarSwitcher.GetNumericPhrases(language)
+

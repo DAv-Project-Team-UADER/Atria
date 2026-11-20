@@ -410,23 +410,38 @@ class AtriaPanel(QWidget):
         row.addWidget(self._titleLabel, stretch=1)
 
         self._dockButton = QPushButton("⧉")
-        self._dockButton.setFixedSize(48, 44)
-        self._dockButton.setFont(QFont(FONT_SANS, 28, QFont.Bold))
-        self._dockButton.setToolTip("Separar de la ventana de FreeCAD")
+        self._dockButton.setFixedSize(42, 38)
+        self._dockButton.setFont(QFont(FONT_SANS, 16, QFont.Bold))
+        self._dockButton.setToolTip("⧉ Desacoplar / Acoplar panel ATRIA\n(Permite flotar o fijar el panel en FreeCAD)")
+        hand_cursor = getattr(Qt, "PointingHandCursor", None)
+        if hand_cursor is not None:
+            self._dockButton.setCursor(hand_cursor)
         self._dockButton.clicked.connect(self.DockToggleRequested.emit)
         row.addWidget(self._dockButton)
 
         self._prefsButton = QPushButton("⚙")
-        self._prefsButton.setFixedSize(48, 44)
-        self._prefsButton.setFont(QFont(FONT_SANS, 28, QFont.Bold))
-        self._prefsButton.setToolTip("Preferencias")
+        self._prefsButton.setFixedSize(42, 38)
+        self._prefsButton.setFont(QFont(FONT_SANS, 16, QFont.Bold))
+        self._prefsButton.setToolTip(
+            "⚙ Preferencias y Configuración de Voz\n"
+            "🎤 Di: «preferencias»\n"
+            "🖱️ O haz clic para abrir opciones"
+        )
+        if hand_cursor is not None:
+            self._prefsButton.setCursor(hand_cursor)
         self._prefsButton.clicked.connect(self.PreferencesRequested.emit)
         row.addWidget(self._prefsButton)
 
         self._helpButton = QPushButton("?")
-        self._helpButton.setFixedSize(48, 44)
-        self._helpButton.setFont(QFont(FONT_SANS, 28, QFont.Bold))
-        self._helpButton.setToolTip("Información")
+        self._helpButton.setFixedSize(42, 38)
+        self._helpButton.setFont(QFont(FONT_SANS, 16, QFont.Bold))
+        self._helpButton.setToolTip(
+            "? Ayuda de Comandos Activos\n"
+            "🎤 Di: «ayuda» o «contexto»\n"
+            "🖱️ Muestra qué comandos puedes decir ahora"
+        )
+        if hand_cursor is not None:
+            self._helpButton.setCursor(hand_cursor)
         self._helpButton.clicked.connect(self.HelpRequested.emit)
         row.addWidget(self._helpButton)
 
@@ -486,35 +501,70 @@ class AtriaPanel(QWidget):
         if not icon and getattr(Entry, "Spoken", ""):
             icon = self._locator.Find(Entry.Spoken)
 
+        is_sub = getattr(Entry, "IsSubContext", False)
         button = QPushButton()
         button.setFixedSize(self.BUTTON_SIZE, self.BUTTON_SIZE)
-        button.setToolTip(Entry.Spoken)
-        button.setStyleSheet(self._ButtonQss())
+
+        hand_cursor = getattr(Qt, "PointingHandCursor", None)
+        if hand_cursor is not None:
+            button.setCursor(hand_cursor)
+
+        spoken_text = getattr(Entry, "Spoken", "") or getattr(Entry, "InternalKey", "")
+        clean_name = spoken_text.replace("_", " ").strip().title()
+
+        if is_sub:
+            tooltip = (
+                f"📂 Submenú: {clean_name}\n"
+                f"🎤 Di «{spoken_text}»\n"
+                f"🖱️ Clic para explorar herramientas"
+            )
+            button.setStyleSheet(self._SubmenuButtonQss())
+        else:
+            tooltip = (
+                f"⚡ Herramienta: {clean_name}\n"
+                f"🎤 Di «{spoken_text}»\n"
+                f"🖱️ Clic para ejecutar"
+            )
+            button.setStyleSheet(self._ButtonQss())
+
+        button.setToolTip(tooltip)
 
         if icon:
             button.setIcon(QIcon(icon))
             button.setIconSize(QSize(self.ICON_SIZE, self.ICON_SIZE))
         else:
-            # Fallback cuando no hay icono SVG: mostrar texto/abreviatura
-            label = Entry.Spoken or Entry.InternalKey
-            if len(label) > 6:
-                words = label.split()
-                if len(words) > 1:
-                    label = "".join(w[0].upper() for w in words[:3])
-                else:
-                    label = label[:4].capitalize()
-            button.setText(label)
-            button.setFont(QFont(FONT_SANS, 9, QFont.Bold))
+            # Fallback cuando no hay icono SVG: mostrar prefijo visual y texto limpio
+            if is_sub:
+                short_label = clean_name.split()[0][:6]
+                button.setText(f"📁 {short_label}")
+                button.setFont(QFont(FONT_SANS, 8, QFont.Bold))
+            else:
+                label = spoken_text or Entry.InternalKey
+                if len(label) > 6:
+                    words = label.split()
+                    if len(words) > 1:
+                        label = "".join(w[0].upper() for w in words[:3])
+                    else:
+                        label = label[:4].capitalize()
+                button.setText(label)
+                button.setFont(QFont(FONT_SANS, 9, QFont.Bold))
 
         spoken = Entry.Spoken
         button.clicked.connect(lambda _checked=False, s=spoken: self._OnEntryClicked(s))
         return button
 
     def _MakeBackButton(self) -> QPushButton:
-        button = QPushButton("←")
+        button = QPushButton("⬅")
         button.setFixedSize(self.BUTTON_SIZE, self.BUTTON_SIZE)
-        button.setToolTip("Volver")
-        button.setFont(QFont(FONT_SANS, 18, QFont.Bold))
+        button.setToolTip(
+            "⬅ Volver al nivel anterior\n"
+            "🎤 Di: «volver» o «subir»\n"
+            "🖱️ O haz clic para regresar"
+        )
+        button.setFont(QFont(FONT_SANS, 16, QFont.Bold))
+        hand_cursor = getattr(Qt, "PointingHandCursor", None)
+        if hand_cursor is not None:
+            button.setCursor(hand_cursor)
         button.setStyleSheet(self._BackButtonQss())
         button.clicked.connect(lambda: self._OnEntryClicked(self.BACK_PHRASE))
         return button
@@ -559,7 +609,7 @@ class AtriaPanel(QWidget):
             self._prefsButton,
             self._dockButton,
         ):
-            button.setStyleSheet(self._ButtonQss())
+            button.setStyleSheet(self._HeaderButtonQss())
 
         if self._treeWidget is not None:
             self._treeWidget.setStyleSheet(self._TreeQss())
@@ -602,20 +652,70 @@ class AtriaPanel(QWidget):
             f" border: 1.5px solid {palette['btn_border']}; border-radius: 8px;"
             f" color: {palette['black']}; font-family: {FONT_SANS};"
             f" font-size: 10px; font-weight: bold; }}"
-            f"QPushButton:hover {{ background: {palette['btn_hover']} !important; }}"
-            f"QPushButton:pressed {{ background: {palette['btn_hover']} !important; }}"
+            f"QPushButton:hover {{ background: {palette['btn_hover']} !important; border-color: #3b82f6; }}"
+            f"QPushButton:pressed {{ background: {palette['highlight']} !important; border-color: #2563eb; }}"
+        )
+
+    def _SubmenuButtonQss(self) -> str:
+        palette = self._palette
+        bg_val = str(palette.get("bg", "#")).lower()
+        is_dark = bg_val.startswith("#1") or bg_val.startswith("#2")
+        if is_dark:
+            top = "#203a5e"
+            bot = "#162842"
+            border = "#3b82f6"
+            hover = "#2563eb"
+            text_color = "#ffffff"
+        else:
+            top = "#ebf3fe"
+            bot = "#dceafc"
+            border = "#3b82f6"
+            hover = "#bfdbfe"
+            text_color = "#1e3a8a"
+
+        return (
+            f"QPushButton {{"
+            f" background: qlineargradient(x1:0,y1:0,x2:0,y2:1,"
+            f" stop:0 {top}, stop:1 {bot}) !important;"
+            f" border: 2px solid {border}; border-radius: 8px;"
+            f" color: {text_color}; font-family: {FONT_SANS};"
+            f" font-size: 10px; font-weight: bold; }}"
+            f"QPushButton:hover {{ background: {hover} !important; border-color: #2563eb; }}"
+            f"QPushButton:pressed {{ background: {hover} !important; }}"
         )
 
     def _BackButtonQss(self) -> str:
         palette = self._palette
+        bg_val = str(palette.get("bg", "#")).lower()
+        is_dark = bg_val.startswith("#1") or bg_val.startswith("#2")
+        border = "#f59e0b" if is_dark else "#d97706"
+        top = "#3d2b12" if is_dark else "#fef3c7"
+        bot = "#291c0a" if is_dark else "#fde68a"
+        hover = "#f59e0b" if is_dark else "#fcd34d"
+        text = "#ffffff" if is_dark else "#78350f"
+
         return (
             f"QPushButton {{"
             f" background: qlineargradient(x1:0,y1:0,x2:0,y2:1,"
-            f" stop:0 {palette['highlight']}, stop:1 {palette['btn_bot']}) !important;"
-            f" border: 1.5px solid {palette['btn_border']}; border-radius: 8px;"
+            f" stop:0 {top}, stop:1 {bot}) !important;"
+            f" border: 2px solid {border}; border-radius: 8px;"
+            f" color: {text}; font-family: {FONT_SANS};"
+            f" font-size: 16px; font-weight: bold; }}"
+            f"QPushButton:hover {{ background: {hover} !important; border-color: #d97706; }}"
+            f"QPushButton:pressed {{ background: {border} !important; }}"
+        )
+
+    def _HeaderButtonQss(self) -> str:
+        palette = self._palette
+        return (
+            f"QPushButton {{"
+            f" background: qlineargradient(x1:0,y1:0,x2:0,y2:1,"
+            f" stop:0 {palette['btn_top']}, stop:1 {palette['btn_bot']}) !important;"
+            f" border: 1.5px solid {palette['btn_border']}; border-radius: 6px;"
             f" color: {palette['black']}; font-family: {FONT_SANS};"
-            f" font-size: 18px; font-weight: bold; }}"
-            f"QPushButton:hover {{ background: {palette['highlight']} !important; }}"
+            f" font-size: 14px; font-weight: bold; }}"
+            f"QPushButton:hover {{ background: {palette['btn_hover']} !important; border-color: #3b82f6; }}"
+            f"QPushButton:pressed {{ background: {palette['highlight']} !important; }}"
         )
 
     def resizeEvent(self, Event) -> None:  # noqa: N802 (API de Qt)

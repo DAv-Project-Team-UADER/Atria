@@ -68,6 +68,12 @@ except ImportError:
         class QPushButton:
             def __init__(self, *args):
                 self.clicked = Signal()
+                self._text = args[0] if args else ""
+            def setText(self, t): self._text = t
+            def text(self): return self._text
+            def setToolTip(self, t): pass
+            def setStyleSheet(self, s): pass
+            def setCursor(self, c): pass
             def setAutoDefault(self, a): pass
             def setDefault(self, d): pass
 
@@ -184,12 +190,67 @@ class BaseInputPrompt(QDialog):
 
         button_row = QHBoxLayout()
         button_row.addStretch()
-        self._OkButton = QPushButton(T(self._Language, "ok"), self)
-        self._CancelButton = QPushButton(T(self._Language, "cancel"), self)
+
+        ok_text = f"✓ {T(self._Language, 'ok')}"
+        cancel_text = f"✕ {T(self._Language, 'cancel')}"
+
+        self._OkButton = QPushButton(ok_text, self)
+        self._CancelButton = QPushButton(cancel_text, self)
         self._OkButton.setAutoDefault(False)
-        self._OkButton.setDefault(False)
+        self._OkButton.setDefault(True)
         self._CancelButton.setAutoDefault(False)
         self._CancelButton.setDefault(False)
+
+        self._OkButton.setToolTip(
+            "Confirmar valor ingresado\n"
+            "🎤 Di «ok», «listo» o «enviar»\n"
+            "⌨️ Presiona Enter"
+        )
+        self._CancelButton.setToolTip(
+            "Cancelar y descartar entrada\n"
+            "🎤 Di «cancelar» o «anular»\n"
+            "⌨️ Presiona Esc"
+        )
+
+        hand_cursor = getattr(Qt, "PointingHandCursor", None)
+        if hand_cursor is not None:
+            if hasattr(self._OkButton, "setCursor"):
+                self._OkButton.setCursor(hand_cursor)
+            if hasattr(self._CancelButton, "setCursor"):
+                self._CancelButton.setCursor(hand_cursor)
+
+        is_dark = _IsDarkTheme()
+        if is_dark:
+            self._OkButton.setStyleSheet(
+                "QPushButton { background-color: #15803d; color: #ffffff;"
+                " border: 1.5px solid #22c55e; border-radius: 6px; padding: 6px 18px;"
+                " font-size: 10pt; font-weight: bold; }"
+                "QPushButton:hover { background-color: #16a34a; border-color: #4ade80; }"
+                "QPushButton:pressed { background-color: #14532d; }"
+            )
+            self._CancelButton.setStyleSheet(
+                "QPushButton { background-color: #374151; color: #e5e7eb;"
+                " border: 1.5px solid #4b5563; border-radius: 6px; padding: 6px 18px;"
+                " font-size: 10pt; font-weight: 500; }"
+                "QPushButton:hover { background-color: #4b5563; border-color: #9ca3af; }"
+                "QPushButton:pressed { background-color: #1f2937; }"
+            )
+        else:
+            self._OkButton.setStyleSheet(
+                "QPushButton { background-color: #16a34a; color: #ffffff;"
+                " border: 1.5px solid #15803d; border-radius: 6px; padding: 6px 18px;"
+                " font-size: 10pt; font-weight: bold; }"
+                "QPushButton:hover { background-color: #15803d; border-color: #166534; }"
+                "QPushButton:pressed { background-color: #14532d; }"
+            )
+            self._CancelButton.setStyleSheet(
+                "QPushButton { background-color: #f3f4f6; color: #374151;"
+                " border: 1.5px solid #d1d5db; border-radius: 6px; padding: 6px 18px;"
+                " font-size: 10pt; font-weight: 500; }"
+                "QPushButton:hover { background-color: #e5e7eb; border-color: #9ca3af; }"
+                "QPushButton:pressed { background-color: #d1d5db; }"
+            )
+
         self._OkButton.clicked.connect(lambda: self.AcceptValue(self.GetCurrentText()))
         self._CancelButton.clicked.connect(self.Cancel)
         button_row.addWidget(self._OkButton)
