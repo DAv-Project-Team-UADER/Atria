@@ -108,14 +108,38 @@ try:
     from .commands import Upgrade
 except ImportError:
     Upgrade = None
-CutWithPlane = None  # TODO: sin implementacion en commands.py
-Difference = None  # TODO: sin implementacion en commands.py
-ExtrudeFace = None  # TODO: sin implementacion en commands.py
-Extrude = None  # TODO: sin implementacion en commands.py
-Intersection = None  # TODO: sin implementacion en commands.py
-PointArray = None  # TODO: sin implementacion en commands.py
-PolarArray = None  # TODO: sin implementacion en commands.py
-Union = None  # TODO: sin implementacion en commands.py
+try:
+    from .commands import CutWithPlane
+except ImportError:
+    CutWithPlane = None
+try:
+    from .commands import Difference
+except ImportError:
+    Difference = None
+try:
+    from .commands import ExtrudeFace
+except ImportError:
+    ExtrudeFace = None
+try:
+    from .commands import Extrude
+except ImportError:
+    Extrude = None
+try:
+    from .commands import Intersection
+except ImportError:
+    Intersection = None
+try:
+    from .commands import PointArray
+except ImportError:
+    PointArray = None
+try:
+    from .commands import PolarArray
+except ImportError:
+    PolarArray = None
+try:
+    from .commands import Union
+except ImportError:
+    Union = None
 
 TraduceToEs = {
     # AddComponent
@@ -153,12 +177,12 @@ TraduceToEs = {
     'degradar elemento': Downgrade,
     'degradar': Downgrade,
     'bajar nivel': Downgrade,
-    'downgrade objeto': Downgrade,
+    'desarmar elemento': Downgrade,
     'descomponer objeto': Downgrade,
     # DraftToSketch
     'convertir a croquis': DraftToSketch,
     'draft a croquis': DraftToSketch,
-    'convertir a sketch': DraftToSketch,
+    'transformar dibujo en croquis': DraftToSketch,
     'pasar a boceto': DraftToSketch,
     'convertir draft a croquis': DraftToSketch,
     # Edit
@@ -185,14 +209,14 @@ TraduceToEs = {
     'crear vínculo': make_link,
     'crear vinculo': make_link,
     # Mirror
-    'espejar': mirror,
+    'crear reflejo': mirror,
     'reflejar': mirror,
     'espejo': mirror,
     'crear simétrico': mirror,
     'crear simetrico': mirror,
     'reflejar objeto': mirror,
     # Move
-    'mover': move,
+    'cambiar posición': move,
     'mover objeto': move,
     'desplazar': move,
     'trasladar': move,
@@ -204,15 +228,15 @@ TraduceToEs = {
     'duplicar contorno': Offset,
     'desfase': Offset,
     # Offset2D
-    'crear desfase dos d': Offset2D,
-    'generar offset dos d': Offset2D,
+    'desplazar contorno plano': Offset2D,
+    'separar contorno a distancia': Offset2D,
     'aplicar desfase plano': Offset2D,
     'duplicar a distancia': Offset2D,
     'desfase 2d': Offset2D,
     'offset 2d': Offset2D,
     # PathArray
-    'crear path array': PathArray,
-    'generar path array': PathArray,
+    'repetir objetos a lo largo de una curva': PathArray,
+    'distribuir copias sobre un recorrido': PathArray,
     'crear matriz sobre trayectoria': PathArray,
     'duplicar en curva': PathArray,
     'matriz sobre trayectoria': PathArray,
@@ -220,7 +244,7 @@ TraduceToEs = {
     'quitar componente': RemoveComponent,
     'eliminar componente': RemoveComponent,
     'sustraer objeto': RemoveComponent,
-    'desvincular elemento BIM': RemoveComponent,
+    'retirar del componente': RemoveComponent,
     'remover componente': RemoveComponent,
     # Rotate
     'rotar': rotate,
@@ -238,8 +262,8 @@ TraduceToEs = {
     'copia simple': simple_copy,
     'crear copia simple': simple_copy,
     'copiar forma': simple_copy,
-    'copia no paramétrica': simple_copy,
-    'copia no parametrica': simple_copy,
+    'duplicar solo la forma': simple_copy,
+    'duplicar sin relación con el original': simple_copy,
     'copiar sin vínculo': simple_copy,
     'copiar sin vinculo': simple_copy,
     # Split
@@ -247,26 +271,26 @@ TraduceToEs = {
     'dividir': Split,
     'cortar línea': Split,
     'cortar linea': Split,
-    'separar alambre': Split,
-    'escindir objeto': Split,
+    'separar el trazado': Split,
+    'partir el elemento': Split,
     # Stretch
     'estirar elemento': Stretch,
     'estirar': Stretch,
-    'aplicar stretch': Stretch,
+    'estirar contorno': Stretch,
     'mover vértices': Stretch,
     'mover vertices': Stretch,
-    'deformar objeto': Stretch,
+    'cambiar la forma del elemento': Stretch,
     # Trimex
     'recortar o extender': Trimex,
-    'ejecutar trimex': Trimex,
+    'ajustar longitud del borde': Trimex,
     'recortar elemento': Trimex,
     'extender elemento': Trimex,
-    'trimex': Trimex,
+    'ajustar longitud del trazado': Trimex,
     # Upgrade
     'promover elemento': Upgrade,
     'promover': Upgrade,
     'elevar nivel': Upgrade,
-    'upgrade objeto': Upgrade,
+    'subir nivel del elemento': Upgrade,
     'convertir a cara': Upgrade,
     # CutWithPlane
     'cortar con plano': CutWithPlane,
@@ -277,18 +301,18 @@ TraduceToEs = {
     'cortar objetos': Difference,
     'restar objetos': Difference,
     'aplicar diferencia': Difference,
-    'corte booleano': Difference,
+    'quitar un sólido de otro': Difference,
     # ExtrudeFace
-    'extruir cara': ExtrudeFace,
-    'dar volumen a la cara': ExtrudeFace,
-    'extrusión de cara': ExtrudeFace,
+    'prolongar la cara': ExtrudeFace,
+    'levantar la cara seleccionada': ExtrudeFace,
+    'crear volumen desde la cara': ExtrudeFace,
     # Extrude
-    'extruir pieza': Extrude,
-    'extruir forma': Extrude,
-    'generar extrusión': Extrude,
+    'prolongar la pieza': Extrude,
+    'dar profundidad a la forma': Extrude,
+    'extender el perfil en profundidad': Extrude,
     'dar volumen tridimensional': Extrude,
     # Intersection
-    'intersecar objetos': Intersection,
+    'obtener el volumen común': Intersection,
     'crear intersección': Intersection,
     'extraer parte común': Intersection,
     'volumen compartido': Intersection,
@@ -305,6 +329,6 @@ TraduceToEs = {
     # Union
     'unir objetos': Union,
     'fusionar piezas': Union,
-    'unión booleana': Union,
+    'fusionar sólidos en uno': Union,
     'combinar sólidos': Union,
 }

@@ -794,3 +794,35 @@ upgrade_cmds = {
     'convertir a cara': Upgrade,
     'help': ayuda,
 }
+
+
+def CutWithPlane():
+    Gui.runCommand('Arch_CutPlane', 0)
+
+
+def Difference():
+    Gui.runCommand('Part_Cut', 0)
+
+
+def ExtrudeFace():
+    Gui.runCommand('Draft_Extrude', 0)
+
+
+def Extrude():
+    Gui.runCommand('Part_Extrude', 0)
+
+
+def Intersection():
+    Gui.runCommand('Part_Common', 0)
+
+
+def PointArray():
+    Gui.runCommand('Draft_PointArray', 0)
+
+
+def PolarArray():
+    Gui.runCommand('Draft_PolarArray', 0)
+
+
+def Union():
+    Gui.runCommand('Part_Fuse', 0)

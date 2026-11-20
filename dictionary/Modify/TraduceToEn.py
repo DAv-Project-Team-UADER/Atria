@@ -108,14 +108,38 @@ try:
     from .commands import Upgrade
 except ImportError:
     Upgrade = None
-CutWithPlane = None  # TODO: sin implementacion en commands.py
-Difference = None  # TODO: sin implementacion en commands.py
-ExtrudeFace = None  # TODO: sin implementacion en commands.py
-Extrude = None  # TODO: sin implementacion en commands.py
-Intersection = None  # TODO: sin implementacion en commands.py
-PointArray = None  # TODO: sin implementacion en commands.py
-PolarArray = None  # TODO: sin implementacion en commands.py
-Union = None  # TODO: sin implementacion en commands.py
+try:
+    from .commands import CutWithPlane
+except ImportError:
+    CutWithPlane = None
+try:
+    from .commands import Difference
+except ImportError:
+    Difference = None
+try:
+    from .commands import ExtrudeFace
+except ImportError:
+    ExtrudeFace = None
+try:
+    from .commands import Extrude
+except ImportError:
+    Extrude = None
+try:
+    from .commands import Intersection
+except ImportError:
+    Intersection = None
+try:
+    from .commands import PointArray
+except ImportError:
+    PointArray = None
+try:
+    from .commands import PolarArray
+except ImportError:
+    PolarArray = None
+try:
+    from .commands import Union
+except ImportError:
+    Union = None
 
 TraduceToEn = {
     # AddComponent
@@ -281,10 +305,10 @@ TraduceToEn = {
     'extract common part': Intersection,
     'shared volume': Intersection,
     # PointArray
-    'crear matriz por puntos': PointArray,
-    'nueva matriz de puntos': PointArray,
-    'arreglo por puntos': PointArray,
-    'distribuir en puntos': PointArray,
+    'create point array': PointArray,
+    'new point array': PointArray,
+    'array by points': PointArray,
+    'distribute copies at points': PointArray,
     # PolarArray
     'create polar array': PolarArray,
     'new polar array': PolarArray,
