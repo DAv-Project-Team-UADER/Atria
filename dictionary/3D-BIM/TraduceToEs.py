@@ -153,7 +153,9 @@ TraduceToEs = {
     # Beam
     'nueva viga': Beam,
     'generar haz': Beam,
+    'crear haz': Beam,
     'añadir viga': Beam,
+    'crear elemento estructural horizontal': Beam,
     # Beam_Reinforcement
     'reforzar viga': Beam_Reinforcement,
     'agregar refuerzo de viga': Beam_Reinforcement,
@@ -347,6 +349,7 @@ TraduceToEs = {
     # ArchRebar
     'crear armadura personalizada': ArchRebar,
     'nueva barra de refuerzo': ArchRebar,
+    'generar armadura personalizada': ArchRebar,
     'generar armadura': ArchRebar,
     'añadir rebar': ArchRebar,
     'crear barra personalizada': ArchRebar,
@@ -384,6 +387,8 @@ TraduceToEs = {
     'generar armadura en L': LShapeRebar,
     'añadir barra de refuerzo en L': LShapeRebar,
     'crear rebar en L': LShapeRebar,
+    'crear armadura en forma de L': LShapeRebar,
+    'crear barra en forma de L': LShapeRebar,
     # StirrupRebar
     'crear estribo': StirrupRebar,
     'nuevo estribo': StirrupRebar,
@@ -402,4 +407,6 @@ TraduceToEs = {
     'generar armadura en U': UShapeRebar,
     'añadir barra de refuerzo en U': UShapeRebar,
     'crear rebar en U': UShapeRebar,
+    'crear armadura en forma de U': UShapeRebar,
+    'crear barra en forma de U': UShapeRebar,
 }

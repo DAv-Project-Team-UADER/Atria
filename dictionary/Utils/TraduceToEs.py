@@ -107,6 +107,7 @@ TraduceToEs = {
     # Close Holes
     'cerrar agujeros': close_holes,
     'reparar agujeros': close_holes,
+    'tapar agujeros': close_holes,
     'cerrar holes': close_holes,
     'cerrar huecos': close_holes,
     # Convertir a proyecto IFC
@@ -129,6 +130,7 @@ TraduceToEs = {
     'generar estructuras multiples': multiple_structures,
     'crear estructuras múltiples': multiple_structures,
     'estructuras desde bordes': multiple_structures,
+    'crear múltiples elementos': multiple_structures,
     # Hoja de panel
     'crear hoja de panel': panel_sheet,
     'nueva hoja de panel': panel_sheet,
@@ -149,6 +151,8 @@ TraduceToEs = {
     'chequear versión IFC OpenShell': ifc_openshell_update,
     'actualizar librería IFC': ifc_openshell_update,
     'actualizar IFCOpenShell': ifc_openshell_update,
+    'actualizar IfcOpenShell': ifc_openshell_update,
+    'buscar actualización IfcOpenShell': ifc_openshell_update,
     # IFC Shape Diff
     'comparar formas IFC': ifc_shape_diff,
     'comparar IFC': ifc_shape_diff,
@@ -246,6 +250,7 @@ TraduceToEs = {
     'nuevo proyecto IFC': ifc_project,
     'crear proyecto IFC': ifc_project,
     'generar proyecto IFC': ifc_project,
+    'iniciar proyecto IFC': ifc_project,
     'crear proyecto BIM': ifc_project,
     # Recorte de panel
     'crear recorte de panel': panel_cut,
@@ -300,6 +305,7 @@ TraduceToEs = {
     'mostrar subcomponentes': toggle_subcomponents,
     'ocultar subcomponentes': toggle_subcomponents,
     'mostrar componentes internos': toggle_subcomponents,
+    'mostrar subcomponentes': toggle_subcomponents,
     # ArchSurvey
     'inspeccionar modelo': ArchSurvey,
     'tomar medidas': ArchSurvey,
