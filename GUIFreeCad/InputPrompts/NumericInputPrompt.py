@@ -39,15 +39,30 @@ class NumericInputPrompt(BaseInputPrompt):
     def ProcessFinalText(self, Text: str) -> PromptResult:
         """Accumulate spoken text and parse it once a confirmation word arrives.
 
-        Accumulates text across multiple utterances so that saying a number
-        and then "ok" in separate phrases works correctly (e.g. "cinco"
-        followed by "ok" produces the parsed value).
+        Supports both single-utterance dictation ("diez ok", "ciento cincuenta listo")
+        and multi-utterance dictation ("diez" followed by "ok" in separate phrases).
         """
         tokens = SpokenNumberParser.Tokenize(Text)
 
         if self._HasCancellation(tokens):
             self._AccumulatedText = ""
             return self.Cancel()
+
+        # Separate tokens that are not confirmation words
+        num_tokens = [
+            t
+            for t in tokens
+            if t not in SpokenNumberParser.ConfirmationWords
+            and t not in SpokenNumberParser.CancellationWords
+            and t != "unk"
+        ]
+        if num_tokens:
+            phrase_part = " ".join(num_tokens)
+            self._AccumulatedText = (
+                (self._AccumulatedText + " " + phrase_part).strip()
+                if self._AccumulatedText
+                else phrase_part
+            )
 
         if self._HasConfirmation(tokens):
             if not self._AccumulatedText:
@@ -61,9 +76,6 @@ class NumericInputPrompt(BaseInputPrompt):
                 return self.Fail(str(error))
             return self.AcceptValue(value)
 
-        self._AccumulatedText = (
-            (self._AccumulatedText + " " + Text).strip() if self._AccumulatedText else Text
-        )
         self.SetStatus(T(self._Language, "numeric_prompt"))
         return self.GetResult()
 

@@ -72,8 +72,23 @@ class CoordinateInputPrompt(BaseInputPrompt):
             self._AccumulatedText = ""
             return self.Cancel()
 
+        num_tokens = [
+            t
+            for t in tokens
+            if t not in SpokenNumberParser.ConfirmationWords
+            and t not in SpokenNumberParser.CancellationWords
+            and t != "unk"
+        ]
+        if num_tokens:
+            phrase_part = " ".join(num_tokens)
+            self._AccumulatedText = (
+                (self._AccumulatedText + " " + phrase_part).strip()
+                if self._AccumulatedText
+                else phrase_part
+            )
+
         if self._HasConfirmation(tokens):
-            phrase = self._AccumulatedText or Text
+            phrase = self._AccumulatedText
             self._AccumulatedText = ""
             coords = self._ExtractCoordinates(phrase)
             if not coords:
@@ -85,9 +100,6 @@ class CoordinateInputPrompt(BaseInputPrompt):
                 return self.GetResult()
             return self.AcceptValue(coords)
 
-        self._AccumulatedText = (
-            (self._AccumulatedText + " " + Text).strip() if self._AccumulatedText else Text
-        )
         preview_coords = self._ExtractCoordinates(self._AccumulatedText)
         if preview_coords:
             coord_str = ", ".join(str(c) for c in preview_coords)
@@ -99,29 +111,54 @@ class CoordinateInputPrompt(BaseInputPrompt):
     def _ExtractCoordinates(self, Phrase: str) -> tuple[float, ...] | None:
         """Extract two or three coordinate values from spoken phrase."""
         tokens = SpokenNumberParser.Tokenize(Phrase)
-        clean_tokens = [
+        clean = [
             t
             for t in tokens
             if t not in SpokenNumberParser.ConfirmationWords
             and t not in SpokenNumberParser.CancellationWords
-            and t not in ("x", "y", "z", "punto", "point", "coord", "coordenada")
+            and t not in ("coord", "coordenada", "coordenadas", "unk")
         ]
-        if not clean_tokens:
+        if not clean:
             return None
 
-        merged = SpokenNumberParser._MergeTensAndUnits(clean_tokens)
+        merged = SpokenNumberParser._MergeTensAndUnits(clean)
         numbers: list[float] = []
+        i = 0
+        total = len(merged)
+        while i < total:
+            token = merged[i]
+            sign = 1.0
+            if token in SpokenNumberParser.NegativeWords or token == "-":
+                sign = -1.0
+                i += 1
+                if i >= total:
+                    break
+                token = merged[i]
 
-        for token in merged:
-            num = SpokenNumberParser.TryParseFloat(token)
-            if num is not None:
-                numbers.append(num)
-            elif token in SpokenNumberParser.DigitWords:
+            val = SpokenNumberParser.TryParseFloat(token)
+            if val is None and token in SpokenNumberParser.DigitWords:
                 try:
-                    numbers.append(float(SpokenNumberParser.DigitWords[token]))
+                    val = float(SpokenNumberParser.DigitWords[token])
                 except ValueError:
-                    pass
+                    val = None
+
+            if val is not None:
+                if i + 1 < total and merged[i + 1] in SpokenNumberParser.DecimalWords:
+                    if i + 2 < total:
+                        dec_token = merged[i + 2]
+                        dec_num = SpokenNumberParser.TryParseFloat(dec_token)
+                        if dec_num is None and dec_token in SpokenNumberParser.DigitWords:
+                            try:
+                                dec_num = float(SpokenNumberParser.DigitWords[dec_token])
+                            except ValueError:
+                                dec_num = None
+                        if dec_num is not None:
+                            val = float(f"{int(val)}.{int(dec_num)}")
+                            i += 2
+                numbers.append(sign * val)
+            i += 1
 
         if len(numbers) >= 2:
             return tuple(numbers[:3]) if len(numbers) >= 3 else (numbers[0], numbers[1])
         return None
+

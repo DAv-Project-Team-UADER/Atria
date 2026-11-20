@@ -19,37 +19,182 @@
 
 from __future__ import annotations
 
+import logging
+
+from InputPrompts.SpokenNumberParser import SpokenNumberParser
+
+log = logging.getLogger("ATRIA.NumericGrammarSwitcher")
+
 
 class NumericGrammarSwitcher:
     """Swaps the Vosk grammar between CAD navigation and numeric input.
 
-    Kept separate from PromptVoiceRouter: the router's job is tracking which
-    prompt is currently active, while grammar switching is a distinct
-    responsibility with its own dependencies (AtriaVoiceService, the Numbers
-    dictionary, the active Browser adapter).
+    Restricts Vosk exclusively to numbers, decimal separators, signs,
+    and confirmation/cancellation words when an input prompt is awaiting
+    parameters. This prevents Vosk from outputting random CAD words or
+    hallucinating commands when the user dictates numbers.
     """
+
+    @classmethod
+    def GetNumericPhrases(cls, Language: str = "es") -> list[str]:
+        """Return a deduplicated, sorted list of all valid spoken numeric phrases."""
+        phrases: set[str] = set()
+
+        # 1. Palabras de dígitos y números base (0-19, 20-90, 100-900, 1000)
+        for word in SpokenNumberParser.DigitWords.keys():
+            phrases.add(word.lower().strip())
+        for word in SpokenNumberParser.TensWords.keys():
+            phrases.add(word.lower().strip())
+        for word in SpokenNumberParser.HundredsWords.keys():
+            phrases.add(word.lower().strip())
+        for word in SpokenNumberParser.ThousandsWords.keys():
+            phrases.add(word.lower().strip())
+
+        # 2. Conectores, decimales y negativos
+        for word in SpokenNumberParser.ConnectorWords:
+            phrases.add(word.lower().strip())
+        for word in SpokenNumberParser.DecimalWords:
+            phrases.add(word.lower().strip())
+        for word in SpokenNumberParser.NegativeWords:
+            phrases.add(word.lower().strip())
+
+        # 3. Confirmación y cancelación
+        for word in SpokenNumberParser.ConfirmationWords:
+            phrases.add(word.lower().strip())
+        for word in SpokenNumberParser.CancellationWords:
+            phrases.add(word.lower().strip())
+
+        # 4. Palabras auxiliares de coordenadas y dimensiones
+        for aux in (
+            "x",
+            "y",
+            "z",
+            "punto",
+            "point",
+            "coord",
+            "coordenada",
+            "coordenadas",
+            "milimetro",
+            "milimetros",
+            "milímetro",
+            "milímetros",
+            "mm",
+            "metro",
+            "metros",
+            "m",
+            "centimetro",
+            "centimetros",
+            "centímetro",
+            "centímetros",
+            "cm",
+        ):
+            phrases.add(aux)
+
+        # 5. Dígitos numéricos directos
+        for d in ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"):
+            phrases.add(d)
+
+        # 6. Compuestos en español (decena + conector + unidad)
+        es_tens = ["treinta", "cuarenta", "cincuenta", "sesenta", "setenta", "ochenta", "noventa"]
+        es_units = [
+            "uno",
+            "un",
+            "una",
+            "dos",
+            "tres",
+            "cuatro",
+            "cinco",
+            "seis",
+            "siete",
+            "ocho",
+            "nueve",
+        ]
+        for ten in es_tens:
+            for unit in es_units:
+                phrases.add(f"{ten} y {unit}")
+
+        # 7. Compuestos comunes de centenas y miles
+        es_hundreds = [
+            "cien",
+            "ciento",
+            "doscientos",
+            "trescientos",
+            "cuatrocientos",
+            "quinientos",
+            "seiscientos",
+            "setecientos",
+            "ochocientos",
+            "novecientos",
+        ]
+        common_subs = [
+            "diez",
+            "veinte",
+            "veinticinco",
+            "treinta",
+            "cincuenta",
+            "cinco mil",
+            "dos mil",
+        ]
+        for h in es_hundreds:
+            for sub in common_subs:
+                phrases.add(f"{h} {sub}")
+
+        # 8. Combinaciones comunes con confirmación directa (dictado fluido en un solo respiro)
+        common_spoken_numbers = [
+            "cero",
+            "uno",
+            "dos",
+            "tres",
+            "cuatro",
+            "cinco",
+            "diez",
+            "quince",
+            "veinte",
+            "veinticinco",
+            "treinta",
+            "cincuenta",
+            "cien",
+            "ciento cincuenta",
+            "doscientos",
+            "doscientos cincuenta",
+            "quinientos",
+            "mil",
+            "dos mil",
+            "cinco mil",
+            "cero cero",
+            "diez diez",
+            "diez veinte",
+            "veinte diez",
+            "cero cinco",
+        ]
+        for num in common_spoken_numbers:
+            phrases.add(f"{num} ok")
+            phrases.add(f"{num} listo")
+            phrases.add(f"{num} enviar")
+
+        # 9. Comodín Vosk
+        phrases.add("[unk]")
+
+        return sorted(phrases)
 
     @staticmethod
     def ActivateNumericGrammar() -> None:
         """Switch the Vosk grammar to numeric input words for the configured language."""
         try:
-            import sys
-            from pathlib import Path
-
             from GUIFreeCad.core.settings import settings
-            from GUIFreeCad.speech.atria_voice_service import AtriaVoiceService
-            from GUIFreeCad.integration.voice_bootstrap import _resolve_dictionary_root
 
-            dic_root = str(_resolve_dictionary_root())
-            if dic_root not in sys.path:
-                sys.path.insert(0, dic_root)
-
-            from Numbers.Numbers import get_numeric_grammar_phrases
-
-            phrases = get_numeric_grammar_phrases(settings.language)
-            AtriaVoiceService.get().set_grammar(phrases)
+            lang = getattr(settings, "language", "es") or "es"
         except Exception:
-            pass
+            lang = "es"
+
+        try:
+            from GUIFreeCad.speech.atria_voice_service import AtriaVoiceService
+
+            phrases = NumericGrammarSwitcher.GetNumericPhrases(lang)
+            AtriaVoiceService.get().set_grammar(phrases)
+            log.info("Gramática numérica activada (%d frases)", len(phrases))
+        except Exception as exc:
+            log.exception("No se pudo activar la gramática numérica: %s", exc)
 
     @staticmethod
     def RestoreCadGrammar() -> None:
@@ -58,7 +203,21 @@ class NumericGrammarSwitcher:
             from GUIFreeCad.integration.browser_voice_adapter import get_active_adapter
 
             adapter = get_active_adapter()
-            if adapter is not None:
+            if adapter is None:
+                from GUIFreeCad.speech.atria_voice_service import AtriaVoiceService
+
+                svc = AtriaVoiceService.get()
+                adapter = getattr(svc, "_cad_adapter", None)
+
+            if adapter is not None and hasattr(adapter, "RestoreGrammar"):
                 adapter.RestoreGrammar()
-        except Exception:
-            pass
+                log.info("Gramática CAD restaurada vía RestoreGrammar")
+            elif adapter is not None:
+                browser = getattr(adapter, "_browser", getattr(adapter, "browser", None))
+                if browser is not None and hasattr(browser, "GetSpokenPhrases"):
+                    from GUIFreeCad.speech.atria_voice_service import AtriaVoiceService
+
+                    AtriaVoiceService.get().set_grammar(browser.GetSpokenPhrases())
+                    log.info("Gramática CAD restaurada vía Browser.GetSpokenPhrases")
+        except Exception as exc:
+            log.exception("No se pudo restaurar la gramática CAD: %s", exc)
