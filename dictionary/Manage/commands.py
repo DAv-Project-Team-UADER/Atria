@@ -23,6 +23,19 @@ reune lo que antes vivia en una carpeta por funcion.
 import FreeCAD
 import FreeCADGui
 
+# Registrar los comandos BIM de FreeCAD necesarios para las funciones
+# de Manage (clasificación, propiedades IFC, capas, preflight, setup, etc.).
+# Sin este import, FreeCADGui.runCommand falla con "No such command".
+try:
+    import bimcommands  # noqa: F401
+except ImportError:
+    pass
+# Registrar comandos Draft necesarios (Draft_AnnotationStyleEditor, etc.)
+try:
+    import DraftTools  # noqa: F401
+except ImportError:
+    pass
+
 
 def _RequireDocument():
     doc = FreeCAD.ActiveDocument
@@ -490,12 +503,12 @@ recomputar. Varias consultas se pueden encadenar a modo de tubería (pipeline)
 para flujos de trabajo complejos.
 
 FreeCAD no trae este módulo: viene con el addon externo "Reporting". Con el
-addon instalado, el comando `Report_Create` reemplaza a Schedule en el menú
+addon instalado, el comando `Create_Report` reemplaza a Schedule en el menú
 Manage.
-Comando FreeCAD: Report_Create.
+Comando FreeCAD: Create_Report.
 """
 
-COMMAND_BIM_REPORT = "Report_Create"
+COMMAND_BIM_REPORT = "Create_Report"
 
 ADDON_NAME = "Reporting"
 
@@ -511,6 +524,19 @@ def IsAvailable():
     return COMMAND_BIM_REPORT in list_commands()
 
 def _RequireAddon():
+    """Intenta cargar el addon Reporting si el comando aún no está registrado."""
+    if IsAvailable():
+        return
+    # Intentar cargar Reporting automáticamente
+    try:
+        import Reporting  # noqa: F401
+    except ImportError:
+        pass
+    # Intentar activar el workbench Reporting para registrar comandos
+    try:
+        FreeCADGui.activateWorkbench("ReportingWorkbench")
+    except Exception:
+        pass
     if not IsAvailable():
         raise RuntimeError(
             f"BIM Report necesita el addon externo '{ADDON_NAME}', que no está instalado."

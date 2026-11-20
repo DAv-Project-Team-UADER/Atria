@@ -24,6 +24,15 @@ import FreeCAD
 import FreeCADGui
 import FreeCADGui as Gui
 
+# Registrar los comandos BIM de FreeCAD necesarios para las funciones
+# de Annotation (cotas, líder, texto, página/vista TechDraw, sección, etc.).
+# Sin este import, FreeCADGui.runCommand falla con "No such command".
+try:
+    import bimcommands  # noqa: F401
+except ImportError:
+    pass
+
+
 def _RequireDocument():
     doc = FreeCAD.ActiveDocument
     if doc is None:

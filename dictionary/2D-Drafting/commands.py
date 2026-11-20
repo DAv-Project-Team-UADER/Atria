@@ -24,6 +24,16 @@ import FreeCAD
 import FreeCADGui
 import FreeCADGui as Gui
 
+# Registrar el módulo DraftTools de FreeCAD para que sus comandos
+# (Draft_Point, Draft_Line, etc.) estén disponibles al llamar a
+# Gui.runCommand. Sin este import, falla con "No such command".
+# DraftTools importa internamente todos los módulos draftguitools.gui_*
+# que registran los comandos con Gui.addCommand.
+try:
+    import DraftTools  # noqa: F401
+except ImportError:
+    pass
+
 
 # --- Arc ---
 Arc = {
@@ -93,13 +103,18 @@ Rectangle = {
 # --- Sketch ---
 def _sketch():
     import Show
-    ActiveSketch = Gui.getDocument('Unnamed').getObject('Sketch')
-    tv = Show.TempoVis(Gui.ActiveDocument, tag=ActiveSketch.ViewObject.TypeId)
+    doc = FreeCAD.ActiveDocument
+    if doc is None:
+        raise RuntimeError("No hay un documento de FreeCAD abierto.")
+    ActiveSketch = doc.getObject('Sketch')
+    if ActiveSketch is None:
+        raise RuntimeError("No se encontró un objeto 'Sketch' en el documento activo.")
+    tv = Show.TempoVis(doc, tag=ActiveSketch.ViewObject.TypeId)
     ActiveSketch.ViewObject.TempoVis = tv
     if ActiveSketch.ViewObject.EditingWorkbench:
         tv.activateWorkbench(ActiveSketch.ViewObject.EditingWorkbench)
     if ActiveSketch.ViewObject.HideDependent:
-        tv.hide(tv.get_all_dependent(Gui.getDocument('Unnamed').getObject('Sketch'), ''))
+        tv.hide(tv.get_all_dependent(doc.getObject('Sketch'), ''))
     if ActiveSketch.ViewObject.ShowSupport:
         tv.show([ref[0] for ref in ActiveSketch.AttachmentSupport if not (ref[0].isDerivedFrom("App::Plane") or ref[0].isDerivedFrom("App::LocalCoordinateSystem"))])
     if ActiveSketch.ViewObject.ShowLinks:
@@ -109,7 +124,7 @@ def _sketch():
     del tv
     del ActiveSketch
 
-    ActiveSketch = Gui.getDocument('Unnamed').getObject('Sketch')
+    ActiveSketch = doc.getObject('Sketch')
     if ActiveSketch.ViewObject.RestoreCamera:
         ActiveSketch.ViewObject.TempoVis.saveCamera()
         if ActiveSketch.ViewObject.ForceOrtho:
