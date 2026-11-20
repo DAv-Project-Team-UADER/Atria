@@ -24,6 +24,16 @@ import FreeCAD
 import FreeCADGui
 import FreeCADGui as Gui
 
+
+class _ParamSpec:
+    """Especificacion de parametro compatible con Validator y ParameterCollector."""
+
+    def __init__(self, index: int, name: str, param_type: type, required: bool = True) -> None:
+        self.index = index
+        self.name = name
+        self.param_type = param_type
+        self.required = required
+
 def _RequireDocument():
     doc = FreeCAD.ActiveDocument
     if doc is None:
@@ -108,6 +118,11 @@ def working_plane_side(offset=0, interactive=False):
     plane.set_to_side(offset)
     return plane
 
+
+working_plane_side._param_specs = [
+    _ParamSpec(1, "offset", float, True),
+]
+
 # --- WorkingPlaneTop ---
 """Working Plane Top — Menú BIM → Snapping → Working Plane Top.
 
@@ -145,6 +160,11 @@ def working_plane_top(offset=0, interactive=False):
     plane = WorkingPlane.get_working_plane(update=False)
     plane.set_to_top(offset)
     return plane
+
+
+working_plane_top._param_specs = [
+    _ParamSpec(1, "offset", float, True),
+]
 
 # --- WorkingPlaneFront ---
 """Working Plane Front — Menú BIM → Snapping → Working Plane Front.

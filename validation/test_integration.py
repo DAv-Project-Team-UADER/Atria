@@ -108,7 +108,7 @@ class IntegrationTests(unittest.TestCase):
         self.assertTrue(callable(fn))
 
     def test_atria_parameterless_function_validation(self) -> None:
-        fn = GetDictionaryFunction("2d-drafting", "arc")
+        fn = GetDictionaryFunction("2d-drafting", "sketch")
         v = Validator()
         es = v.GetRequirements("es", fn)
         self.assertIn("sin par", es.lower())

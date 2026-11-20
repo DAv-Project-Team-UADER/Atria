@@ -25,6 +25,16 @@ import FreeCADGui
 import FreeCADGui as Gui
 
 
+class _ParamSpec:
+    """Especificacion de parametro compatible con Validator y ParameterCollector."""
+
+    def __init__(self, index: int, name: str, param_type: type, required: bool = True) -> None:
+        self.index = index
+        self.name = name
+        self.param_type = param_type
+        self.required = required
+
+
 def _require_document():
     doc = FreeCAD.ActiveDocument
     if doc is None:
@@ -121,13 +131,21 @@ Comando FreeCAD: BIM_Box.
 
 COMMAND_BOX = "BIM_Box"
 
-def box(length=None, width=None, height=None, placement=None):
+def box(
+    length: float = 1000.0,
+    width: float = 1000.0,
+    height: float = 1000.0,
+    placement=None,
+    x: float = 0.0,
+    y: float = 0.0,
+    z: float = 0.0,
+):
     """Crea una caja.
 
     Parámetros
     ----------
     length, width, height : float, opcional
-        Dimensiones en mm. Si se omite alguna, se abre la herramienta
+        Dimensiones en mm. Si se omite alguna o es None, se abre la herramienta
         interactiva de 4 clics sobre el plano de trabajo.
     placement : FreeCAD.Placement, opcional
         Posición y orientación de la caja creada por script.
@@ -136,17 +154,23 @@ def box(length=None, width=None, height=None, placement=None):
     --------
     El objeto Part::Box creado, o None en modo interactivo.
     """
-    doc = _require_document()
-    _require_3d_view()
+    doc = FreeCAD.ActiveDocument if FreeCAD else None
+    if doc is None and FreeCAD and hasattr(FreeCAD, "newDocument"):
+        doc = FreeCAD.newDocument()
 
     if length is None or width is None or height is None:
-        FreeCADGui.runCommand(COMMAND_BOX)
+        if FreeCADGui and hasattr(FreeCADGui, "runCommand"):
+            FreeCADGui.runCommand(COMMAND_BOX)
         return None
 
     if length <= 0 or width <= 0 or height <= 0:
         raise RuntimeError("Las dimensiones de la caja deben ser mayores que cero.")
 
-    doc.openTransaction("Box")
+    if doc is None:
+        return None
+
+    if hasattr(doc, "openTransaction"):
+        doc.openTransaction("Box")
     try:
         result = doc.addObject("Part::Box", "Box")
         result.Length = length
@@ -154,12 +178,24 @@ def box(length=None, width=None, height=None, placement=None):
         result.Height = height
         if placement is not None:
             result.Placement = placement
+        elif FreeCAD and hasattr(FreeCAD, "Placement"):
+            result.Placement = FreeCAD.Placement(FreeCAD.Vector(x, y, z), FreeCAD.Rotation())
     except Exception:
-        doc.abortTransaction()
+        if hasattr(doc, "abortTransaction"):
+            doc.abortTransaction()
         raise
-    doc.commitTransaction()
-    doc.recompute()
+    if hasattr(doc, "commitTransaction"):
+        doc.commitTransaction()
+    if hasattr(doc, "recompute"):
+        doc.recompute()
     return result
+
+
+box._param_specs = [
+    _ParamSpec(1, "length", float, True),
+    _ParamSpec(2, "width", float, True),
+    _ParamSpec(3, "height", float, True),
+]
 
 # --- Column_Reinforcement ---
 """Column Reinforcement — Menú BIM → 3D/BIM → Reinforcement tools → Column Reinforcement.
@@ -486,9 +522,44 @@ def slab_reinforcement():
     FreeCADGui.runCommand(COMMAND_SLAB_REINFORCEMENT)
 
 # --- Beam ---
-Beam = {
-    "beam": lambda: Gui.runCommand('BIM_Beam',0)
-}
+def beam(
+    length: float = 4000.0,
+    width: float = 200.0,
+    height: float = 400.0,
+    x: float = 0.0,
+    y: float = 0.0,
+    z: float = 0.0,
+):
+    """Crea una viga Arch / Structure con las dimensiones indicadas."""
+    doc = FreeCAD.ActiveDocument if FreeCAD else None
+    if doc is None and FreeCAD and hasattr(FreeCAD, "newDocument"):
+        doc = FreeCAD.newDocument()
+    try:
+        import Arch
+        import Draft
+
+        b = Arch.makeStructure(length=length, width=width, height=height)
+        if hasattr(b, "Role"):
+            b.Role = "Beam"
+        if FreeCAD and hasattr(b, "Placement"):
+            b.Placement.Base = FreeCAD.Vector(x, y, z)
+        Draft.autogroup(b)
+        if doc and hasattr(doc, "recompute"):
+            doc.recompute()
+        return b
+    except Exception:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("BIM_Beam", 0)
+        return None
+
+
+beam._param_specs = [
+    _ParamSpec(1, "length", float, True),
+    _ParamSpec(2, "width", float, True),
+    _ParamSpec(3, "height", float, True),
+]
+
+Beam = {"beam": beam}
 
 # --- Building ---
 def _building():
@@ -502,9 +573,44 @@ Building = {
 }
 
 # --- Column ---
-Column = {
-    "column": lambda: Gui.runCommand('BIM_Column',0)
-}
+def column(
+    length: float = 300.0,
+    width: float = 300.0,
+    height: float = 3000.0,
+    x: float = 0.0,
+    y: float = 0.0,
+    z: float = 0.0,
+):
+    """Crea una columna Arch / Structure con las dimensiones indicadas."""
+    doc = FreeCAD.ActiveDocument if FreeCAD else None
+    if doc is None and FreeCAD and hasattr(FreeCAD, "newDocument"):
+        doc = FreeCAD.newDocument()
+    try:
+        import Arch
+        import Draft
+
+        col = Arch.makeStructure(length=length, width=width, height=height)
+        if hasattr(col, "Role"):
+            col.Role = "Column"
+        if FreeCAD and hasattr(col, "Placement"):
+            col.Placement.Base = FreeCAD.Vector(x, y, z)
+        Draft.autogroup(col)
+        if doc and hasattr(doc, "recompute"):
+            doc.recompute()
+        return col
+    except Exception:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("BIM_Column", 0)
+        return None
+
+
+column._param_specs = [
+    _ParamSpec(1, "length", float, True),
+    _ParamSpec(2, "width", float, True),
+    _ParamSpec(3, "height", float, True),
+]
+
+Column = {"column": column}
 
 # --- CurtainWall ---
 # (typo upstream "CuratainWall" corregido para que resuelva el diccionario)
@@ -513,9 +619,29 @@ CurtainWall = {
 }
 
 # --- Door ---
-Door = {
-    "door": lambda: Gui.runCommand('BIM_Door',0)
-}
+def door(width: float = 900.0, height: float = 2100.0):
+    """Crea una puerta con ancho y alto especificados."""
+    doc = FreeCAD.ActiveDocument if FreeCAD else None
+    if doc is None and FreeCAD and hasattr(FreeCAD, "newDocument"):
+        doc = FreeCAD.newDocument()
+    try:
+        import Arch
+        d = Arch.makeWindowPreset("Simple door", width=width, height=height)
+        if doc and hasattr(doc, "recompute"):
+            doc.recompute()
+        return d
+    except Exception:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("BIM_Door", 0)
+        return None
+
+
+door._param_specs = [
+    _ParamSpec(1, "width", float, True),
+    _ParamSpec(2, "height", float, True),
+]
+
+Door = {"door": door}
 
 # --- Level ---
 def _level():
@@ -531,15 +657,35 @@ Level = {
 }
 
 # --- Pipe ---
-def _pipe():
-    import Arch
-    import Draft
-    obj = Arch.makePipe()
-    Draft.autogroup(obj)
+def pipe(length: float = 2000.0, diameter: float = 50.0):
+    """Crea un tubo paramétrico."""
+    doc = FreeCAD.ActiveDocument if FreeCAD else None
+    if doc is None and FreeCAD and hasattr(FreeCAD, "newDocument"):
+        doc = FreeCAD.newDocument()
+    try:
+        import Arch
+        import Draft
 
-Pipe = {
-    "pipe": _pipe
-}
+        p1 = FreeCAD.Vector(0, 0, 0) if FreeCAD else (0, 0, 0)
+        p2 = FreeCAD.Vector(length, 0, 0) if FreeCAD else (length, 0, 0)
+        base = Draft.make_line(p1, p2)
+        p_obj = Arch.makePipe(base, diameter=diameter)
+        Draft.autogroup(p_obj)
+        if doc and hasattr(doc, "recompute"):
+            doc.recompute()
+        return p_obj
+    except Exception:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Arch_Pipe", 0)
+        return None
+
+
+pipe._param_specs = [
+    _ParamSpec(1, "length", float, True),
+    _ParamSpec(2, "diameter", float, True),
+]
+
+Pipe = {"pipe": pipe}
 
 # --- PipeConnector ---
 PipeConnector = {
@@ -563,9 +709,44 @@ Site = {
 }
 
 # --- Slab ---
-Slab = {
-    "slab": lambda: Gui.runCommand('BIM_Slab',0)
-}
+def slab(
+    length: float = 4000.0,
+    width: float = 3000.0,
+    thickness: float = 150.0,
+    x: float = 0.0,
+    y: float = 0.0,
+    z: float = 0.0,
+):
+    """Crea una losa Arch / Structure con las dimensiones indicadas."""
+    doc = FreeCAD.ActiveDocument if FreeCAD else None
+    if doc is None and FreeCAD and hasattr(FreeCAD, "newDocument"):
+        doc = FreeCAD.newDocument()
+    try:
+        import Arch
+        import Draft
+
+        sl = Arch.makeStructure(length=length, width=width, height=thickness)
+        if hasattr(sl, "Role"):
+            sl.Role = "Slab"
+        if FreeCAD and hasattr(sl, "Placement"):
+            sl.Placement.Base = FreeCAD.Vector(x, y, z)
+        Draft.autogroup(sl)
+        if doc and hasattr(doc, "recompute"):
+            doc.recompute()
+        return sl
+    except Exception:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("BIM_Slab", 0)
+        return None
+
+
+slab._param_specs = [
+    _ParamSpec(1, "length", float, True),
+    _ParamSpec(2, "width", float, True),
+    _ParamSpec(3, "thickness", float, True),
+]
+
+Slab = {"slab": slab}
 
 # --- Space ---
 Space = {
@@ -573,14 +754,67 @@ Space = {
 }
 
 # --- Wall ---
-Wall = {
-    "wall": lambda: Gui.runCommand('Arch_Wall',0)
-}
+def wall(
+    length: float = 5000.0,
+    width: float = 200.0,
+    height: float = 3000.0,
+    x: float = 0.0,
+    y: float = 0.0,
+    z: float = 0.0,
+):
+    """Crea un muro Arch a partir de sus dimensiones o abre la herramienta interactiva."""
+    doc = FreeCAD.ActiveDocument if FreeCAD else None
+    if doc is None and FreeCAD and hasattr(FreeCAD, "newDocument"):
+        doc = FreeCAD.newDocument()
+    try:
+        import Arch
+        import Draft
+
+        p1 = FreeCAD.Vector(x, y, z) if FreeCAD else (x, y, z)
+        p2 = FreeCAD.Vector(x + length, y, z) if FreeCAD else (x + length, y, z)
+        base_line = Draft.make_line(p1, p2)
+        wall_obj = Arch.makeWall(base_line, width=width, height=height)
+        if doc and hasattr(doc, "recompute"):
+            doc.recompute()
+        return wall_obj
+    except Exception:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Arch_Wall", 0)
+        return None
+
+
+wall._param_specs = [
+    _ParamSpec(1, "length", float, True),
+    _ParamSpec(2, "width", float, True),
+    _ParamSpec(3, "height", float, True),
+]
+
+Wall = {"wall": wall}
 
 # --- Window ---
-Window = {
-    "window": lambda: Gui.runCommand('Arch_Window',0)
-}
+def window(width: float = 1200.0, height: float = 1200.0):
+    """Crea una ventana con ancho y alto especificados."""
+    doc = FreeCAD.ActiveDocument if FreeCAD else None
+    if doc is None and FreeCAD and hasattr(FreeCAD, "newDocument"):
+        doc = FreeCAD.newDocument()
+    try:
+        import Arch
+        w = Arch.makeWindowPreset("Open 1-pane", width=width, height=height)
+        if doc and hasattr(doc, "recompute"):
+            doc.recompute()
+        return w
+    except Exception:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Arch_Window", 0)
+        return None
+
+
+window._param_specs = [
+    _ParamSpec(1, "width", float, True),
+    _ParamSpec(2, "height", float, True),
+]
+
+Window = {"window": window}
 
 # --- ArchEquipment ---
 ArchEquipment = {
@@ -613,14 +847,45 @@ ArchRoof = {
 }
 
 # --- ArchStairs ---
+def stairs(
+    steps: int = 17,
+    step_length: float = 280.0,
+    step_height: float = 175.0,
+    step_width: float = 1000.0,
+):
+    """Crea una escalera paramétrica."""
+    doc = FreeCAD.ActiveDocument if FreeCAD else None
+    if doc is None and FreeCAD and hasattr(FreeCAD, "newDocument"):
+        doc = FreeCAD.newDocument()
+    try:
+        import Arch
+        import Draft
+
+        st = Arch.makeStairs(
+            steps=steps,
+            length=steps * step_length,
+            height=steps * step_height,
+            width=step_width,
+        )
+        Draft.autogroup(st)
+        if doc and hasattr(doc, "recompute"):
+            doc.recompute()
+        return st
+    except Exception:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Arch_Stairs", 0)
+        return None
+
+
+stairs._param_specs = [
+    _ParamSpec(1, "steps", int, True),
+]
+
 def _stairs():
-    import Arch
-    import Draft
-    stairs = Arch.makeStairs(steps=17)
-    Draft.autogroup(stairs)
+    return stairs()
 
 ArchStairs = {
-    "arch stairs": _stairs
+    "arch stairs": stairs
 }
 
 # --- ArchTruss ---

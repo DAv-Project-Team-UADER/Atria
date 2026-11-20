@@ -24,6 +24,16 @@ import FreeCAD
 import FreeCADGui
 import FreeCADGui as Gui
 
+
+class _ParamSpec:
+    """Especificacion de parametro compatible con Validator y ParameterCollector."""
+
+    def __init__(self, index: int, name: str, param_type: type, required: bool = True) -> None:
+        self.index = index
+        self.name = name
+        self.param_type = param_type
+        self.required = required
+
 # Registrar los comandos BIM de FreeCAD necesarios para las funciones
 # de Annotation (cotas, líder, texto, página/vista TechDraw, sección, etc.).
 # Sin este import, FreeCADGui.runCommand falla con "No such command".
@@ -270,6 +280,12 @@ def CreateAxis(num=DEFAULT_NUM, size=DEFAULT_SIZE, name=DEFAULT_NAME_AXIS):
 
     return Arch.makeAxis(num=int(num), size=float(size), name=name)
 
+
+CreateAxis._param_specs = [
+    _ParamSpec(1, "num", int, True),
+    _ParamSpec(2, "size", float, True),
+]
+
 Axis = {
     "axis": CreateAxis,
 }
@@ -388,6 +404,14 @@ def CreateGrid(name=DEFAULT_NAME_GRID, rows=None, columns=None, width=None, heig
 
     doc.recompute()
     return grid
+
+
+CreateGrid._param_specs = [
+    _ParamSpec(1, "rows", int, True),
+    _ParamSpec(2, "columns", int, True),
+    _ParamSpec(3, "width", float, True),
+    _ParamSpec(4, "height", float, True),
+]
 
 Grid = {
     "grid": CreateGrid,
@@ -1069,7 +1093,13 @@ def _CreateDraftText(text, point):
     doc.recompute()
     return obj
 
-def CreateText(text=None, point=None):
+def CreateText(
+    text=None,
+    point=None,
+    x: float = 0.0,
+    y: float = 0.0,
+    z: float = 0.0,
+):
     """Crea un texto en la vista 3D o en la página TechDraw activa.
 
     Parámetros
@@ -1078,7 +1108,7 @@ def CreateText(text=None, point=None):
         Contenido del texto. Si se omite, se activa el comando interactivo.
     point : tuple, opcional
         Punto de inserción (x, y, z) del texto en la vista 3D. Si se omite se
-        usa el origen.
+        usa (x, y, z) o el origen.
 
     Devuelve
     --------
@@ -1086,6 +1116,9 @@ def CreateText(text=None, point=None):
     """
     _RequireDocument()
     _RequireView()
+
+    if point is None and (x != 0.0 or y != 0.0 or z != 0.0):
+        point = (x, y, z)
 
     if text is not None:
         text = str(text).strip()
@@ -1104,6 +1137,13 @@ def CreateText(text=None, point=None):
 
     FreeCADGui.runCommand(COMMAND_TEXT)
     return None
+
+
+CreateText._param_specs = [
+    _ParamSpec(1, "text", str, True),
+    _ParamSpec(2, "x", float, True),
+    _ParamSpec(3, "y", float, True),
+]
 
 Text = {
     "text": CreateText,

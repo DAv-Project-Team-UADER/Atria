@@ -27,10 +27,60 @@ try:
         QApplication, QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
     )
 except ImportError:
-    from PySide2.QtCore import Qt, Signal  # type: ignore[assignment]
-    from PySide2.QtWidgets import (  # type: ignore[assignment]
-        QApplication, QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
-    )
+    try:
+        from PySide2.QtCore import Qt, Signal  # type: ignore[assignment]
+        from PySide2.QtWidgets import (  # type: ignore[assignment]
+            QApplication, QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
+        )
+    except ImportError:  # Running outside FreeCAD in headless/mock test mode
+        class QDialog:
+            def __init__(self, parent=None):
+                self._parent = parent
+            def setWindowTitle(self, t): pass
+            def setModal(self, m): pass
+            def setMinimumWidth(self, w): pass
+            def setStyleSheet(self, s): pass
+            def show(self): pass
+            def raise_(self): pass
+            def activateWindow(self): pass
+            def accept(self): pass
+            def reject(self): pass
+            def exec(self): return 0
+            def exec_(self): return 0
+
+        class Signal:
+            def __init__(self, *args): pass
+            def emit(self, *args): pass
+            def connect(self, slot): pass
+
+        Qt = type("Qt", (), {"AlignCenter": 0, "AlignmentFlag": type("AlignmentFlag", (), {"AlignCenter": 0})})
+        QApplication = type("QApplication", (), {"instance": lambda: None})
+
+        class QLabel:
+            def __init__(self, *args):
+                self._text = ""
+            def setText(self, t): self._text = t
+            def text(self): return self._text
+            def setWordWrap(self, w): pass
+            def setAlignment(self, a): pass
+            def setStyleSheet(self, s): pass
+
+        class QPushButton:
+            def __init__(self, *args):
+                self.clicked = Signal()
+            def setAutoDefault(self, a): pass
+            def setDefault(self, d): pass
+
+        class QVBoxLayout:
+            def __init__(self, *args): pass
+            def setSpacing(self, s): pass
+            def addWidget(self, w): pass
+            def addLayout(self, l): pass
+
+        class QHBoxLayout:
+            def __init__(self, *args): pass
+            def addStretch(self): pass
+            def addWidget(self, w): pass
 
 from InputPrompts.PromptResult import PromptResult
 from InputPrompts.InputPromptI18n import ResolveLanguage, T

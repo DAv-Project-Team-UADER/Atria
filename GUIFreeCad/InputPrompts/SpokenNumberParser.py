@@ -124,6 +124,46 @@ class SpokenNumberParser:
         "veintisiete": "27",
         "veintiocho": "28",
         "veintinueve": "29",
+        # Centenas y miles (100-900, 1000) comunes en medidas CAD
+        "cien": "100",
+        "ciento": "100",
+        "doscientos": "200",
+        "doscientas": "200",
+        "trescientos": "300",
+        "trescientas": "300",
+        "cuatrocientos": "400",
+        "cuatrocientas": "400",
+        "quinientos": "500",
+        "quinientas": "500",
+        "seiscientos": "600",
+        "seiscientas": "600",
+        "setecientos": "700",
+        "setecientas": "700",
+        "ochocientos": "800",
+        "ochocientas": "800",
+        "novecientos": "900",
+        "novecientas": "900",
+        "mil": "1000",
+        "hundred": "100",
+        "thousand": "1000",
+        "cem": "100",
+        "cento": "100",
+        "duzentos": "200",
+        "duzentas": "200",
+        "trezentos": "300",
+        "trezentas": "300",
+        "quatrocentos": "400",
+        "quatrocentas": "400",
+        "quinhentos": "500",
+        "quinhentas": "500",
+        "seiscentos": "600",
+        "seiscentas": "600",
+        "setecentos": "700",
+        "setecentas": "700",
+        "oitocentos": "800",
+        "oitocentas": "800",
+        "novecentos": "900",
+        "novecentas": "900",
     }
 
     # Palabras de decena (20-90) que se combinan con una unidad siguiente
@@ -153,6 +193,52 @@ class SpokenNumberParser:
         "oitenta": 80,
         "noventa": 90,
         "ninety": 90,
+    }
+
+    # Palabras de centena (100-900) que se combinan con decenas/unidades
+    HundredsWords: dict[str, int] = {
+        "cien": 100,
+        "ciento": 100,
+        "hundred": 100,
+        "cem": 100,
+        "cento": 100,
+        "doscientos": 200,
+        "doscientas": 200,
+        "duzentos": 200,
+        "duzentas": 200,
+        "trescientos": 300,
+        "trescientas": 300,
+        "trezentos": 300,
+        "trezentas": 300,
+        "cuatrocientos": 400,
+        "cuatrocientas": 400,
+        "quatrocentos": 400,
+        "quatrocentas": 400,
+        "quinientos": 500,
+        "quinientas": 500,
+        "quinhentos": 500,
+        "quinhentas": 500,
+        "seiscientos": 600,
+        "seiscientas": 600,
+        "seiscentos": 600,
+        "seiscentas": 600,
+        "setecientos": 700,
+        "setecientas": 700,
+        "setecentos": 700,
+        "setecentas": 700,
+        "ochocientos": 800,
+        "ochocientas": 800,
+        "oitocentos": 800,
+        "oitocentas": 800,
+        "novecientos": 900,
+        "novecientas": 900,
+        "novecentos": 900,
+        "novecentas": 900,
+    }
+
+    ThousandsWords: dict[str, int] = {
+        "mil": 1000,
+        "thousand": 1000,
     }
 
     # Conector opcional entre decena y unidad. El ingles no usa uno en este
@@ -325,36 +411,67 @@ class SpokenNumberParser:
 
     @classmethod
     def _MergeTensAndUnits(cls, Tokens: list[str]) -> list[str]:
-        """Merge "tens [connector] unit" sequences into one number token.
+        """Merge compound spoken numbers (thousands, hundreds, tens, units).
 
-        Lets users say a natural compound number ("treinta y dos", "twenty
-        two", "vinte e um") instead of dictating each digit separately. A
-        lone digit word with no preceding tens word is left untouched, so
-        digit-by-digit dictation (saying "uno" "uno" for 11) still works.
+        Lets users say natural compound numbers ("ciento cincuenta", "treinta y dos",
+        "dos mil quinientos", "twenty two") instead of dictating each digit separately.
+        Lone digit words are left untouched so digit-by-digit dictation still works.
         """
         merged: list[str] = []
         index, total = 0, len(Tokens)
         while index < total:
-            token = Tokens[index]
-            if token in cls.TensWords:
-                lookahead = index + 1
-                if lookahead < total and Tokens[lookahead] in cls.ConnectorWords:
-                    lookahead += 1
-                if lookahead < total and Tokens[lookahead] in cls.UnitWords:
-                    merged.append(str(cls.TensWords[token] + cls.UnitWords[Tokens[lookahead]]))
-                    index = lookahead + 1
-                    continue
+            accum_val = 0
+            consumed = False
+
+            # Millares: "dos mil" -> 2000, o "mil" -> 1000
+            if (
+                Tokens[index] in cls.UnitWords
+                and index + 1 < total
+                and Tokens[index + 1] in cls.ThousandsWords
+            ):
+                accum_val += cls.UnitWords[Tokens[index]] * 1000
+                index += 2
+                consumed = True
+            elif Tokens[index] in cls.ThousandsWords:
+                accum_val += 1000
+                index += 1
+                consumed = True
+
+            # Centenas: "quinientos" / "doscientos" / "ciento"
+            if index < total and Tokens[index] in cls.HundredsWords:
+                accum_val += cls.HundredsWords[Tokens[index]]
+                index += 1
+                consumed = True
+
+            # Decenas y unidades
+            if index < total and Tokens[index] in cls.TensWords:
+                tens_val = cls.TensWords[Tokens[index]]
+                index += 1
+                consumed = True
+                if index < total and Tokens[index] in cls.ConnectorWords:
+                    index += 1
+                if index < total and Tokens[index] in cls.UnitWords:
+                    tens_val += cls.UnitWords[Tokens[index]]
+                    index += 1
+                accum_val += tens_val
             elif (
-                token in cls.TenWords
-                and index + 2 < total
+                index + 2 < total
+                and Tokens[index] in cls.TenWords
                 and Tokens[index + 1] in cls.ConnectorWords
                 and Tokens[index + 2] in cls.UnitWords
             ):
-                merged.append(str(10 + cls.UnitWords[Tokens[index + 2]]))
+                accum_val += 10 + cls.UnitWords[Tokens[index + 2]]
                 index += 3
-                continue
-            merged.append(token)
-            index += 1
+                consumed = True
+            elif index < total and Tokens[index] in cls.UnitWords and consumed:
+                accum_val += cls.UnitWords[Tokens[index]]
+                index += 1
+
+            if consumed:
+                merged.append(str(accum_val))
+            else:
+                merged.append(Tokens[index])
+                index += 1
         return merged
 
     @classmethod

@@ -132,8 +132,11 @@ class PromptedCommandExecutor:
         try:
             import FreeCAD as App
 
-            App.Console.PrintMessage(Text.rstrip() + "\n")
-        except ImportError:
+            if hasattr(App, "Console") and hasattr(App.Console, "PrintMessage"):
+                App.Console.PrintMessage(Text.rstrip() + "\n")
+            else:
+                print(Text)
+        except (ImportError, AttributeError):
             print(Text)
 
     @staticmethod
@@ -141,6 +144,9 @@ class PromptedCommandExecutor:
         try:
             import FreeCAD as App
 
-            App.Console.PrintError(Text.rstrip() + "\n")
-        except ImportError:
+            if hasattr(App, "Console") and hasattr(App.Console, "PrintError"):
+                App.Console.PrintError(Text.rstrip() + "\n")
+            else:
+                print(Text)
+        except (ImportError, AttributeError):
             print(Text)

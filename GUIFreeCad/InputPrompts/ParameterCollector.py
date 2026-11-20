@@ -27,7 +27,13 @@ from typing import Any, Callable, Iterable
 
 from InputPrompts.PromptResult import PromptResult
 from InputPrompts.SpokenNumberParser import SpokenNumberParser
-from InputPrompts.InputPromptI18n import KindLabel, ResolveLanguage, T
+from InputPrompts.InputPromptI18n import (
+    KindLabel,
+    ParamFriendlyMessage,
+    ParamFriendlyName,
+    ResolveLanguage,
+    T,
+)
 
 
 @dataclass(frozen=True)
@@ -167,6 +173,11 @@ class ParameterCollector:
 
         kind = getattr(Spec, "kind", "object")
         try:
+            if kind in ("coord", "point", "vector"):
+                from InputPrompts.CoordinateInputPrompt import CoordinateInputPrompt
+
+                prompt = CoordinateInputPrompt()
+                return prompt.ProcessFinalText(Text)
             if kind == "int":
                 return PromptResult.Ok(SpokenNumberParser.ParseInteger(Text))
             if kind == "float":
@@ -186,8 +197,13 @@ class ParameterCollector:
 
     def _CreatePromptForSpec(self, Spec: Any):
         kind = getattr(Spec, "kind", "object")
-        title = T(self.Language, "param_title", index=getattr(Spec, "index", ""))
+        title = self._BuildPromptTitle(Spec)
         message = self._BuildPromptMessage(Spec)
+
+        if kind in ("coord", "point", "vector"):
+            from InputPrompts.CoordinateInputPrompt import CoordinateInputPrompt
+
+            return CoordinateInputPrompt(title, message, self.Parent)
 
         if kind == "int":
             from InputPrompts.IntegerInputPrompt import IntegerInputPrompt
@@ -206,9 +222,19 @@ class ParameterCollector:
 
         return ObjectSelectionInputPrompt(title, message, self.Parent)
 
+    def _BuildPromptTitle(self, Spec: Any) -> str:
+        name = getattr(Spec, "name", "value")
+        friendly = ParamFriendlyName(self.Language, name)
+        if friendly:
+            return f"ATRIA — {friendly}"
+        return T(self.Language, "param_title", index=getattr(Spec, "index", ""))
+
     def _BuildPromptMessage(self, Spec: Any) -> str:
         name = getattr(Spec, "name", "value")
         kind = getattr(Spec, "kind", "object")
+        friendly = ParamFriendlyMessage(self.Language, name, kind)
+        if friendly:
+            return friendly
         return T(
             self.Language,
             "param_message",

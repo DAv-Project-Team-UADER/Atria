@@ -24,6 +24,16 @@ import FreeCAD
 import FreeCADGui
 import FreeCADGui as Gui
 
+
+class _ParamSpec:
+    """Especificacion de parametro compatible con Validator y ParameterCollector."""
+
+    def __init__(self, index: int, name: str, param_type: type, required: bool = True) -> None:
+        self.index = index
+        self.name = name
+        self.param_type = param_type
+        self.required = required
+
 def _RequireDocument():
     doc = FreeCAD.ActiveDocument
     if doc is None:
@@ -452,6 +462,11 @@ def DraftSlope(objects=None, value=None):
     doc.commitTransaction()
     doc.recompute()
     return changed
+
+
+DraftSlope._param_specs = [
+    _ParamSpec(1, "value", float, True),
+]
 
 # --- DraftWorkingPlaneProxy ---
 """Draft WorkingPlaneProxy — Menú BIM → Utils → Create working plane proxy.

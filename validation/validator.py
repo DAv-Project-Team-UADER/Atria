@@ -63,6 +63,7 @@ _I18N: dict[LanguageCode, dict[str, str]] = {
         "expects": "se espera",
         "int": "un entero",
         "float": "un número decimal",
+        "coord": "coordenadas (X, Y) o punto",
         "str": "un texto",
         "object": "un objeto del documento",
         "none": "sin parámetros",
@@ -78,6 +79,7 @@ _I18N: dict[LanguageCode, dict[str, str]] = {
         "expects": "expected",
         "int": "an integer",
         "float": "a decimal number",
+        "coord": "coordinates (X, Y) or point",
         "str": "a string",
         "object": "a document object",
         "none": "no parameters",
@@ -93,6 +95,7 @@ _I18N: dict[LanguageCode, dict[str, str]] = {
         "expects": "espera-se",
         "int": "um inteiro",
         "float": "um número decimal",
+        "coord": "coordenadas (X, Y) ou ponto",
         "str": "um texto",
         "object": "um objeto do documento",
         "none": "sem parâmetros",
@@ -254,13 +257,19 @@ class Validator:
         return specs
 
     def _KindFromParamSpec(self, spec: Any) -> ParamKind:
-        param_type = getattr(spec, "param_type", None) or getattr(spec, "tipo", None)
-        if param_type is int:
+        param_type = (
+            getattr(spec, "param_type", None)
+            or getattr(spec, "tipo", None)
+            or getattr(spec, "kind", None)
+        )
+        if param_type is int or param_type == "int":
             return "int"
-        if param_type is float:
+        if param_type is float or param_type == "float":
             return "float"
-        if param_type is str:
+        if param_type is str or param_type == "str":
             return "str"
+        if param_type in ("coord", "point", "vector"):
+            return "coord"
         return "object"
 
     def _NormalizeUserData(
@@ -313,6 +322,23 @@ class Validator:
                     return float(value.strip()), None
                 except ValueError:
                     pass
+            return None, _Text(language, "coerce_fail").format(name=name, expected=expected)
+
+        if kind == "coord":
+            if isinstance(value, (tuple, list)):
+                try:
+                    return tuple(float(x) for x in value), None
+                except (ValueError, TypeError):
+                    pass
+            if hasattr(value, "x") and hasattr(value, "y"):
+                z = getattr(value, "z", 0.0)
+                return (float(value.x), float(value.y), float(z)), None
+            if isinstance(value, str):
+                import re
+
+                nums = re.findall(r"-?\d+(?:\.\d+)?", value)
+                if nums:
+                    return tuple(float(x) for x in nums), None
             return None, _Text(language, "coerce_fail").format(name=name, expected=expected)
 
         if kind == "str":

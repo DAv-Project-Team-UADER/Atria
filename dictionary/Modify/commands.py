@@ -29,6 +29,16 @@ except ImportError:  # modulo de ayuda aun no migrado
     ayuda = None
 
 
+class _ParamSpec:
+    """Especificacion de parametro compatible con Validator y ParameterCollector."""
+
+    def __init__(self, index: int, name: str, param_type: type, required: bool = True) -> None:
+        self.index = index
+        self.name = name
+        self.param_type = param_type
+        self.required = required
+
+
 def _require_document():
     doc = FreeCAD.ActiveDocument
     if doc is None:
@@ -77,15 +87,15 @@ Comando FreeCAD: BIM_Clone (atajo C, L).
 
 COMMAND_CLONE = "BIM_Clone"
 
-def clone(delta=None):
+def clone(dx: float = 100.0, dy: float = 0.0, dz: float = 0.0, delta=None):
     """Clona la selección actual.
 
     Parámetros
     ----------
+    dx, dy, dz : float, opcionales
+        Desplazamiento del clon respecto del original en mm.
     delta : FreeCAD.Vector | tuple, opcional
-        Desplazamiento de cada clon respecto de su original. Si se omite, se
-        ejecuta la herramienta de BIM, que crea los clones y entra en modo
-        Mover para ubicarlos con el mouse.
+        Vector de desplazamiento directo.
 
     Devuelve
     --------
@@ -99,8 +109,10 @@ def clone(delta=None):
         raise RuntimeError("Seleccioná al menos un objeto para clonar.")
 
     if delta is None:
-        FreeCADGui.runCommand(COMMAND_CLONE)
-        return None
+        if dx == 0.0 and dy == 0.0 and dz == 0.0:
+            FreeCADGui.runCommand(COMMAND_CLONE)
+            return None
+        delta = (dx, dy, dz)
 
     import Draft
 
@@ -114,6 +126,12 @@ def clone(delta=None):
     doc.commitTransaction()
     doc.recompute()
     return clones
+
+
+clone._param_specs = [
+    _ParamSpec(1, "dx", float, True),
+    _ParamSpec(2, "dy", float, True),
+]
 
 # --- Compound ---
 """Compound — Menú BIM → Modify → Compound.
@@ -328,15 +346,22 @@ Comando FreeCAD: Draft_Mirror (atajo M, I).
 
 COMMAND_MIRROR = "Draft_Mirror"
 
-def mirror(p1=None, p2=None):
+def mirror(
+    x1: float = 0.0,
+    y1: float = 0.0,
+    x2: float = 0.0,
+    y2: float = 100.0,
+    p1=None,
+    p2=None,
+):
     """Crea la imagen especular de la selección actual.
 
     Parámetros
     ----------
+    x1, y1, x2, y2 : float, opcionales
+        Coordenadas de los dos puntos que definen la línea de espejo en mm.
     p1, p2 : FreeCAD.Vector | tuple, opcionales
-        Puntos que definen la línea de espejo. El plano de reflexión contiene
-        esa línea y la normal del plano de trabajo. Si falta alguno, se abre
-        la herramienta interactiva para marcarlos en la vista 3D.
+        Puntos que definen la línea de espejo.
 
     Devuelve
     --------
@@ -345,9 +370,9 @@ def mirror(p1=None, p2=None):
     doc = _require_document()
     _require_3d_view()
 
-    if p1 is None or p2 is None:
-        FreeCADGui.runCommand(COMMAND_MIRROR)
-        return None
+    if p1 is None and p2 is None:
+        p1 = (x1, y1, 0.0)
+        p2 = (x2, y2, 0.0)
 
     p1 = FreeCAD.Vector(p1)
     p2 = FreeCAD.Vector(p2)
@@ -370,6 +395,14 @@ def mirror(p1=None, p2=None):
     doc.recompute()
     return result
 
+
+mirror._param_specs = [
+    _ParamSpec(1, "x1", float, True),
+    _ParamSpec(2, "y1", float, True),
+    _ParamSpec(3, "x2", float, True),
+    _ParamSpec(4, "y2", float, True),
+]
+
 # --- Move ---
 """Move — Menú BIM → Modify → Move.
 
@@ -379,14 +412,21 @@ Comando FreeCAD: Draft_Move (atajo M, V).
 
 COMMAND_MOVE = "Draft_Move"
 
-def move(vector=None, copy=False):
+def move(
+    dx: float = 0.0,
+    dy: float = 0.0,
+    dz: float = 0.0,
+    vector=None,
+    copy=False,
+):
     """Mueve la selección actual.
 
     Parámetros
     ----------
+    dx, dy, dz : float, opcionales
+        Desplazamiento en X, Y, Z en mm.
     vector : FreeCAD.Vector | tuple, opcional
-        Desplazamiento (X, Y, Z) en mm. Si se omite, se abre la herramienta
-        interactiva para marcar punto base y punto destino en la vista 3D.
+        Desplazamiento directo. Si se omite y dx=dy=dz=0, abre la herramienta interactiva.
     copy : bool
         Si es True, crea copias desplazadas en lugar de mover los originales.
 
@@ -398,8 +438,10 @@ def move(vector=None, copy=False):
     _require_3d_view()
 
     if vector is None:
-        FreeCADGui.runCommand(COMMAND_MOVE)
-        return None
+        if dx == 0.0 and dy == 0.0 and dz == 0.0:
+            FreeCADGui.runCommand(COMMAND_MOVE)
+            return None
+        vector = (dx, dy, dz)
 
     selection = FreeCADGui.Selection.getSelection()
     if not selection:
@@ -416,6 +458,12 @@ def move(vector=None, copy=False):
     doc.commitTransaction()
     doc.recompute()
     return result
+
+
+move._param_specs = [
+    _ParamSpec(1, "dx", float, True),
+    _ParamSpec(2, "dy", float, True),
+]
 
 # --- Offset ---
 def Offset():
@@ -482,7 +530,15 @@ Comando FreeCAD: Draft_Rotate (atajo R, O).
 
 COMMAND_ROTATE = "Draft_Rotate"
 
-def rotate(angle=None, center=(0, 0, 0), axis=(0, 0, 1), copy=False):
+def rotate(
+    angle: float = 90.0,
+    center=(0, 0, 0),
+    axis=(0, 0, 1),
+    copy: bool = False,
+    center_x: float = 0.0,
+    center_y: float = 0.0,
+    center_z: float = 0.0,
+):
     """Rota la selección actual.
 
     Parámetros
@@ -514,6 +570,9 @@ def rotate(angle=None, center=(0, 0, 0), axis=(0, 0, 1), copy=False):
 
     import Draft
 
+    if center == (0, 0, 0) and (center_x or center_y or center_z):
+        center = (center_x, center_y, center_z)
+
     doc.openTransaction("Rotate")
     try:
         result = Draft.rotate(
@@ -530,6 +589,11 @@ def rotate(angle=None, center=(0, 0, 0), axis=(0, 0, 1), copy=False):
     doc.recompute()
     return result
 
+
+rotate._param_specs = [
+    _ParamSpec(1, "angle", float, True),
+]
+
 # --- Scale ---
 """Scale — Menú BIM → Modify → Scale.
 
@@ -540,7 +604,15 @@ Comando FreeCAD: Draft_Scale (atajo S, C).
 
 COMMAND_SCALE = "Draft_Scale"
 
-def scale(factor=None, center=(0, 0, 0), copy=False, clone=False):
+def scale(
+    factor: float = 2.0,
+    center=(0, 0, 0),
+    copy: bool = False,
+    clone: bool = False,
+    center_x: float = 0.0,
+    center_y: float = 0.0,
+    center_z: float = 0.0,
+):
     """Escala la selección actual.
 
     Parámetros
@@ -574,6 +646,9 @@ def scale(factor=None, center=(0, 0, 0), copy=False, clone=False):
     if not selection:
         raise RuntimeError("Seleccioná al menos un objeto para escalar.")
 
+    if center == (0, 0, 0) and (center_x or center_y or center_z):
+        center = (center_x, center_y, center_z)
+
     if isinstance(factor, (int, float)):
         factor = (factor, factor, factor)
     factor = FreeCAD.Vector(factor)
@@ -597,6 +672,11 @@ def scale(factor=None, center=(0, 0, 0), copy=False, clone=False):
     doc.commitTransaction()
     doc.recompute()
     return result
+
+
+scale._param_specs = [
+    _ParamSpec(1, "factor", float, True),
+]
 
 # --- SimpleCopy ---
 """Simple Copy — Menú BIM → Modify → Simple Copy.
