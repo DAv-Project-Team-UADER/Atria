@@ -32,6 +32,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QScrollArea,
     QSizePolicy,
+    QSplitter,
     QTextEdit,
     QToolButton,
     QTreeWidget,
@@ -150,8 +151,20 @@ class AtriaPanel(QWidget):
         buttons = []
         if not self._context.IsRoot():
             buttons.append(self._MakeBackButton())
+
+        entries = list(self._context.Entries())
+        if self._context.IsRoot():
+            # El botón de Explorador debe estar primero en la lista de iconos del menú principal
+            explorer_idx = next(
+                (i for i, e in enumerate(entries)
+                 if e.InternalKey.lower() == "explorer" or e.Spoken.lower() in ("explorador", "explorer")),
+                None,
+            )
+            if explorer_idx is not None and explorer_idx > 0:
+                entries.insert(0, entries.pop(explorer_idx))
+
         buttons.extend(
-            b for b in map(self._MakeEntryButton, self._context.Entries())
+            b for b in map(self._MakeEntryButton, entries)
             if b is not None
         )
         self._toolButtons = list(buttons)
@@ -348,15 +361,15 @@ class AtriaPanel(QWidget):
         texts = self._texts
 
         layout = QVBoxLayout(self)
-        layout.setSpacing(12)
-        layout.setContentsMargins(16, 12, 16, 12)
+        layout.setSpacing(10)
+        layout.setContentsMargins(14, 10, 14, 10)
 
         layout.addLayout(self._BuildHeader())
 
         self._statusLabel = QLabel(texts.get("status_idle", "Micrófono inactivo"))
         self._statusLabel.setFont(QFont(FONT_SANS, 13, QFont.Bold))
         self._statusLabel.setAlignment(Qt.AlignCenter)
-        self._statusLabel.setFixedHeight(46)
+        self._statusLabel.setFixedHeight(44)
         self._statusLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         layout.addWidget(self._statusLabel)
 
@@ -365,16 +378,23 @@ class AtriaPanel(QWidget):
         layout.addWidget(self._listenLabel)
 
         self._currentText = QTextEdit()
-        self._currentText.setFixedHeight(48)
+        self._currentText.setFixedHeight(46)
         self._currentText.setFont(QFont(FONT_MONO, 12, QFont.Bold))
         self._currentText.setReadOnly(True)
         layout.addWidget(self._currentText)
 
-        panels = QHBoxLayout()
-        panels.setSpacing(16)
-        panels.addLayout(self._BuildTreeColumn(), stretch=1)
-        panels.addLayout(self._BuildHistoryColumn(), stretch=2)
-        layout.addLayout(panels, stretch=1)
+        tree_panel = QWidget()
+        tree_panel.setLayout(self._BuildTreeColumn())
+        hist_panel = QWidget()
+        hist_panel.setLayout(self._BuildHistoryColumn())
+
+        self._centerSplitter = QSplitter(Qt.Horizontal)
+        self._centerSplitter.addWidget(tree_panel)
+        self._centerSplitter.addWidget(hist_panel)
+        self._centerSplitter.setStretchFactor(0, 1)
+        self._centerSplitter.setStretchFactor(1, 2)
+        self._centerSplitter.setChildrenCollapsible(False)
+        layout.addWidget(self._centerSplitter, stretch=1)
 
         self._sectionTitleLabel = QLabel()
         self._sectionTitleLabel.setFont(QFont(FONT_SANS, 12, QFont.Bold))
@@ -421,12 +441,12 @@ class AtriaPanel(QWidget):
             row.addWidget(widget)
 
         self._titleLabel = QLabel("ATRIA")
-        self._titleLabel.setFont(QFont(FONT_SANS, 28, QFont.Bold))
+        self._titleLabel.setFont(QFont(FONT_SANS, 22, QFont.Bold))
         row.addWidget(self._titleLabel, stretch=1)
 
         self._dockButton = QPushButton("⧉")
-        self._dockButton.setFixedSize(42, 38)
-        self._dockButton.setFont(QFont(FONT_SANS, 16, QFont.Bold))
+        self._dockButton.setFixedSize(38, 34)
+        self._dockButton.setFont(QFont(FONT_SANS, 15, QFont.Bold))
         self._dockButton.setToolTip("⧉ Desacoplar / Acoplar panel ATRIA\n(Permite flotar o fijar el panel en FreeCAD)")
         hand_cursor = getattr(Qt, "PointingHandCursor", None)
         if hand_cursor is not None:
@@ -435,8 +455,8 @@ class AtriaPanel(QWidget):
         row.addWidget(self._dockButton)
 
         self._prefsButton = QPushButton("⚙")
-        self._prefsButton.setFixedSize(42, 38)
-        self._prefsButton.setFont(QFont(FONT_SANS, 16, QFont.Bold))
+        self._prefsButton.setFixedSize(38, 34)
+        self._prefsButton.setFont(QFont(FONT_SANS, 15, QFont.Bold))
         self._prefsButton.setToolTip(
             "⚙ Preferencias y Configuración de Voz\n"
             "🎤 Di: «preferencias»\n"
@@ -448,8 +468,8 @@ class AtriaPanel(QWidget):
         row.addWidget(self._prefsButton)
 
         self._helpButton = QPushButton("?")
-        self._helpButton.setFixedSize(42, 38)
-        self._helpButton.setFont(QFont(FONT_SANS, 16, QFont.Bold))
+        self._helpButton.setFixedSize(38, 34)
+        self._helpButton.setFont(QFont(FONT_SANS, 15, QFont.Bold))
         self._helpButton.setToolTip(
             "? Ayuda de Comandos Activos\n"
             "🎤 Di: «ayuda» o «contexto»\n"
@@ -472,7 +492,8 @@ class AtriaPanel(QWidget):
 
         self._treeWidget = QTreeWidget()
         self._treeWidget.setHeaderHidden(True)
-        self._treeWidget.setMinimumHeight(150)
+        self._treeWidget.setMinimumHeight(70)
+        self._treeWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         column.addWidget(self._treeWidget, stretch=1)
 
         self.SetTree([])
@@ -489,7 +510,8 @@ class AtriaPanel(QWidget):
         self._historyList = QTextEdit()
         self._historyList.setFont(QFont(FONT_MONO, 11, QFont.Bold))
         self._historyList.setReadOnly(True)
-        self._historyList.setMinimumHeight(150)
+        self._historyList.setMinimumHeight(70)
+        self._historyList.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         column.addWidget(self._historyList, stretch=1)
 
         return column
@@ -698,11 +720,17 @@ class AtriaPanel(QWidget):
         )
         self._titleLabel.setStyleSheet(
             f"color: {palette['black']}; background-color: transparent !important;"
-            f" font-size: 28pt; font-weight: bold;"
+            f" font-size: 22pt; font-weight: bold;"
         )
         self._statusLabel.setStyleSheet(self._StatusQss())
         self._currentText.setStyleSheet(self._TextPanelQss(palette["dark_text"], 12))
         self._historyList.setStyleSheet(self._TextPanelQss(palette["green"], 11))
+
+        if hasattr(self, "_centerSplitter") and self._centerSplitter is not None:
+            self._centerSplitter.setStyleSheet(
+                f"QSplitter::handle {{ background-color: {palette['panel_border']}; width: 2px; }}"
+                f"QSplitter::handle:hover {{ background-color: #3b82f6; }}"
+            )
 
         section_label = getattr(self, "_sectionTitleLabel", None)
         labels = [self._listenLabel, self._histLabel, self._modelLabel]

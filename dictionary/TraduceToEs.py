@@ -9,6 +9,10 @@ except ImportError:
     from base import Base
 
 TraduceToEs = {
+    # Explorador de archivos y proyectos (primero en la lista de iconos)
+    "explorador": Base.get("Explorer"),
+    "explorer": Base.get("Explorer"),
+
     # 2D-Drafting
     "2d": Base.get("2D-Drafting"),
     "dos d": Base.get("2D-Drafting"),
@@ -41,8 +45,6 @@ TraduceToEs = {
     "utilidades": Base.get("Utils"),
     "herramientas": Base.get("Utils"),
     "utils": Base.get("Utils"),
-    "explorador": Base.get("Explorer"),
-    "explorer": Base.get("Explorer"),
 
     # Panel ATRIA
     "mostrar panel": Base.get("show_atria_panel"),

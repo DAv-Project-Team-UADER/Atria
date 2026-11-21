@@ -9,6 +9,9 @@ except ImportError:
     from base import Base
 
 TraduceToEn = {
+    # File and project explorer (first in base buttons)
+    "explorer": Base.get("Explorer"),
+
     # 2D-Drafting
     "two d": Base.get("2D-Drafting"),
     "drafting": Base.get("2D-Drafting"),
@@ -27,7 +30,6 @@ TraduceToEn = {
     "snapping": Base.get("Snapping"),
     "status bar": Base.get("StatusBar"),
     "utils": Base.get("Utils"),
-    "explorer": Base.get("Explorer"),
 
     # Panel ATRIA
     "show panel": Base.get("show_atria_panel"),
