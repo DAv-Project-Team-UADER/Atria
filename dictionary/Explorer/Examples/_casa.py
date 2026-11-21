@@ -17,7 +17,12 @@
 
 """Draft example: a house drawn with rectangles, triangles, circles and lines."""
 
-from FreeCAD import Placement, Rotation, Vector
+try:
+    from FreeCAD import Placement, Rotation, Vector
+except ImportError:
+    Placement = None
+    Rotation = None
+    Vector = None
 
 from ._common import activeDoc, fitView
 from ._words import nextItem, numbers, send
@@ -51,7 +56,10 @@ _made = {}
 
 
 def _rectangle(x1, y1, x2, y2):
-    import Draft
+    try:
+        import Draft as Draft
+    except ImportError:
+        Draft = None
 
     doc = activeDoc()
     obj = Draft.make_rectangle(
@@ -67,7 +75,10 @@ def _rectangleByCenter(x, y, width, height) -> None:
 
 
 def _triangle(x1, y1, x2, y2, x3, y3):
-    import Draft
+    try:
+        import Draft as Draft
+    except ImportError:
+        Draft = None
 
     doc = activeDoc()
     obj = Draft.make_wire([Vector(x1, y1, 0), Vector(x2, y2, 0), Vector(x3, y3, 0)], closed=True)
@@ -104,7 +115,10 @@ def _pickCut(language: str) -> tuple:
 
 def _cut() -> None:
     # la misma operación que ejecuta el comando «cortar»: la chimenea pierde lo que ocupa el techo
-    import Draft
+    try:
+        import Draft as Draft
+    except ImportError:
+        Draft = None
 
     doc = activeDoc()
     Draft.cut(_made["chimney"], _made["roof"])
@@ -117,7 +131,10 @@ def _cut() -> None:
 
 
 def _circle(x, y, radius) -> None:
-    import Draft
+    try:
+        import Draft as Draft
+    except ImportError:
+        Draft = None
 
     doc = activeDoc()
     Draft.make_circle(radius, placement=Placement(Vector(x, y, 0), Rotation()))
@@ -126,7 +143,10 @@ def _circle(x, y, radius) -> None:
 
 
 def _line(x1, y1, x2, y2) -> None:
-    import Draft
+    try:
+        import Draft as Draft
+    except ImportError:
+        Draft = None
 
     doc = activeDoc()
     Draft.make_wire([Vector(x1, y1, 0), Vector(x2, y2, 0)], closed=False)

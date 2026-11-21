@@ -20,9 +20,14 @@
 Cada funcion conserva su comportamiento original; este modulo
 reune lo que antes vivia en una carpeta por funcion.
 """
-import FreeCAD
-import FreeCADGui
-import FreeCADGui as Gui
+try:
+    import FreeCAD
+    import FreeCADGui
+    import FreeCADGui as Gui
+except ImportError:
+    FreeCAD = None  # type: ignore[assignment]
+    FreeCADGui = None  # type: ignore[assignment]
+    Gui = None  # type: ignore[assignment]
 try:
     from .ayuda import ayuda
 except ImportError:  # modulo de ayuda aun no migrado
@@ -794,3 +799,64 @@ upgrade_cmds = {
     'convertir a cara': Upgrade,
     'help': ayuda,
 }
+# --- Comandos Booleanos, Extrusión y Arreglos ---
+
+def Extrude(length: float = 0.0):
+    """Extruye un boceto, cara o forma seleccionada."""
+    _require_document()
+    _require_3d_view()
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Part_Extrude", 0)
+
+Extrude._param_specs = [
+    _ParamSpec(1, "length", float, True),
+]
+
+def ExtrudeFace():
+    """Extruye una sola cara plana seleccionada de un objeto."""
+    _require_document()
+    _require_3d_view()
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Draft_Extrude", 0)
+
+def CutWithPlane():
+    """Corta un objeto solido de tipo Arch utilizando un plano o cara plana."""
+    _require_document()
+    _require_3d_view()
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Arch_CutPlane", 0)
+
+def Union():
+    """Une dos o mas formas seleccionadas en un unico objeto solido (Fusion)."""
+    _require_document()
+    _require_3d_view()
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Part_Fuse", 0)
+
+def Difference():
+    """Corta (resta) una forma de otra realizando una sustraccion booleana."""
+    _require_document()
+    _require_3d_view()
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Part_Cut", 0)
+
+def Intersection():
+    """Extrae la parte comun (interseccion) entre objetos seleccionados."""
+    _require_document()
+    _require_3d_view()
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Part_Common", 0)
+
+def PolarArray():
+    """Crea una matriz circular distribuyendo copias alrededor de un centro."""
+    _require_document()
+    _require_3d_view()
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Draft_PolarArray", 0)
+
+def PointArray():
+    """Crea una matriz colocando copias en los vertices de un objeto base."""
+    _require_document()
+    _require_3d_view()
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Draft_PointArray", 0)

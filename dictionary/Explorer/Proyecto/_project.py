@@ -28,8 +28,15 @@ import importlib
 import re
 from pathlib import Path
 
-import FreeCAD as App
-import FreeCADGui as Gui
+try:
+    import FreeCAD
+    import FreeCADGui
+    import FreeCADGui as Gui
+except ImportError:
+    FreeCAD = None  # type: ignore[assignment]
+    FreeCADGui = None  # type: ignore[assignment]
+    Gui = None  # type: ignore[assignment]
+App = FreeCAD
 
 # Formatos que se ofrecen al abrir: el propio de FreeCAD y los que abre Gui.open.
 OPEN_EXTENSIONS = ("FCStd", "step", "stp", "iges", "igs", "brep", "brp", "stl", "obj", "dxf")

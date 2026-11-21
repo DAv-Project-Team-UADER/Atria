@@ -647,4 +647,37 @@ def _sketch():
             ActiveSketch.ViewObject.Document.ActiveView.setCameraType("Orthographic")
 
 
-Sketch = {"sketch": _sketch}
+# Alias canónicos exportados para TraduceToEs y TraduceToEn
+
+class _CommandDict(dict):
+    """Contenedor híbrido dict + callable:
+    - Es un dict {'nombre': func} para compatibilidad con la suite de workbench.
+    - Es un callable ejecutable directamente por el motor de voz y Browser.
+    """
+    def __init__(self, key: str, func):
+        super().__init__({key: func})
+        self.func = func
+        self._param_specs = getattr(func, "_param_specs", None)
+
+    def __call__(self, *args, **kwargs):
+        return self.func(*args, **kwargs)
+
+    @property
+    def __name__(self):
+        return getattr(self.func, "__name__", "cmd")
+
+# Alias híbridos canónicos
+Arc = _CommandDict("arc", arc)
+ArcFrom3Points = _CommandDict("arc_from_3_points", arc_from_3_points)
+BSpline = _CommandDict("b_spline", b_spline)
+BezierCurve = _CommandDict("bezier_curve", bezier_curve)
+Circle = _CommandDict("circle", circle)
+CubicBezierCurve = _CommandDict("cubic_bezier_curve", cubic_bezier_curve)
+Ellipse = _CommandDict("ellipse", ellipse)
+Fillet = _CommandDict("fillet", fillet)
+Line = _CommandDict("line", line)
+Point = _CommandDict("point", point)
+Polygon = _CommandDict("polygon", polygon)
+Polyline = _CommandDict("polyline", polyline)
+Rectangle = _CommandDict("rectangle", rectangle)
+Sketch = _CommandDict("sketch", _sketch)

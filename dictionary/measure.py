@@ -31,8 +31,16 @@ cambiar de contexto sin que el comando quede fijo:
 
 import inspect
 
-import Draft
-import FreeCAD as App
+try:
+    import Draft
+except ImportError:
+    Draft = None
+try:
+    import FreeCAD as App
+    import FreeCAD
+except ImportError:
+    App = None
+    FreeCAD = None
 
 try:
     import FreeCADGui as Gui

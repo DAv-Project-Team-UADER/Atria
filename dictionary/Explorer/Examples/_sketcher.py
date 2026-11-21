@@ -17,9 +17,18 @@
 
 """Sketcher example: a circle with a radius constraint and a 2D dimension."""
 
-import Part
-import Sketcher
-from FreeCAD import Vector
+try:
+    import Part
+except ImportError:
+    Part = None
+try:
+    import Sketcher
+except ImportError:
+    Sketcher = None
+try:
+    from FreeCAD import Vector
+except ImportError:
+    Vector = None
 
 from ._common import activeDoc, fitView, lastOfType
 from ._words import numbers, send

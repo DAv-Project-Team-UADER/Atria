@@ -20,8 +20,14 @@
 Cada funcion conserva su comportamiento original; este modulo
 reune lo que antes vivia en una carpeta por funcion.
 """
-import FreeCAD
-import FreeCADGui
+try:
+    import FreeCAD
+    import FreeCADGui
+    import FreeCADGui as Gui
+except ImportError:
+    FreeCAD = None  # type: ignore[assignment]
+    FreeCADGui = None  # type: ignore[assignment]
+    Gui = None  # type: ignore[assignment]
 
 # Registrar los comandos BIM de FreeCAD necesarios para las funciones
 # de Manage (clasificación, propiedades IFC, capas, preflight, setup, etc.).
@@ -597,3 +603,34 @@ def DraftAnnotationStyleEditor():
     _RequireDocument()
     _Require3dView()
     FreeCADGui.runCommand(COMMAND_DRAFT_ANNOTATION_STYLE_EDITOR)
+# --- Comandos BIM Project y Managers ---
+
+def BIMSetup():
+    """Abre la configuracion simplificada de preferencias BIM."""
+    _RequireDocument()
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("BIM_Setup", 0)
+
+def SetupProject():
+    """Crea un proyecto IFC nativo (IfcProject) en el documento."""
+    _RequireDocument()
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("BIM_Project", 0)
+
+def ManageDoorsAndWindows():
+    """Abre el gestor de puertas y ventanas BIM (BIM Windows Manager)."""
+    _RequireDocument()
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("BIM_Windows", 0)
+
+def ManageIFCElements():
+    """Abre el gestor de elementos y tipos IFC (IFC Elements Manager)."""
+    _RequireDocument()
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("BIM_IfcElements", 0)
+
+def ManageIFCQuantities():
+    """Abre el gestor de cantidades y medidas IFC (IFC Quantities Manager)."""
+    _RequireDocument()
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("BIM_IfcQuantities", 0)

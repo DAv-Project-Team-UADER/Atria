@@ -91,9 +91,7 @@ def _play(module, language: str) -> None:
     from InputPrompts.PromptVoiceRouter import PromptVoiceRouter
 
     try:
-        import FreeCADGui as Gui
-
-        parent = Gui.getMainWindow()
+        parent = Gui.getMainWindow() if Gui and hasattr(Gui, "getMainWindow") else None
     except Exception:
         parent = None
 

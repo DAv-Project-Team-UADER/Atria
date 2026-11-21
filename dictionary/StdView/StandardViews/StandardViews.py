@@ -14,7 +14,14 @@
 #
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
-import FreeCADGui as Gui
+try:
+    import FreeCAD
+    import FreeCADGui
+    import FreeCADGui as Gui
+except ImportError:
+    FreeCAD = None  # type: ignore[assignment]
+    FreeCADGui = None  # type: ignore[assignment]
+    Gui = None  # type: ignore[assignment]
 from .ayuda import ayuda
 
 ZOOM_FACTOR = 0.9  # 10% de variación

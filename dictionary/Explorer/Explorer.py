@@ -2,7 +2,14 @@
 # Universidad Autónoma de Entre Ríos (UADER)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import FreeCADGui as Gui
+try:
+    import FreeCAD
+    import FreeCADGui
+    import FreeCADGui as Gui
+except ImportError:
+    FreeCAD = None  # type: ignore[assignment]
+    FreeCADGui = None  # type: ignore[assignment]
+    Gui = None  # type: ignore[assignment]
 from .File.File                         import file
 from .Proyecto.Proyecto                 import proyecto
 from .Edit.Edit                         import edit

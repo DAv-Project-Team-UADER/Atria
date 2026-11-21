@@ -61,3 +61,30 @@ TraduceToEs = {
     'plano de arriba': working_plane_top,
     'plano superior': working_plane_top,
 }
+try:
+    from .commands import toggle_snap, snap_grid, snap_endpoint, snap_midpoint, snap_center, snap_ortho, snap_lock
+except ImportError:
+    toggle_snap = None
+    snap_grid = None
+    snap_endpoint = None
+    snap_midpoint = None
+    snap_center = None
+    snap_ortho = None
+    snap_lock = None
+
+TraduceToEs.update({
+    'alternar enganche': toggle_snap,
+    'activar enganche': toggle_snap,
+    'desactivar enganche': toggle_snap,
+    'enganche a rejilla': snap_grid,
+    'enganche a grilla': snap_grid,
+    'enganche a extremo': snap_endpoint,
+    'punto final': snap_endpoint,
+    'enganche a punto medio': snap_midpoint,
+    'punto medio': snap_midpoint,
+    'enganche a centro': snap_center,
+    'centro': snap_center,
+    'modo ortogonal': snap_ortho,
+    'ortogonal': snap_ortho,
+    'bloquear enganche': snap_lock,
+})

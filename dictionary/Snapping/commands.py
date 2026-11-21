@@ -20,9 +20,14 @@
 Cada funcion conserva su comportamiento original; este modulo
 reune lo que antes vivia en una carpeta por funcion.
 """
-import FreeCAD
-import FreeCADGui
-import FreeCADGui as Gui
+try:
+    import FreeCAD
+    import FreeCADGui
+    import FreeCADGui as Gui
+except ImportError:
+    FreeCAD = None  # type: ignore[assignment]
+    FreeCADGui = None  # type: ignore[assignment]
+    Gui = None  # type: ignore[assignment]
 
 
 class _ParamSpec:
@@ -197,3 +202,42 @@ def SetWorkingPlaneFront():
 WorkingPlaneFront = {
     "working plane front": SetWorkingPlaneFront,
 }
+# Alias canónico
+WorkingPlaneFront = SetWorkingPlaneFront
+
+# --- Herramientas de Enganche (Snapping) ---
+
+def toggle_snap():
+    """Activa o desactiva el enganche (snapping)."""
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Draft_ToggleSnap", 0)
+
+def snap_grid():
+    """Activa/desactiva el enganche a la rejilla."""
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Draft_Snap_Grid", 0)
+
+def snap_endpoint():
+    """Activa/desactiva el enganche a extremos."""
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Draft_Snap_Endpoint", 0)
+
+def snap_midpoint():
+    """Activa/desactiva el enganche a punto medio."""
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Draft_Snap_Midpoint", 0)
+
+def snap_center():
+    """Activa/desactiva el enganche al centro."""
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Draft_Snap_Center", 0)
+
+def snap_ortho():
+    """Activa/desactiva el modo ortogonal."""
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Draft_Snap_Ortho", 0)
+
+def snap_lock():
+    """Bloquea o desbloquea el enganche."""
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Draft_Snap_Lock", 0)
