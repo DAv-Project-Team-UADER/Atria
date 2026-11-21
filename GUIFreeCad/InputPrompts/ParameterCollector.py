@@ -1,4 +1,4 @@
-﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
+# Copyright (C) 2026 El Equipo del Proyecto Atria
 # Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
 # Bajo la dirección de Ernesto Ledesma
 # Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
@@ -51,7 +51,7 @@ class ParameterCollector:
 
     def __init__(
         self,
-        Language: str = "es",
+        Language: str | None = None,
         Parent=None,
         DelayMs: int = 30,
         ValidatorInstance: Any | None = None,
@@ -63,18 +63,13 @@ class ParameterCollector:
 
     @property
     def Language(self) -> str:
-        """Language of the prompt texts: the one configured in ATRIA options right now.
-
-        El colector se crea una sola vez al arrancar la voz; si guardara el idioma de
-        ese momento, los títulos y mensajes seguirían en el idioma anterior tras
-        cambiarlo en Preferencias (mientras los botones, que lo leen en vivo, ya
-        estarían en el nuevo). Se lee cada vez y el valor con el que se creó queda
-        solo como respaldo.
-        """
+        """Language of the prompt texts: explicit if configured, or live from options."""
+        if self._StoredLanguage is not None:
+            return self._StoredLanguage
         try:
             return ResolveLanguage()
         except Exception:
-            return self._StoredLanguage
+            return "es"
 
     @Language.setter
     def Language(self, value: str) -> None:

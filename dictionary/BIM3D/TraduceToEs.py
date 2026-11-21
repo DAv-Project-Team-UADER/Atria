@@ -14,7 +14,7 @@
 #
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
-"""Mapa de voz (ES) para la seccion 3D-BIM (consolidado)."""
+"""Mapa de voz (ES) para la seccion BIM3D (consolidado)."""
 
 try:
     from .commands import Beam

@@ -15,7 +15,7 @@
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
-"""Comandos FreeCAD de la seccion 3D-BIM (consolidado).
+"""Comandos FreeCAD de la seccion BIM3D (consolidado).
 
 Cada funcion conserva su comportamiento original; este modulo
 reune lo que antes vivia en una carpeta por funcion.

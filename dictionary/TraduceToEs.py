@@ -10,6 +10,7 @@ except ImportError:
 
 TraduceToEs = {
     # 2D-Drafting
+    "2d": Base.get("2D-Drafting"),
     "dos d": Base.get("2D-Drafting"),
     "dos de": Base.get("2D-Drafting"),
     "dibujo": Base.get("2D-Drafting"),
@@ -17,6 +18,7 @@ TraduceToEs = {
     "drafting": Base.get("2D-Drafting"),
 
     # 3D-BIM
+    "3d": Base.get("3D-BIM"),
     "tres d": Base.get("3D-BIM"),
     "tres de": Base.get("3D-BIM"),
     "bim": Base.get("3D-BIM"),

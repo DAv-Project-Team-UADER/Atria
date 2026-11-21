@@ -46,11 +46,9 @@ def open_voice_preferences():
 def set_language_es():
     """Establece el idioma de ATRIA en español."""
     try:
-        from GUIFreeCad.core.preferences import Preferences
+        from GUIFreeCad.core.preferences import preferences
         from GUIFreeCad.core.language_code import LanguageCode
-        prefs = Preferences.Load()
-        prefs.DefaultLanguage = LanguageCode.Es
-        prefs.Save()
+        preferences.SetLanguage = LanguageCode.Es
     except Exception:
         pass
 
@@ -58,10 +56,8 @@ def set_language_es():
 def set_language_en():
     """Establece el idioma de ATRIA en inglés."""
     try:
-        from GUIFreeCad.core.preferences import Preferences
+        from GUIFreeCad.core.preferences import preferences
         from GUIFreeCad.core.language_code import LanguageCode
-        prefs = Preferences.Load()
-        prefs.DefaultLanguage = LanguageCode.En
-        prefs.Save()
+        preferences.SetLanguage = LanguageCode.En
     except Exception:
         pass
