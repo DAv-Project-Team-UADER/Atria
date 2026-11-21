@@ -20,10 +20,10 @@ TEXTS = {
         "title":           "ASISTENTE DE VOZ PARA TECNICOS",
         "mic_active":      "Microfono activo - Escuchando...",
         "mic_error":       "Esperando microfono",
-        "section_listen":  "Escuchando:",
+        "section_listen":  "🎤 Voz reconocida:",
         "detected":        "Detectado:",
-        "section_model":   "Modelo",
-        "section_history": "Historial",
+        "section_model":   "📦 Modelo 3D:",
+        "section_history": "📋 Historial:",
         "mic_inactive":    "Microfono inactivo",
         "empty_context":   "Sin comandos en este contexto",
         "section_cmds":    "Comandos sugeridos",
@@ -59,10 +59,10 @@ TEXTS = {
         "title":           "VOICE ASSISTANT FOR TECHNICIANS",
         "mic_active":      "Microphone active - Listening...",
         "mic_error":       "Microphone error",
-        "section_listen":  "Listening:",
+        "section_listen":  "🎤 Recognized voice:",
         "detected":        "Detected:",
-        "section_model":   "Model",
-        "section_history": "History",
+        "section_model":   "📦 3D Model:",
+        "section_history": "📋 History:",
         "mic_inactive":    "Microphone inactive",
         "empty_context":   "No commands in this context",
         "section_cmds":    "Suggested commands",
@@ -98,10 +98,10 @@ TEXTS = {
         "title":           "ASSISTENTE DE VOZ PARA TECNICOS",
         "mic_active":      "Microfone ativo - Escutando...",
         "mic_error":       "Erro de microfone",
-        "section_listen":  "Escutando:",
+        "section_listen":  "🎤 Voz reconhecida:",
         "detected":        "Detectado:",
-        "section_model":   "Modelo",
-        "section_history": "Historico",
+        "section_model":   "📦 Modelo 3D:",
+        "section_history": "📋 Histórico:",
         "mic_inactive":    "Microfone inativo",
         "empty_context":   "Sem comandos neste contexto",
         "section_cmds":    "Comandos sugeridos",
@@ -140,3 +140,95 @@ MODEL_PARTS = ["Documento 1"]
 MODEL_PARTS_ALIASES = {
     "documento uno": "Documento 1",
 }
+
+SECTION_NAMES = {
+    "es": {
+        "Base": "Categorías Principales",
+        "3D-BIM": "3D - Modelado BIM",
+        "BIM3D": "3D - Modelado BIM",
+        "2D-Drafting": "2D - Dibujo y Boceto",
+        "Drafting2D": "2D - Dibujo y Boceto",
+        "Annotation": "Anotación y Cotas",
+        "Manage": "Administración y Gestión BIM",
+        "Modify": "Modificar y Transformar",
+        "Preferences": "Preferencias y Ajustes",
+        "Snapping": "Enganche (Snapping)",
+        "StatusBar": "Barra de Estado y Vistas",
+        "Utils": "Utilidades y Herramientas",
+        "Explorer": "Explorador de Archivos",
+        "file": "Archivo",
+        "edit": "Edición",
+        "print": "Imprimir / Exportar PDF",
+        "windows": "Ventanas",
+        "expressions": "Expresiones",
+        "tools": "Herramientas",
+        "structure": "Estructura",
+        "examples": "Ejemplos y Tutoriales",
+    },
+    "en": {
+        "Base": "Main Categories",
+        "3D-BIM": "3D - BIM Modeling",
+        "BIM3D": "3D - BIM Modeling",
+        "2D-Drafting": "2D - Drafting & Sketch",
+        "Drafting2D": "2D - Drafting & Sketch",
+        "Annotation": "Annotation & Dimensions",
+        "Manage": "Management & BIM Data",
+        "Modify": "Modify & Transform",
+        "Preferences": "Preferences & Settings",
+        "Snapping": "Snapping",
+        "StatusBar": "Status Bar & Views",
+        "Utils": "Utilities & Tools",
+        "Explorer": "File Explorer",
+        "file": "File",
+        "edit": "Edit",
+        "print": "Print / Export PDF",
+        "windows": "Windows",
+        "expressions": "Expressions",
+        "tools": "Tools",
+        "structure": "Structure",
+        "examples": "Examples & Tutorials",
+    },
+    "pt": {
+        "Base": "Categorias Principais",
+        "3D-BIM": "3D - Modelagem BIM",
+        "BIM3D": "3D - Modelagem BIM",
+        "2D-Drafting": "2D - Desenho e Esboço",
+        "Drafting2D": "2D - Desenho e Esboço",
+        "Annotation": "Anotação e Cotas",
+        "Manage": "Administração e Gestão BIM",
+        "Modify": "Modificar e Transformar",
+        "Preferences": "Preferências e Configurações",
+        "Snapping": "Encaixe (Snapping)",
+        "StatusBar": "Barra de Estado e Vistas",
+        "Utils": "Utilidades e Ferramentas",
+        "Explorer": "Explorador de Arquivos",
+        "file": "Arquivo",
+        "edit": "Edição",
+        "print": "Imprimir / Exportar PDF",
+        "windows": "Janelas",
+        "expressions": "Expressões",
+        "tools": "Ferramentas",
+        "structure": "Estrutura",
+        "examples": "Exemplos e Tutoriais",
+    },
+}
+
+
+def format_section_title(context_path: str, lang: str = "es") -> str:
+    """Genera el título legible y descriptivo para la sección activa de comandos."""
+    lang_key = "en" if str(lang).lower().startswith("en") else ("pt" if str(lang).lower().startswith("pt") else "es")
+    names = SECTION_NAMES.get(lang_key, SECTION_NAMES["es"])
+    prefix = "📍 Section:" if lang_key == "en" else ("📍 Seção:" if lang_key == "pt" else "📍 Sección:")
+
+    path = (context_path or "Base").strip()
+    if not path or path == "Base":
+        base_name = names.get("Base", "Categorías Principales")
+        return f"{prefix} {base_name}"
+
+    segments = [p.strip() for p in path.split(">") if p.strip()]
+    content = [s for s in segments if s != "Base"]
+    if not content:
+        return f"{prefix} {names.get('Base', 'Categorías Principales')}"
+
+    translated = [names.get(s, s) for s in content]
+    return f"{prefix} " + " > ".join(translated)
