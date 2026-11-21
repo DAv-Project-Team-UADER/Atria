@@ -45,20 +45,20 @@ try:
     from InterfazATRIA.FlashOverlay import FlashOverlay
     from InterfazATRIA.IconLocator import IconLocator
     from InterfazATRIA.Paletas import DARK, FONT_MONO, FONT_SANS, LIGHT
-    from InterfazATRIA.Textos import TEXTS
+    from InterfazATRIA.Textos import TEXTS, format_section_title
 except ImportError:
     try:
         from .ContextView import ContextView
         from .FlashOverlay import FlashOverlay
         from .IconLocator import IconLocator
         from .Paletas import DARK, FONT_MONO, FONT_SANS, LIGHT
-        from .Textos import TEXTS
+        from .Textos import TEXTS, format_section_title
     except ImportError:
         from ContextView import ContextView
         from FlashOverlay import FlashOverlay
         from IconLocator import IconLocator
         from Paletas import DARK, FONT_MONO, FONT_SANS, LIGHT
-        from Textos import TEXTS
+        from Textos import TEXTS, format_section_title
 
 
 class AtriaPanel(QWidget):
@@ -133,6 +133,7 @@ class AtriaPanel(QWidget):
             Context: snapshot of the active voice context.
         """
         self._context = Context or ContextView()
+        self._UpdateSectionTitle()
         self._ClearToolArea()
 
         if self._context.IsEmpty():
@@ -307,6 +308,7 @@ class AtriaPanel(QWidget):
         self._listenLabel.setText(self._texts["section_listen"])
         self._histLabel.setText(self._texts["section_history"])
         self._modelLabel.setText(self._texts["section_model"])
+        self._UpdateSectionTitle()
 
     def SetDockState(self, Floating: bool) -> None:
         """Reflect whether the panel is detached, on the dock/undock button.
@@ -369,6 +371,10 @@ class AtriaPanel(QWidget):
         panels.addLayout(self._BuildTreeColumn(), stretch=1)
         panels.addLayout(self._BuildHistoryColumn(), stretch=2)
         layout.addLayout(panels, stretch=1)
+
+        self._sectionTitleLabel = QLabel()
+        self._sectionTitleLabel.setFont(QFont(FONT_SANS, 12, QFont.Bold))
+        layout.addWidget(self._sectionTitleLabel)
 
         # Grilla, no fila: hay contextos de 47 entradas (Part) contra 5 de la
         # raiz. En una sola fila el ancho pedido crecia con la cantidad y
@@ -584,6 +590,18 @@ class AtriaPanel(QWidget):
     #: Frase que el Browser interpreta como "subir un nivel" (Atria/dictionary/NavCommands).
     BACK_PHRASE = "subir"
 
+    @property
+    def CurrentSectionTitle(self) -> str:
+        """Titulo legible de la seccion activa de comandos."""
+        return self._FormatSectionTitle()
+
+    def _FormatSectionTitle(self) -> str:
+        return format_section_title(self._context.ContextPath, self._lang)
+
+    def _UpdateSectionTitle(self) -> None:
+        if hasattr(self, "_sectionTitleLabel") and self._sectionTitleLabel is not None:
+            self._sectionTitleLabel.setText(self._FormatSectionTitle())
+
     def _OnEntryClicked(self, Spoken: str) -> None:
         self.Flash()
         self.CommandRequested.emit(Spoken)
@@ -610,7 +628,12 @@ class AtriaPanel(QWidget):
         self._currentText.setStyleSheet(self._TextPanelQss(palette["dark_text"], 12))
         self._historyList.setStyleSheet(self._TextPanelQss(palette["green"], 11))
 
-        for label in (self._listenLabel, self._histLabel, self._modelLabel):
+        section_label = getattr(self, "_sectionTitleLabel", None)
+        labels = [self._listenLabel, self._histLabel, self._modelLabel]
+        if section_label is not None:
+            labels.append(section_label)
+
+        for label in labels:
             label.setStyleSheet(
                 f"color: {palette['black']}; background-color: transparent !important;"
                 f" font-size: 12pt; font-weight: bold;"
