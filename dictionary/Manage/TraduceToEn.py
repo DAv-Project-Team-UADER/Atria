@@ -44,15 +44,31 @@ try:
     from .commands import BIMReport
 except ImportError:
     BIMReport = None
-BIMSetup = None  # TODO: sin implementacion en commands.py
 try:
     from .commands import DraftAnnotationStyleEditor
 except ImportError:
     DraftAnnotationStyleEditor = None
-ManageDoorsAndWindows = None  # TODO: sin implementacion en commands.py
-ManageIFCElements = None  # TODO: sin implementacion en commands.py
-ManageIFCQuantities = None  # TODO: sin implementacion en commands.py
-SetupProject = None  # TODO: sin implementacion en commands.py
+
+try:
+    from .commands import BIMSetup
+except ImportError:
+    BIMSetup = None
+try:
+    from .commands import SetupProject
+except ImportError:
+    SetupProject = None
+try:
+    from .commands import ManageDoorsAndWindows
+except ImportError:
+    ManageDoorsAndWindows = None
+try:
+    from .commands import ManageIFCElements
+except ImportError:
+    ManageIFCElements = None
+try:
+    from .commands import ManageIFCQuantities
+except ImportError:
+    ManageIFCQuantities = None
 
 TraduceToEn = {
     # ArchSchedule

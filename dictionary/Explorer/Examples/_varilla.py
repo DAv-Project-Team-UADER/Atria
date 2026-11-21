@@ -17,9 +17,18 @@
 
 """Assembly example: an M30 threaded rod with two nuts that turn along its thread (screw joint)."""
 
-import Part
-import Sketcher
-from FreeCAD import Vector
+try:
+    import Part
+except ImportError:
+    Part = None
+try:
+    import Sketcher
+except ImportError:
+    Sketcher = None
+try:
+    from FreeCAD import Vector
+except ImportError:
+    Vector = None
 
 from ._bulontuerca import _assemblyHelpers, _connectors, _pick, _pickBody
 from ._common import activeDoc, attachAt, fitView, lastOfType, setView

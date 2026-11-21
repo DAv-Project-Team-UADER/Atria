@@ -16,7 +16,7 @@
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 def ayuda():
-    print('Comandos disponibles en 3D-BIM:')
+    print('Comandos disponibles en BIM3D:')
     print('  crear sitio                     - Crea el emplazamiento o terreno del proyecto y agrupa los edificios')
     print('  crear edificio                  - Crea el grupo Edificio que organiza los niveles del modelo')
     print('  crear nivel                     - Crea un nivel o planta que agrupa objetos y comparte su altura')

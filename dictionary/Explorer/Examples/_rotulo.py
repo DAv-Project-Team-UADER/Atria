@@ -17,7 +17,12 @@
 
 """Draft example: a simple title block, two rectangles and a text spelled letter by letter."""
 
-from FreeCAD import Placement, Rotation, Vector
+try:
+    from FreeCAD import Placement, Rotation, Vector
+except ImportError:
+    Placement = None
+    Rotation = None
+    Vector = None
 
 from ._common import activeDoc, fitView
 from ._words import numbers
@@ -40,7 +45,10 @@ _CONFIRM = {"es": "okey", "en": "okey", "pt": "okey"}
 
 def _rectangle(x1: float, y1: float, x2: float, y2: float):
     def action() -> None:
-        import Draft
+        try:
+            import Draft as Draft
+        except ImportError:
+            Draft = None
 
         doc = activeDoc()
         Draft.make_rectangle(
@@ -53,7 +61,10 @@ def _rectangle(x1: float, y1: float, x2: float, y2: float):
 
 
 def _text() -> None:
-    import Draft
+    try:
+        import Draft as Draft
+    except ImportError:
+        Draft = None
 
     doc = activeDoc()
     Draft.make_text([LABEL], placement=Placement(Vector(10, 12, 0), Rotation()))

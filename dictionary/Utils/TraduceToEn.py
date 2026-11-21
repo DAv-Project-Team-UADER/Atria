@@ -20,48 +20,6 @@ try:
     from .commands import unclone
 except ImportError:
     unclone = None
-add_to_construction_group = None  # TODO: sin implementacion en commands.py
-check = None  # TODO: sin implementacion en commands.py
-close_holes = None  # TODO: sin implementacion en commands.py
-convert_to_ifc_project = None  # TODO: sin implementacion en commands.py
-ifc_diff = None  # TODO: sin implementacion en commands.py
-structure = None  # TODO: sin implementacion en commands.py
-multiple_structures = None  # TODO: sin implementacion en commands.py
-panel_sheet = None  # TODO: sin implementacion en commands.py
-ifc_expand = None  # TODO: sin implementacion en commands.py
-ifc_explorer = None  # TODO: sin implementacion en commands.py
-ifc_openshell_update = None  # TODO: sin implementacion en commands.py
-ifc_shape_diff = None  # TODO: sin implementacion en commands.py
-image_plane = None  # TODO: sin implementacion en commands.py
-lock_ifc = None  # TODO: sin implementacion en commands.py
-merge_walls = None  # TODO: sin implementacion en commands.py
-mesh_to_shape = None  # TODO: sin implementacion en commands.py
-new_ifc_spreadsheet = None  # TODO: sin implementacion en commands.py
-nest = None  # TODO: sin implementacion en commands.py
-nudge_down = None  # TODO: sin implementacion en commands.py
-nudge_extend = None  # TODO: sin implementacion en commands.py
-nudge_left = None  # TODO: sin implementacion en commands.py
-nudge_right = None  # TODO: sin implementacion en commands.py
-nudge_rotate_left = None  # TODO: sin implementacion en commands.py
-nudge_rotate_right = None  # TODO: sin implementacion en commands.py
-nudge_shrink = None  # TODO: sin implementacion en commands.py
-nudge_switch = None  # TODO: sin implementacion en commands.py
-nudge_up = None  # TODO: sin implementacion en commands.py
-panel = None  # TODO: sin implementacion en commands.py
-glue = None  # TODO: sin implementacion en commands.py
-preferences = None  # TODO: sin implementacion en commands.py
-ifc_project = None  # TODO: sin implementacion en commands.py
-panel_cut = None  # TODO: sin implementacion en commands.py
-reextrude = None  # TODO: sin implementacion en commands.py
-remove_shape_from_bim = None  # TODO: sin implementacion en commands.py
-rename_wire = None  # TODO: sin implementacion en commands.py
-select_non_manifold_meshes = None  # TODO: sin implementacion en commands.py
-structural_system = None  # TODO: sin implementacion en commands.py
-split_mesh = None  # TODO: sin implementacion en commands.py
-toggle_3d_view_background = None  # TODO: sin implementacion en commands.py
-toggle_bim_views = None  # TODO: sin implementacion en commands.py
-toggle_ifc_brep_flag = None  # TODO: sin implementacion en commands.py
-toggle_subcomponents = None  # TODO: sin implementacion en commands.py
 try:
     from .commands import ArchSurvey
 except ImportError:
@@ -87,6 +45,174 @@ try:
 except ImportError:
     DraftWorkingPlaneProxy = None
 
+try:
+    from .commands import add_to_construction_group
+except ImportError:
+    add_to_construction_group = None
+try:
+    from .commands import check
+except ImportError:
+    check = None
+try:
+    from .commands import close_holes
+except ImportError:
+    close_holes = None
+try:
+    from .commands import convert_to_ifc_project
+except ImportError:
+    convert_to_ifc_project = None
+try:
+    from .commands import ifc_diff
+except ImportError:
+    ifc_diff = None
+try:
+    from .commands import structure
+except ImportError:
+    structure = None
+try:
+    from .commands import multiple_structures
+except ImportError:
+    multiple_structures = None
+try:
+    from .commands import panel_sheet
+except ImportError:
+    panel_sheet = None
+try:
+    from .commands import ifc_expand
+except ImportError:
+    ifc_expand = None
+try:
+    from .commands import ifc_explorer
+except ImportError:
+    ifc_explorer = None
+try:
+    from .commands import ifc_openshell_update
+except ImportError:
+    ifc_openshell_update = None
+try:
+    from .commands import ifc_shape_diff
+except ImportError:
+    ifc_shape_diff = None
+try:
+    from .commands import image_plane
+except ImportError:
+    image_plane = None
+try:
+    from .commands import lock_ifc
+except ImportError:
+    lock_ifc = None
+try:
+    from .commands import merge_walls
+except ImportError:
+    merge_walls = None
+try:
+    from .commands import mesh_to_shape
+except ImportError:
+    mesh_to_shape = None
+try:
+    from .commands import new_ifc_spreadsheet
+except ImportError:
+    new_ifc_spreadsheet = None
+try:
+    from .commands import nest
+except ImportError:
+    nest = None
+try:
+    from .commands import nudge_down
+except ImportError:
+    nudge_down = None
+try:
+    from .commands import nudge_extend
+except ImportError:
+    nudge_extend = None
+try:
+    from .commands import nudge_left
+except ImportError:
+    nudge_left = None
+try:
+    from .commands import nudge_right
+except ImportError:
+    nudge_right = None
+try:
+    from .commands import nudge_rotate_left
+except ImportError:
+    nudge_rotate_left = None
+try:
+    from .commands import nudge_rotate_right
+except ImportError:
+    nudge_rotate_right = None
+try:
+    from .commands import nudge_shrink
+except ImportError:
+    nudge_shrink = None
+try:
+    from .commands import nudge_switch
+except ImportError:
+    nudge_switch = None
+try:
+    from .commands import nudge_up
+except ImportError:
+    nudge_up = None
+try:
+    from .commands import panel
+except ImportError:
+    panel = None
+try:
+    from .commands import glue
+except ImportError:
+    glue = None
+try:
+    from .commands import preferences
+except ImportError:
+    preferences = None
+try:
+    from .commands import ifc_project
+except ImportError:
+    ifc_project = None
+try:
+    from .commands import panel_cut
+except ImportError:
+    panel_cut = None
+try:
+    from .commands import reextrude
+except ImportError:
+    reextrude = None
+try:
+    from .commands import remove_shape_from_bim
+except ImportError:
+    remove_shape_from_bim = None
+try:
+    from .commands import rename_wire
+except ImportError:
+    rename_wire = None
+try:
+    from .commands import select_non_manifold_meshes
+except ImportError:
+    select_non_manifold_meshes = None
+try:
+    from .commands import structural_system
+except ImportError:
+    structural_system = None
+try:
+    from .commands import split_mesh
+except ImportError:
+    split_mesh = None
+try:
+    from .commands import toggle_3d_view_background
+except ImportError:
+    toggle_3d_view_background = None
+try:
+    from .commands import toggle_bim_views
+except ImportError:
+    toggle_bim_views = None
+try:
+    from .commands import toggle_ifc_brep_flag
+except ImportError:
+    toggle_ifc_brep_flag = None
+try:
+    from .commands import toggle_subcomponents
+except ImportError:
+    toggle_subcomponents = None
 TraduceToEn = {
     # Unclone
     'unclone': unclone,

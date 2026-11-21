@@ -17,7 +17,14 @@
 
 """Helpers shared by the guided examples."""
 
-import FreeCAD as App
+try:
+    import FreeCAD as App
+    import FreeCAD
+    import FreeCADGui as Gui
+except ImportError:
+    App = None  # type: ignore[assignment]
+    FreeCAD = None  # type: ignore[assignment]
+    Gui = None  # type: ignore[assignment]
 
 
 def activeDoc():
@@ -31,7 +38,14 @@ def activeDoc():
 def fitView() -> None:
     """Fit the 3D view to the model. Does nothing without a GUI."""
     try:
-        import FreeCADGui as Gui
+        try:
+            import FreeCAD
+            import FreeCADGui
+            import FreeCADGui as Gui
+        except ImportError:
+            FreeCAD = None  # type: ignore[assignment]
+            FreeCADGui = None  # type: ignore[assignment]
+            Gui = None  # type: ignore[assignment]
 
         if Gui.ActiveDocument is not None and Gui.ActiveDocument.ActiveView is not None:
             Gui.SendMsgToActiveView("ViewFit")
@@ -77,7 +91,7 @@ def attachAt(body, feature, x: float, y: float, z: float) -> None:
         y: Y of the primitive's origin, in millimetres.
         z: Z of the primitive's origin, in millimetres.
     """
-    import FreeCAD as App
+
 
     # se ata al plano XY del origen del Body con un desplazamiento, como los comandos
     # "por medidas" del diccionario

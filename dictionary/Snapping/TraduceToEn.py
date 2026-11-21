@@ -60,3 +60,23 @@ TraduceToEn = {
     'set top plane': working_plane_top,
     'set working plane top': working_plane_top,
 }
+try:
+    from .commands import toggle_snap, snap_grid, snap_endpoint, snap_midpoint, snap_center, snap_ortho, snap_lock
+except ImportError:
+    toggle_snap = None
+    snap_grid = None
+    snap_endpoint = None
+    snap_midpoint = None
+    snap_center = None
+    snap_ortho = None
+    snap_lock = None
+
+TraduceToEn.update({
+    'toggle snap': toggle_snap,
+    'snap grid': snap_grid,
+    'snap endpoint': snap_endpoint,
+    'snap midpoint': snap_midpoint,
+    'snap center': snap_center,
+    'snap ortho': snap_ortho,
+    'lock snap': snap_lock,
+})

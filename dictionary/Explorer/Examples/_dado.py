@@ -17,7 +17,14 @@
 
 """PartDesign example: a die. A cube, a cylinder cut for the one and a sketch and pocket per face."""
 
-import FreeCAD as App
+try:
+    import FreeCAD as App
+    import FreeCAD
+    import FreeCADGui as Gui
+except ImportError:
+    App = None  # type: ignore[assignment]
+    FreeCAD = None  # type: ignore[assignment]
+    Gui = None  # type: ignore[assignment]
 
 from ._common import activeDoc, attachAt, fitView, lastOfType, setView
 from ._words import down, nextItem, numbers, send
@@ -116,7 +123,10 @@ def _faceKey(faces: dict, name: str) -> str:
 
 def _pips(number: int):
     def action() -> None:
-        import Part
+        try:
+            import Part as Part
+        except ImportError:
+            Part = None
 
         doc = activeDoc()
         sketch = lastOfType(doc, "Sketcher::SketchObject")

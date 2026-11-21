@@ -25,7 +25,12 @@ punto es plano (X, Y) o espacial (X, Y, Z) según el documento (ver
 
 import inspect
 
-import FreeCAD as App
+try:
+    import FreeCAD as App
+    import FreeCAD
+except ImportError:
+    App = None
+    FreeCAD = None
 
 from measure import dimensionMode
 

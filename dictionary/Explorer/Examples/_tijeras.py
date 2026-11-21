@@ -20,7 +20,14 @@
 The full voice guide, with the open assembly and the ANSI B drawing, is ``Atria/docs/en/voice-scissors-guide.md``.
 """
 
-import FreeCAD as App
+try:
+    import FreeCAD as App
+    import FreeCAD
+    import FreeCADGui as Gui
+except ImportError:
+    App = None  # type: ignore[assignment]
+    FreeCAD = None  # type: ignore[assignment]
+    Gui = None  # type: ignore[assignment]
 
 from ._bulontuerca import _assemblyHelpers, _connectors, _offered, _pick, _pickBody
 from ._common import activeDoc, attachAt, fitView, lastOfType, setView
@@ -73,7 +80,10 @@ def _profiles() -> list:
 
 def _triangle(vertices):
     def action() -> None:
-        import Part
+        try:
+            import Part as Part
+        except ImportError:
+            Part = None
 
         doc = activeDoc()
         points = [App.Vector(x, y, 0) for x, y in vertices]

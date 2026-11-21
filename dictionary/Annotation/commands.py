@@ -20,9 +20,14 @@
 Cada funcion conserva su comportamiento original; este modulo
 reune lo que antes vivia en una carpeta por funcion.
 """
-import FreeCAD
-import FreeCADGui
-import FreeCADGui as Gui
+try:
+    import FreeCAD
+    import FreeCADGui
+    import FreeCADGui as Gui
+except ImportError:
+    FreeCAD = None  # type: ignore[assignment]
+    FreeCADGui = None  # type: ignore[assignment]
+    Gui = None  # type: ignore[assignment]
 
 
 class _ParamSpec:
@@ -1145,6 +1150,20 @@ CreateText._param_specs = [
     _ParamSpec(3, "y", float, True),
 ]
 
-Text = {
-    "text": CreateText,
-}
+# Alias canónicos exportados para TraduceToEs y TraduceToEn
+Axis = CreateAxis
+AxisSystem = CreateAxisSystem
+Grid = CreateGrid
+Hatch = CreateHatch
+Label = CreateLabel
+Leader = CreateLeader
+NewPage = CreateNewPage
+NewView = CreateNewView
+SectionCut = CreateSectionCut
+SectionPlane = CreateSectionPlane
+SectionView = CreateSectionView
+Text = CreateText
+TwoDDrawing = CreateTwoDDrawing
+Aligned_Dimension = aligned_dimension
+Horizontal_Dimension = horizontal_dimension
+Vertical_Dimension = vertical_dimension

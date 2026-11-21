@@ -14,6 +14,29 @@
 #
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
-"""Mapa de voz (ES) para la seccion StatusBar (consolidado, pendiente)."""
 
-TraduceToEs = {}
+"""Mapa de voz (ES) para la seccion StatusBar."""
+
+try:
+    from .commands import toggle_status_bar, set_units_mm, set_units_m, set_units_in, show_status_message
+except ImportError:
+    toggle_status_bar = None
+    set_units_mm = None
+    set_units_m = None
+    set_units_in = None
+    show_status_message = None
+
+TraduceToEs = {
+    'barra de estado': toggle_status_bar,
+    'alternar barra de estado': toggle_status_bar,
+    'mostrar barra de estado': toggle_status_bar,
+    'ocultar barra de estado': toggle_status_bar,
+    'unidades milimetros': set_units_mm,
+    'unidades milímetros': set_units_mm,
+    'cambiar a milimetros': set_units_mm,
+    'unidades metros': set_units_m,
+    'cambiar a metros': set_units_m,
+    'unidades pulgadas': set_units_in,
+    'cambiar a pulgadas': set_units_in,
+    'estado listo': show_status_message,
+}

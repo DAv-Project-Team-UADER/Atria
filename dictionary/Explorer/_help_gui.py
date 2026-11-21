@@ -25,7 +25,14 @@ def show_help_dialog(title: str, content: str):
         def _open_box():
             global _active_help_box
             try:
-                import FreeCADGui as Gui
+                try:
+                    import FreeCAD
+                    import FreeCADGui
+                    import FreeCADGui as Gui
+                except ImportError:
+                    FreeCAD = None  # type: ignore[assignment]
+                    FreeCADGui = None  # type: ignore[assignment]
+                    Gui = None  # type: ignore[assignment]
                 parent = Gui.getMainWindow() if hasattr(Gui, "getMainWindow") else None
                 box = QtWidgets.QMessageBox(parent)
                 box.setWindowTitle(f"ATRIA - Ayuda: {title}")

@@ -20,9 +20,14 @@
 Cada funcion conserva su comportamiento original; este modulo
 reune lo que antes vivia en una carpeta por funcion.
 """
-import FreeCAD
-import FreeCADGui
-import FreeCADGui as Gui
+try:
+    import FreeCAD
+    import FreeCADGui
+    import FreeCADGui as Gui
+except ImportError:
+    FreeCAD = None  # type: ignore[assignment]
+    FreeCADGui = None  # type: ignore[assignment]
+    Gui = None  # type: ignore[assignment]
 
 
 class _ParamSpec:
@@ -515,3 +520,219 @@ def DraftWorkingPlaneProxy(placement=None):
     doc.commitTransaction()
     doc.recompute()
     return proxy
+# --- Herramientas de Utilidades BIM y Draft ---
+
+def _run_safe(cmd_name):
+    if Gui and hasattr(Gui, "runCommand"):
+        try:
+            Gui.runCommand(cmd_name, 0)
+        except Exception:
+            pass
+
+def add_to_construction_group():
+    """Mueve la geometria seleccionada al grupo de construccion."""
+    _RequireDocument()
+    _run_safe("Draft_AddToConstructionGroup")
+
+def check():
+    """Comprueba y valida la geometria del modelo o solidos seleccionados."""
+    _RequireDocument()
+    _run_safe("Part_CheckGeometry")
+
+def close_holes():
+    """Cierra agujeros o convierte alambre en cara plana."""
+    _RequireDocument()
+    _run_safe("Draft_Draft2Sketch")
+
+def convert_to_ifc_project():
+    """Convierte el contenido en un proyecto IFC nativo."""
+    _RequireDocument()
+    _run_safe("BIM_Project")
+
+def ifc_diff():
+    """Compara visualmente dos versiones de un archivo IFC."""
+    _RequireDocument()
+    _run_safe("BIM_IfcDiff")
+
+def structure():
+    """Crea un elemento estructural generico."""
+    _RequireDocument()
+    _run_safe("BIM_Structure")
+
+def multiple_structures():
+    """Crea o distribuye multiples elementos estructurales."""
+    _RequireDocument()
+    _run_safe("BIM_MultipleStructures")
+
+def panel_sheet():
+    """Crea una hoja de corte para paneles de construccion."""
+    _RequireDocument()
+    _run_safe("BIM_PanelSheet")
+
+def ifc_expand():
+    """Despliega los componentes internos de un elemento IFC."""
+    _RequireDocument()
+    _run_safe("BIM_IfcElements")
+
+def ifc_explorer():
+    """Abre el explorador de estructura y atributos IFC."""
+    _RequireDocument()
+    _run_safe("BIM_IfcExplorer")
+
+def ifc_openshell_update():
+    """Comprueba y actualiza la libreria IfcOpenShell."""
+    _RequireDocument()
+    _run_safe("BIM_IfcElements")
+
+def ifc_shape_diff():
+    """Compara la geometria de dos formas IFC."""
+    _RequireDocument()
+    _run_safe("BIM_IfcDiff")
+
+def image_plane():
+    """Inserta un plano de imagen calibrable en el espacio 3D."""
+    _RequireDocument()
+    _run_safe("BIM_ImagePlane")
+
+def lock_ifc():
+    """Alterna el modo IFC estricto en el documento actual."""
+    _RequireDocument()
+    _run_safe("BIM_TogglePanels")
+
+def merge_walls():
+    """Une o fusiona muros seleccionados en una sola pared continua."""
+    _RequireDocument()
+    _run_safe("BIM_MergeWalls")
+
+def mesh_to_shape():
+    """Convierte una malla poligonal en una forma o solido de FreeCAD."""
+    _RequireDocument()
+    _run_safe("Mesh_Union")
+
+def new_ifc_spreadsheet():
+    """Genera una nueva hoja de calculo de cantidades IFC."""
+    _RequireDocument()
+    _run_safe("BIM_IfcQuantities")
+
+def nest():
+    """Organiza y anida piezas en una lamina de corte optimizada."""
+    _RequireDocument()
+    _run_safe("BIM_PanelCut")
+
+def nudge_down():
+    """Desplaza el objeto seleccionado hacia abajo segun el paso configurado."""
+    _RequireDocument()
+    _run_safe("BIM_Nudge_Down")
+
+def nudge_extend():
+    """Extiende la longitud o altura del elemento seleccionado."""
+    _RequireDocument()
+    _run_safe("BIM_Nudge_Extend")
+
+def nudge_left():
+    """Desplaza el objeto seleccionado hacia la izquierda."""
+    _RequireDocument()
+    _run_safe("BIM_Nudge_Left")
+
+def nudge_right():
+    """Desplaza el objeto seleccionado hacia la derecha."""
+    _RequireDocument()
+    _run_safe("BIM_Nudge_Right")
+
+def nudge_rotate_left():
+    """Gira el objeto seleccionado 90 grados a la izquierda."""
+    _RequireDocument()
+    _run_safe("BIM_Nudge_RotateLeft")
+
+def nudge_rotate_right():
+    """Gira el objeto seleccionado 90 grados a la derecha."""
+    _RequireDocument()
+    _run_safe("BIM_Nudge_RotateRight")
+
+def nudge_shrink():
+    """Reduce la longitud o altura del elemento seleccionado."""
+    _RequireDocument()
+    _run_safe("BIM_Nudge_Shrink")
+
+def nudge_switch():
+    """Alterna el paso de empuje (nudge) entre fino, medio y grueso."""
+    _RequireDocument()
+    _run_safe("BIM_Nudge_Switch")
+
+def nudge_up():
+    """Desplaza el objeto seleccionado hacia arriba."""
+    _RequireDocument()
+    _run_safe("BIM_Nudge_Up")
+
+def panel():
+    """Crea un panel o placa de construccion."""
+    _RequireDocument()
+    _run_safe("BIM_Panel")
+
+def glue():
+    """Pega o une formas adyacentes manteniendo sus limites."""
+    _RequireDocument()
+    _run_safe("BIM_Glue")
+
+def preferences():
+    """Abre las preferencias de modelado BIM."""
+    _RequireDocument()
+    _run_safe("BIM_Setup")
+
+def ifc_project():
+    """Crea o configura el proyecto IFC."""
+    _RequireDocument()
+    _run_safe("BIM_Project")
+
+def panel_cut():
+    """Genera una vista de corte 2D para fabricacion de panel."""
+    _RequireDocument()
+    _run_safe("BIM_PanelCut")
+
+def reextrude():
+    """Reconstruye una forma re-extruyendo su alambre base."""
+    _RequireDocument()
+    _run_safe("BIM_Reextrude")
+
+def remove_shape_from_bim():
+    """Desvincula la forma geometrica de un elemento BIM haciendolo independiente."""
+    _RequireDocument()
+    _run_safe("BIM_Unlink")
+
+def rename_wire():
+    """Reconstruye o renombra un alambre base de perfil."""
+    _RequireDocument()
+    _run_safe("Draft_Draft2Sketch")
+
+def select_non_manifold_meshes():
+    """Evalua y selecciona mallas que no sean solidos cerrados manifold."""
+    _RequireDocument()
+    _run_safe("Mesh_Evaluate")
+
+def structural_system():
+    """Crea un sistema estructural modular."""
+    _RequireDocument()
+    _run_safe("BIM_Structure")
+
+def split_mesh():
+    """Separa componentes desconectados de una malla."""
+    _RequireDocument()
+    _run_safe("Mesh_SplitComponents")
+
+def toggle_3d_view_background():
+    """Alterna el color de fondo de la vista 3D entre gradiente y color solido."""
+    _run_safe("Std_ViewBackground")
+
+def toggle_bim_views():
+    """Alterna la visibilidad del panel de vistas y niveles BIM."""
+    _run_safe("BIM_ToggleViews")
+
+def toggle_ifc_brep_flag():
+    """Alterna la bandera de exportacion B-Rep en elementos IFC."""
+    _RequireDocument()
+    _run_safe("BIM_IfcElements")
+
+def toggle_subcomponents():
+    """Muestra u oculta los subcomponentes internos de elementos BIM."""
+    _RequireDocument()
+    _run_safe("Arch_ToggleSubs")

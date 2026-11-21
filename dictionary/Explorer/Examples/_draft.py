@@ -17,7 +17,12 @@
 
 """Draft example: a rectangle, a circle, a polygon and a 2D dimension."""
 
-from FreeCAD import Placement, Rotation, Vector
+try:
+    from FreeCAD import Placement, Rotation, Vector
+except ImportError:
+    Placement = None
+    Rotation = None
+    Vector = None
 
 from ._common import activeDoc, fitView
 from ._words import numbers
@@ -30,7 +35,10 @@ TITLE = {
 
 
 def _rectangle() -> None:
-    import Draft
+    try:
+        import Draft as Draft
+    except ImportError:
+        Draft = None
 
     doc = activeDoc()
     Draft.make_rectangle(60, 40)
@@ -39,7 +47,10 @@ def _rectangle() -> None:
 
 
 def _circle() -> None:
-    import Draft
+    try:
+        import Draft as Draft
+    except ImportError:
+        Draft = None
 
     doc = activeDoc()
     Draft.make_circle(10, placement=Placement(Vector(30, 20, 0), Rotation()))
@@ -48,7 +59,10 @@ def _circle() -> None:
 
 
 def _polygon() -> None:
-    import Draft
+    try:
+        import Draft as Draft
+    except ImportError:
+        Draft = None
 
     doc = activeDoc()
     Draft.make_polygon(6, radius=5, placement=Placement(Vector(30, 20, 0), Rotation()))

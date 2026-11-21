@@ -19,10 +19,26 @@
 
 import os
 
-import FreeCAD as App
-import Part
-import Sketcher
-from FreeCAD import Vector
+try:
+    import FreeCAD as App
+    import FreeCAD
+    import FreeCADGui as Gui
+except ImportError:
+    App = None  # type: ignore[assignment]
+    FreeCAD = None  # type: ignore[assignment]
+    Gui = None  # type: ignore[assignment]
+try:
+    import Part
+except ImportError:
+    Part = None
+try:
+    import Sketcher
+except ImportError:
+    Sketcher = None
+try:
+    from FreeCAD import Vector
+except ImportError:
+    Vector = None
 
 from ._common import activeDoc, fitView, lastOfType
 from ._words import nextItem, numbers, send

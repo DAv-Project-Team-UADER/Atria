@@ -14,6 +14,25 @@
 #
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
-"""Mapa de voz (EN) para la seccion Preferences (consolidado, pendiente)."""
 
-TraduceToEn = {}
+"""Mapa de voz (EN) para la seccion Preferences."""
+
+try:
+    from .commands import open_preferences, open_voice_preferences, set_language_es, set_language_en
+except ImportError:
+    open_preferences = None
+    open_voice_preferences = None
+    set_language_es = None
+    set_language_en = None
+
+TraduceToEn = {
+    'preferences': open_preferences,
+    'open preferences': open_preferences,
+    'settings': open_preferences,
+    'open settings': open_preferences,
+    'options': open_preferences,
+    'configure voice': open_voice_preferences,
+    'voice settings': open_voice_preferences,
+    'set spanish': set_language_es,
+    'set english': set_language_en,
+}

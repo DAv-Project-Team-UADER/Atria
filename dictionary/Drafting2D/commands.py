@@ -15,7 +15,7 @@
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
-"""Comandos FreeCAD de la seccion 2D-Drafting (consolidado).
+"""Comandos FreeCAD de la seccion Drafting2D (consolidado).
 
 Cada funcion soporta ejecucion parametrica completa con dictado por voz y
 dialogos interactivos de captura de coordenadas, ademas de fallback interactivo.
@@ -608,43 +608,82 @@ Rectangle = {"rectangle": rectangle}
 
 # --- Sketch ---
 def _sketch():
-    import Show
-
+    """Abre o crea un boceto (Sketch) en el documento activo."""
     doc = FreeCAD.ActiveDocument if FreeCAD else None
-    if doc is None:
-        raise RuntimeError("No hay un documento de FreeCAD abierto.")
-    ActiveSketch = doc.getObject("Sketch")
-    if ActiveSketch is None:
-        raise RuntimeError("No se encontró un objeto 'Sketch' en el documento activo.")
-    tv = Show.TempoVis(doc, tag=ActiveSketch.ViewObject.TypeId)
-    ActiveSketch.ViewObject.TempoVis = tv
-    if ActiveSketch.ViewObject.EditingWorkbench:
-        tv.activateWorkbench(ActiveSketch.ViewObject.EditingWorkbench)
-    if ActiveSketch.ViewObject.HideDependent:
-        tv.hide(tv.get_all_dependent(doc.getObject("Sketch"), ""))
-    if ActiveSketch.ViewObject.ShowSupport:
-        tv.show(
-            [
-                ref[0]
-                for ref in ActiveSketch.AttachmentSupport
-                if not (
-                    ref[0].isDerivedFrom("App::Plane")
-                    or ref[0].isDerivedFrom("App::LocalCoordinateSystem")
+    if doc is None and FreeCAD and hasattr(FreeCAD, "newDocument"):
+        doc = FreeCAD.newDocument()
+    try:
+        import Show
+        ActiveSketch = doc.getObject("Sketch") if doc else None
+        if ActiveSketch is not None and hasattr(ActiveSketch, "ViewObject"):
+            tv = Show.TempoVis(doc, tag=ActiveSketch.ViewObject.TypeId)
+            ActiveSketch.ViewObject.TempoVis = tv
+            if ActiveSketch.ViewObject.EditingWorkbench:
+                tv.activateWorkbench(ActiveSketch.ViewObject.EditingWorkbench)
+            if ActiveSketch.ViewObject.HideDependent:
+                tv.hide(tv.get_all_dependent(doc.getObject("Sketch"), ""))
+            if ActiveSketch.ViewObject.ShowSupport:
+                tv.show(
+                    [
+                        ref[0]
+                        for ref in ActiveSketch.AttachmentSupport
+                        if not (
+                            ref[0].isDerivedFrom("App::Plane")
+                            or ref[0].isDerivedFrom("App::LocalCoordinateSystem")
+                        )
+                    ]
                 )
-            ]
-        )
-    if ActiveSketch.ViewObject.ShowLinks:
-        tv.show([ref[0] for ref in ActiveSketch.ExternalGeometry])
-    tv.sketchClipPlane(ActiveSketch, ActiveSketch.ViewObject.SectionView)
-    tv.hide(ActiveSketch)
-    del tv
-    del ActiveSketch
+            if ActiveSketch.ViewObject.ShowLinks:
+                tv.show([ref[0] for ref in ActiveSketch.ExternalGeometry])
+            tv.sketchClipPlane(ActiveSketch, ActiveSketch.ViewObject.SectionView)
+            tv.hide(ActiveSketch)
+            del tv
+            del ActiveSketch
+            ActiveSketch = doc.getObject("Sketch")
+            if ActiveSketch and ActiveSketch.ViewObject.RestoreCamera:
+                ActiveSketch.ViewObject.TempoVis.saveCamera()
+                if ActiveSketch.ViewObject.ForceOrtho:
+                    ActiveSketch.ViewObject.Document.ActiveView.setCameraType("Orthographic")
+            return ActiveSketch
+    except Exception:
+        pass
 
-    ActiveSketch = doc.getObject("Sketch")
-    if ActiveSketch.ViewObject.RestoreCamera:
-        ActiveSketch.ViewObject.TempoVis.saveCamera()
-        if ActiveSketch.ViewObject.ForceOrtho:
-            ActiveSketch.ViewObject.Document.ActiveView.setCameraType("Orthographic")
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Sketcher_NewSketch", 0)
+    return None
 
 
-Sketch = {"sketch": _sketch}
+# Alias canónicos exportados para TraduceToEs y TraduceToEn
+
+class _CommandDict(dict):
+    """Contenedor híbrido dict + callable:
+    - Es un dict {'nombre': func} para compatibilidad con la suite de workbench.
+    - Es un callable ejecutable directamente por el motor de voz y Browser.
+    """
+    def __init__(self, key: str, func):
+        super().__init__({key: func})
+        self.func = func
+        self._param_specs = getattr(func, "_param_specs", None)
+
+    def __call__(self, *args, **kwargs):
+        return self.func(*args, **kwargs)
+
+    @property
+    def __name__(self):
+        return getattr(self.func, "__name__", "cmd")
+
+# Alias híbridos canónicos
+Arc = _CommandDict("arc", arc)
+ArcFrom3Points = _CommandDict("arc_from_3_points", arc_from_3_points)
+BSpline = _CommandDict("b_spline", b_spline)
+BezierCurve = _CommandDict("bezier_curve", bezier_curve)
+Circle = _CommandDict("circle", circle)
+CubicBezierCurve = _CommandDict("cubic_bezier_curve", cubic_bezier_curve)
+Ellipse = _CommandDict("ellipse", ellipse)
+Fillet = _CommandDict("fillet", fillet)
+Line = _CommandDict("line", line)
+Point = _CommandDict("point", point)
+Polygon = _CommandDict("polygon", polygon)
+Polyline = _CommandDict("polyline", polyline)
+Rectangle = _CommandDict("rectangle", rectangle)
+Sketch = _CommandDict("sketch", _sketch)

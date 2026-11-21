@@ -20,9 +20,14 @@
 Cada funcion conserva su comportamiento original; este modulo
 reune lo que antes vivia en una carpeta por funcion.
 """
-import FreeCAD
-import FreeCADGui
-import FreeCADGui as Gui
+try:
+    import FreeCAD
+    import FreeCADGui
+    import FreeCADGui as Gui
+except ImportError:
+    FreeCAD = None  # type: ignore[assignment]
+    FreeCADGui = None  # type: ignore[assignment]
+    Gui = None  # type: ignore[assignment]
 
 
 class _ParamSpec:
@@ -66,6 +71,8 @@ def _require_selected_face(que):
     return sel.Object, faces[0]
 
 def _require_3d_view():
+    if not hasattr(FreeCADGui, "ActiveDocument") or not hasattr(FreeCADGui, "activeView"):
+        return
     view = FreeCADGui.activeView() if FreeCADGui.ActiveDocument else None
     if view is None or not hasattr(view, "getSceneGraph"):
         raise RuntimeError("No hay una vista 3D activa.")
@@ -884,42 +891,129 @@ stairs._param_specs = [
 def _stairs():
     return stairs()
 
-ArchStairs = {
-    "arch stairs": stairs
-}
+# --- Comandos BIM y Rebars complementarios ---
 
-# --- ArchTruss ---
-ArchTruss = {
-    "arch truss": lambda: Gui.runCommand('Arch_Truss', 0)
-}
+def CurtainWall():
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("BIM_CurtainWall", 0)
 
-# --- BentShapeRebar ---
-BentShapeRebar = {
-    "bent shape rebar": lambda: Gui.runCommand('Arch_RebarTools', 5)
-}
+def Roof():
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("BIM_Roof", 0)
 
-# --- HelicalRebar ---
-HelicalRebar = {
-    "helical rebar": lambda: Gui.runCommand('Arch_RebarTools', 6)
-}
+def ArchEquipment():
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Arch_Equipment", 0)
 
-# --- LShapeRebar ---
-LShapeRebar = {
-    "l shape rebar": lambda: Gui.runCommand('Arch_RebarTools', 3)
-}
+def ArchFence():
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("BIM_Fence", 0)
 
-# --- StirrupRebar ---
-StirrupRebar = {
-    "stirrup rebar": lambda: Gui.runCommand('Arch_RebarTools', 4)
-}
+def ArchFrame():
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Arch_Frame", 0)
 
-# --- StraightRebar ---
-StraightRebar = {
-    "straight rebar": lambda: Gui.runCommand('Arch_RebarTools', 1)
-}
+def ArchPanel():
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Arch_Panel", 0)
 
-# --- UShapeRebar ---
-UShapeRebar = {
-    "u shape rebar": lambda: Gui.runCommand('Arch_RebarTools', 2)
-}
+def ArchRebar():
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Arch_Rebar", 0)
 
+def ArchTruss():
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Arch_Truss", 0)
+
+def PipeConnector():
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Arch_PipeConnector", 0)
+
+def Space():
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Arch_Space", 0)
+
+def BentShapeRebar():
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Arch_RebarTools", 5)
+
+def HelicalRebar():
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Arch_RebarTools", 6)
+
+def LShapeRebar():
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Arch_RebarTools", 3)
+
+def StirrupRebar():
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Arch_RebarTools", 4)
+
+def StraightRebar():
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Arch_RebarTools", 1)
+
+def UShapeRebar():
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Arch_RebarTools", 2)
+
+# Alias canónicos exportados para TraduceToEs y TraduceToEn
+
+class _CommandDict(dict):
+    """Contenedor híbrido dict + callable:
+    - Es un dict {'nombre': func} para compatibilidad con la suite de workbench.
+    - Es un callable ejecutable directamente por el motor de voz y Browser.
+    """
+    def __init__(self, key: str, func):
+        super().__init__({key: func})
+        self.func = func
+        self._param_specs = getattr(func, "_param_specs", None)
+
+    def __call__(self, *args, **kwargs):
+        return self.func(*args, **kwargs)
+
+    @property
+    def __name__(self):
+        return getattr(self.func, "__name__", "cmd")
+
+# Alias híbridos canónicos
+Beam = _CommandDict("beam", beam)
+Box = _CommandDict("box", box)
+Building = _CommandDict("building", _building)
+Column = _CommandDict("column", column)
+Component = _CommandDict("component", component)
+CurtainWall = _CommandDict("curtain_wall", CurtainWall)
+Door = _CommandDict("door", door)
+Level = _CommandDict("level", _level)
+Pipe = _CommandDict("pipe", pipe)
+PipeConnector = _CommandDict("pipe_connector", PipeConnector)
+Roof = _CommandDict("roof", Roof)
+Site = _CommandDict("site", _site)
+Slab = _CommandDict("slab", slab)
+Space = _CommandDict("space", Space)
+Stairs = _CommandDict("stairs", stairs)
+ArchStairs = _CommandDict("arch_stairs", stairs)
+Wall = _CommandDict("wall", wall)
+Window = _CommandDict("window", window)
+Beam_Reinforcement = _CommandDict("beam_reinforcement", beam_reinforcement)
+Column_Reinforcement = _CommandDict("column_reinforcement", column_reinforcement)
+Footing_Reinforcement = _CommandDict("footing_reinforcement", footing_reinforcement)
+Slab_Reinforcement = _CommandDict("slab_reinforcement", slab_reinforcement)
+External_Reference = _CommandDict("external_reference", external_reference)
+Facebinder = _CommandDict("facebinder", facebinder)
+Objects_Library = _CommandDict("objects_library", objects_library)
+Profile = _CommandDict("profile", profile)
+Shape_Builder = _CommandDict("shape_builder", shape_builder)
+ArchEquipment = _CommandDict("arch_equipment", ArchEquipment)
+ArchFence = _CommandDict("arch_fence", ArchFence)
+ArchFrame = _CommandDict("arch_frame", ArchFrame)
+ArchPanel = _CommandDict("arch_panel", ArchPanel)
+ArchRebar = _CommandDict("arch_rebar", ArchRebar)
+ArchRoof = _CommandDict("arch_roof", ArchRoof)
+ArchTruss = _CommandDict("arch_truss", ArchTruss)
+BentShapeRebar = _CommandDict("bent_shape_rebar", BentShapeRebar)
+HelicalRebar = _CommandDict("helical_rebar", HelicalRebar)
+LShapeRebar = _CommandDict("l_shape_rebar", LShapeRebar)
+StirrupRebar = _CommandDict("stirrup_rebar", StirrupRebar)
+StraightRebar = _CommandDict("straight_rebar", StraightRebar)
+UShapeRebar = _CommandDict("u_shape_rebar", UShapeRebar)

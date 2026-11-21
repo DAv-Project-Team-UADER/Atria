@@ -16,7 +16,7 @@
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
 def ayuda():
-    print('Comandos disponibles en 2D-Drafting:')
+    print('Comandos disponibles en Drafting2D:')
     print('  punto                    - Crea un punto simple en el plano de trabajo')
     print('  línea                    - Crea una línea recta a partir de dos puntos')
     print('  rectángulo               - Crea un rectángulo a partir de dos puntos')
