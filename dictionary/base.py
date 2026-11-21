@@ -37,6 +37,7 @@ def hide_atria_panel():
         pass
 
 Base = {
+    "Explorer": Explorer,
     "2D-Drafting": Drafting,
     "3D-BIM": BIM,
     "Annotation": Annotation,
@@ -46,7 +47,6 @@ Base = {
     "Snapping": Snapping,
     "StatusBar": StatusBar,
     "Utils": Utils,
-    "Explorer": Explorer,
     "show_atria_panel": show_atria_panel,
     "hide_atria_panel": hide_atria_panel,
 }

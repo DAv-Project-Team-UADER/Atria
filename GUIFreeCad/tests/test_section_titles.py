@@ -98,6 +98,34 @@ class TestSectionTitles(unittest.TestCase):
         panel.SetLanguage("en")
         self.assertEqual(panel.CurrentSectionTitle, "📍 Section: Modify & Transform")
 
+    def test_explorer_button_is_first_in_base_context(self) -> None:
+        """Explorer must be the first button in Base icon list."""
+        try:
+            from PySide6.QtWidgets import QApplication
+            from ui.AtriaPanel import AtriaPanel
+            from ui.ContextView import ContextView, ContextEntryView
+            app = QApplication.instance() or QApplication([])
+        except ImportError:
+            self.skipTest("PySide6 not available in test runner")
+
+        panel = AtriaPanel()
+        base_view = ContextView(
+            "Base",
+            [
+                ContextEntryView("2d", "2D-Drafting", IsSubContext=True),
+                ContextEntryView("3d", "3D-BIM", IsSubContext=True),
+                ContextEntryView("anotacion", "Annotation", IsSubContext=True),
+                ContextEntryView("explorador", "Explorer", IsSubContext=True),
+            ],
+            []
+        )
+        panel.RenderContext(base_view)
+
+        # First button must be Explorer
+        self.assertGreaterEqual(len(panel._toolButtons), 4)
+        first_btn = panel._toolButtons[0]
+        self.assertIn("Explorador", first_btn.text())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -239,6 +239,9 @@ class Browser:
                 if spoken:
                     phrases.add(spoken.strip().lower())
 
+        # Comandos universales de ayuda y cierre de ayuda
+        phrases.update({"ayuda", "manual", "cerrar ayuda", "cerrar", "help", "close help", "close"})
+
         # enviar/cancelar ya entran arriba con el resto de _nav_translate: son
         # comandos de NavCommands como "subir". Solo queda fijo [unk], que es el
         # comodin de Vosk para absorber ruido, no una palabra del diccionario.
@@ -421,24 +424,45 @@ class Browser:
     # ------------------------------------------------------------------
 
     def _ResolveNavAction(self, normalized_spoken: str) -> str | None:
-        """Return the NavActions key ('up', 'show_context', ...) for a
+        """Return the NavActions key ('up', 'show_context', 'help', 'close_help', ...) for a
         spoken phrase, or None if it does not name a navigation command."""
         for spoken, target in self._nav_translate.items():
             if DictionaryLoader.NormalizeSpoken(spoken) != normalized_spoken:
                 continue
             for key, value in self._nav_actions.items():
                 if value is target:
+                    # 'cerrar'/'close' solo se interpreta como close_help si la ayuda está abierta
+                    if key == "close_help" and normalized_spoken in {"cerrar", "close", "fechar"}:
+                        try:
+                            from GUIFreeCad.ui.HelpDialog import AtriaHelpDialog
+                            if not AtriaHelpDialog.IsHelpOpen():
+                                continue
+                        except Exception:
+                            continue
                     return key
         # Universal navigation fallback: garantiza que palabras universales
         # como 'subir', 'volver', 'atras', 'up', 'back' siempre funcionen como 'up',
-        # y 'contexto', 'ayuda', 'context' como 'show_context', sin importar el idioma
-        # activo configurado en _nav_translate ni el contexto actual.
-        _UNIVERSAL_UP = {"subir", "volver", "atras", "up", "back"}
+        # y 'contexto' como 'show_context', 'ayuda'/'manual' como 'help',
+        # y 'cerrar ayuda'/'cerrar' como 'close_help'.
+        _UNIVERSAL_UP = {"subir", "volver", "atras", "up", "back", "voltar"}
         if normalized_spoken in _UNIVERSAL_UP:
             return "up"
-        _UNIVERSAL_CONTEXT = {"contexto", "context", "ayuda", "help"}
+        _UNIVERSAL_CONTEXT = {"contexto", "context"}
         if normalized_spoken in _UNIVERSAL_CONTEXT:
             return "show_context"
+        _UNIVERSAL_HELP = {"ayuda", "manual", "help", "ajuda", "manual de usuario"}
+        if normalized_spoken in _UNIVERSAL_HELP:
+            return "help"
+        _UNIVERSAL_CLOSE_HELP = {"cerrar ayuda", "close help", "fechar ajuda"}
+        if normalized_spoken in _UNIVERSAL_CLOSE_HELP:
+            return "close_help"
+        if normalized_spoken in {"cerrar", "close", "fechar"}:
+            try:
+                from GUIFreeCad.ui.HelpDialog import AtriaHelpDialog
+                if AtriaHelpDialog.IsHelpOpen():
+                    return "close_help"
+            except Exception:
+                pass
         return None
 
     def _ExecuteNavAction(self, action_key: str) -> BrowserResult:
@@ -449,7 +473,38 @@ class Browser:
             return BrowserResult(False, "back", "Already at root context")
         if action_key == "show_context":
             return BrowserResult(True, "show_context", self.DescribeContext())
+        if action_key == "help":
+            try:
+                from GUIFreeCad.ui.HelpContent import get_help_for_category
+                from GUIFreeCad.ui.HelpDialog import AtriaHelpDialog
+                title, items, _ = get_help_for_category(
+                    self.CurrentContextName,
+                    self.ContextPath,
+                    self.Context,
+                )
+                AtriaHelpDialog.ShowHelp(title, items)
+                return BrowserResult(True, "help", f"Mostrando ayuda de {title}")
+            except Exception as exc:
+                return BrowserResult(False, "help", f"No se pudo mostrar la ayuda: {exc}")
+        if action_key == "close_help":
+            try:
+                from GUIFreeCad.ui.HelpDialog import AtriaHelpDialog
+                if AtriaHelpDialog.IsHelpOpen():
+                    AtriaHelpDialog.CloseHelp()
+                    return BrowserResult(True, "close_help", "Ventana de ayuda cerrada")
+                return BrowserResult(False, "close_help", "No hay ventana de ayuda abierta")
+            except Exception as exc:
+                return BrowserResult(False, "close_help", f"Error al cerrar la ayuda: {exc}")
         return BrowserResult(False, "nav_unknown", f"Unknown nav action '{action_key}'")
+
+    def GetHelpForCurrentContext(self) -> tuple[str, list[tuple[str, str]], str]:
+        """Devuelve el título, lista de ítems de ayuda y texto plano del contexto actual."""
+        from GUIFreeCad.ui.HelpContent import get_help_for_category
+        return get_help_for_category(
+            self.CurrentContextName,
+            self.ContextPath,
+            self.Context,
+        )
 
     def _FirstSpokenForNavAction(self, action_key: str) -> str | None:
         """First spoken word mapped to a NavActions key, for user-facing hints."""

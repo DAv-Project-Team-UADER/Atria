@@ -226,16 +226,21 @@ class BrowserPanelSource:
             self.PublishHistory(f"[ATRIA] No se pudieron abrir las preferencias: {exc}", True)
 
     def OpenHelp(self) -> None:
-        """Show the available commands for the active context.
-
-        Reuses ``Browser.DescribeContext``: la ayuda util aca es que comandos
-        se pueden decir ahora, no un texto fijo como el de la ventana externa.
-        """
+        """Abre la ventana emergente de ayuda con la explicación de cada botón de la sección activa."""
         try:
-            for line in self._browser.DescribeContext().splitlines():
-                self.PublishHistory(line)
+            from GUIFreeCad.ui.HelpContent import get_help_for_category
+            from GUIFreeCad.ui.HelpDialog import AtriaHelpDialog
+
+            title, items, _ = get_help_for_category(
+                self._browser.CurrentContextName,
+                self._browser.ContextPath,
+                self._browser.Context,
+            )
+            theme = getattr(self._panel, "_theme", None)
+            AtriaHelpDialog.ShowHelp(title, items, parent=self._panel, theme=theme)
+            self.PublishHistory(f"[ATRIA] Mostrando ayuda de {title}")
         except Exception as exc:  # noqa: BLE001
-            self.PublishHistory(f"[ATRIA] No se pudo describir el contexto: {exc}", True)
+            self.PublishHistory(f"[ATRIA] No se pudo abrir la ayuda: {exc}", True)
 
     def SendCommand(self, Spoken: str) -> None:
         """Process a phrase picked in the UI as if it had been spoken."""
