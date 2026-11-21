@@ -140,11 +140,16 @@ class AtriaPanel(QWidget):
             return
 
         # Las entradas sin .svg no generan boton (siguen andando por voz).
-        buttons = [b for b in map(self._MakeEntryButton, self._context.Entries())
-                   if b is not None]
-        self._toolButtons.extend(buttons)
+        # El boton "subir" va primero (indice 0) para estar siempre visible arriba
+        # a la izquierda, sin importar cuantos botones haya ni el scroll horizontal.
+        buttons = []
         if not self._context.IsRoot():
             buttons.append(self._MakeBackButton())
+        buttons.extend(
+            b for b in map(self._MakeEntryButton, self._context.Entries())
+            if b is not None
+        )
+        self._toolButtons = list(buttons)
 
         # Se llena por columnas, no por filas: con scroll horizontal la altura
         # es la dimension fija (TOOL_AREA_MAX_ROWS) y el ancho es el que crece.
@@ -566,8 +571,15 @@ class AtriaPanel(QWidget):
         if hand_cursor is not None:
             button.setCursor(hand_cursor)
         button.setStyleSheet(self._BackButtonQss())
-        button.clicked.connect(lambda: self._OnEntryClicked(self.BACK_PHRASE))
+        button.clicked.connect(lambda _checked=False: self._OnEntryClicked(self._BackPhrase()))
         return button
+
+    def _BackPhrase(self) -> str:
+        """Frase para subir un nivel segun el idioma activo (o fallback universal)."""
+        lang = getattr(self, "_lang", "es")
+        if str(lang).lower().startswith("en"):
+            return "up"
+        return self.BACK_PHRASE
 
     #: Frase que el Browser interpreta como "subir un nivel" (Atria/dictionary/NavCommands).
     BACK_PHRASE = "subir"
@@ -725,6 +737,6 @@ class AtriaPanel(QWidget):
         # redibuja solo si el numero de columnas cambio, para no rehacer la
         # grilla en cada pixel del arrastre.
         if not self._context.IsEmpty():
-            total = len(self._toolButtons) + (0 if self._context.IsRoot() else 1)
+            total = len(self._toolButtons)
             if self._RowCount(total) != self._lastColumns:
                 self.RenderContext(self._context)

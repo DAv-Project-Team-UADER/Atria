@@ -965,16 +965,25 @@ class _CommandDict(dict):
     - Es un callable ejecutable directamente por el motor de voz y Browser.
     """
     def __init__(self, key: str, func):
+        if isinstance(func, dict):
+            inner = next(iter(func.values())) if func else func
+            func = inner if callable(inner) else func
         super().__init__({key: func})
+        self.key = key
         self.func = func
         self._param_specs = getattr(func, "_param_specs", None)
 
     def __call__(self, *args, **kwargs):
-        return self.func(*args, **kwargs)
+        if callable(self.func):
+            return self.func(*args, **kwargs)
+        return None
 
     @property
     def __name__(self):
-        return getattr(self.func, "__name__", "cmd")
+        name = getattr(self.func, "__name__", None)
+        if name and not name.startswith("<"):
+            return name
+        return self.key
 
 # Alias híbridos canónicos
 Beam = _CommandDict("beam", beam)

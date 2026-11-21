@@ -429,6 +429,16 @@ class Browser:
             for key, value in self._nav_actions.items():
                 if value is target:
                     return key
+        # Universal navigation fallback: garantiza que palabras universales
+        # como 'subir', 'volver', 'atras', 'up', 'back' siempre funcionen como 'up',
+        # y 'contexto', 'ayuda', 'context' como 'show_context', sin importar el idioma
+        # activo configurado en _nav_translate ni el contexto actual.
+        _UNIVERSAL_UP = {"subir", "volver", "atras", "up", "back"}
+        if normalized_spoken in _UNIVERSAL_UP:
+            return "up"
+        _UNIVERSAL_CONTEXT = {"contexto", "context", "ayuda", "help"}
+        if normalized_spoken in _UNIVERSAL_CONTEXT:
+            return "show_context"
         return None
 
     def _ExecuteNavAction(self, action_key: str) -> BrowserResult:
@@ -573,6 +583,11 @@ class Browser:
             for key, value in views.items():
                 if value is target:
                     return key
+        explorer_dict = self._LoadExplorerDict()
+        if explorer_dict:
+            for key, value in explorer_dict.items():
+                if value is target:
+                    return key
         if isinstance(target, dict) and len(target) == 1:
             only_key, only_val = next(iter(target.items()))
             if isinstance(only_key, str) and callable(only_val):
@@ -587,12 +602,35 @@ class Browser:
     def _LoadStandardViewsDict() -> dict[str, Any] | None:
         """Load StandardViews using the same import paths as TraduceTo updates."""
         for module_name in (
+            "dictionary.StdView.StandardViews.StandardViews",
             "dic.StdView.StandardViews.StandardViews",
             "StdView.StandardViews.StandardViews",
         ):
             try:
                 mod = __import__(module_name, fromlist=["StandardViews"])
                 table = getattr(mod, "StandardViews", None)
+                if isinstance(table, dict):
+                    return table
+            except Exception:
+                continue
+        return None
+
+    @staticmethod
+    def _LoadExplorerDict() -> dict[str, Any] | None:
+        """Load Explorer master dictionary if available."""
+        import sys
+        for mod_name in ("Explorer.Explorer", "dictionary.Explorer.Explorer"):
+            if mod_name in sys.modules:
+                table = getattr(sys.modules[mod_name], "explorer", None)
+                if isinstance(table, dict):
+                    return table
+        for module_name in (
+            "Explorer.Explorer",
+            "dictionary.Explorer.Explorer",
+        ):
+            try:
+                mod = __import__(module_name, fromlist=["explorer"])
+                table = getattr(mod, "explorer", None)
                 if isinstance(table, dict):
                     return table
             except Exception:
