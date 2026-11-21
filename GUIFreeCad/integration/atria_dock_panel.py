@@ -236,7 +236,8 @@ class BrowserPanelSource:
                 self._browser.ContextPath,
                 self._browser.Context,
             )
-            AtriaHelpDialog.ShowHelp(title, items, parent=self._panel)
+            theme = getattr(self._panel, "_theme", None)
+            AtriaHelpDialog.ShowHelp(title, items, parent=self._panel, theme=theme)
             self.PublishHistory(f"[ATRIA] Mostrando ayuda de {title}")
         except Exception as exc:  # noqa: BLE001
             self.PublishHistory(f"[ATRIA] No se pudo abrir la ayuda: {exc}", True)

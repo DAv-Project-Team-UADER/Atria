@@ -148,11 +148,20 @@ class AtriaPanel(QWidget):
         # Las entradas sin .svg no generan boton (siguen andando por voz).
         # El boton "subir" va primero (indice 0) para estar siempre visible arriba
         # a la izquierda, sin importar cuantos botones haya ni el scroll horizontal.
+        # El botón de ayuda contextual va al inicio, cerca del botón volver (indice 1).
         buttons = []
         if not self._context.IsRoot():
             buttons.append(self._MakeBackButton())
+            buttons.append(self._MakeContextHelpButton())
 
         entries = list(self._context.Entries())
+        # Filtrar posibles duplicados de 'ayuda'/'manual' para que no haya dos botones de ayuda
+        entries = [
+            e for e in entries
+            if e.InternalKey.lower() not in ("help", "ayuda")
+            and e.Spoken.lower() not in ("ayuda", "help", "manual", "manual de usuario")
+        ]
+
         if self._context.IsRoot():
             # El botón de Explorador debe estar primero en la lista de iconos del menú principal
             explorer_idx = next(
@@ -163,10 +172,18 @@ class AtriaPanel(QWidget):
             if explorer_idx is not None and explorer_idx > 0:
                 entries.insert(0, entries.pop(explorer_idx))
 
-        buttons.extend(
-            b for b in map(self._MakeEntryButton, entries)
-            if b is not None
-        )
+            entry_buttons = [b for b in map(self._MakeEntryButton, entries) if b is not None]
+            if entry_buttons:
+                buttons.append(entry_buttons[0])
+                buttons.append(self._MakeContextHelpButton())
+                buttons.extend(entry_buttons[1:])
+            else:
+                buttons.append(self._MakeContextHelpButton())
+        else:
+            buttons.extend(
+                b for b in map(self._MakeEntryButton, entries)
+                if b is not None
+            )
         self._toolButtons = list(buttons)
 
         # Se llena por columnas, no por filas: con scroll horizontal la altura
@@ -609,6 +626,37 @@ class AtriaPanel(QWidget):
         button.clicked.connect(lambda _checked=False: self._OnEntryClicked(self._BackPhrase()))
         return button
 
+    def _MakeContextHelpButton(self) -> QToolButton:
+        """Crea el botón de ayuda contextual situado al inicio, cerca del botón volver."""
+        button = QToolButton()
+        button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        button.setFixedSize(self.BUTTON_WIDTH, self.BUTTON_HEIGHT)
+        button.setToolTip(
+            "❓ Ayuda y Manual de la Sección\n"
+            "🎤 Di: «ayuda» o «manual»\n"
+            "🖱️ Haz clic para abrir la ventana de ayuda de esta sección\n"
+            "🎤 Di: «cerrar ayuda» o «cerrar» para cerrarla"
+        )
+        button.setFont(QFont(FONT_SANS, 8, QFont.Bold))
+        hand_cursor = getattr(Qt, "PointingHandCursor", None)
+        if hand_cursor is not None:
+            button.setCursor(hand_cursor)
+        button.setStyleSheet(self._HelpButtonQss())
+
+        icon = (
+            self._locator.Find("help")
+            or self._locator.Find("Help_WhatsThis")
+            or self._locator.Find("manual")
+            or self._locator.Find("ayuda")
+        )
+        if icon:
+            button.setIcon(QIcon(icon))
+            button.setIconSize(QSize(self.ICON_SIZE, self.ICON_SIZE))
+
+        button.setText("❓ Ayuda")
+        button.clicked.connect(lambda _checked=False: self._OnEntryClicked("ayuda"))
+        return button
+
     def _FormatButtonText(self, spoken: str) -> str:
         """Formatea el comando de activación hablado para que quepa armoniosamente en el botón."""
         s = (spoken or "").strip().replace("_", " ")
@@ -845,6 +893,36 @@ class AtriaPanel(QWidget):
             f" font-size: 8.5pt; font-weight: bold; text-align: center;"
             f" padding: 2px 2px 3px 2px; }}"
             f"QToolButton:hover, QPushButton:hover {{ background: {hover} !important; border-color: #d97706; }}"
+            f"QToolButton:pressed, QPushButton:pressed {{ background: {border} !important; }}"
+        )
+
+    def _HelpButtonQss(self) -> str:
+        palette = self._palette
+        bg_val = str(palette.get("bg", "#")).lower()
+        is_dark = bg_val.startswith("#1") or bg_val.startswith("#2") or getattr(self, "_theme", "light") == "dark"
+
+        if is_dark:
+            border = "#00a896"
+            top = "#0e3838"
+            bot = "#092323"
+            hover = "#00828a"
+            text = "#72efdd"
+        else:
+            border = "#00828a"
+            top = "#e6f7f7"
+            bot = "#ccefed"
+            hover = "#99dfdc"
+            text = "#005055"
+
+        return (
+            f"QToolButton, QPushButton {{"
+            f" background: qlineargradient(x1:0,y1:0,x2:0,y2:1,"
+            f" stop:0 {top}, stop:1 {bot}) !important;"
+            f" border: 2px solid {border}; border-radius: 8px;"
+            f" color: {text}; font-family: {FONT_SANS};"
+            f" font-size: 8.5pt; font-weight: bold; text-align: center;"
+            f" padding: 2px 2px 3px 2px; }}"
+            f"QToolButton:hover, QPushButton:hover {{ background: {hover} !important; border-color: {border}; }}"
             f"QToolButton:pressed, QPushButton:pressed {{ background: {border} !important; }}"
         )
 

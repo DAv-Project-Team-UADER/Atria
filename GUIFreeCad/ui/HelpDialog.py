@@ -15,7 +15,8 @@
 """Ventana emergente de ayuda contextual y manual de comandos de ATRIA.
 
 Muestra explicaciones claras sobre para qué se usa cada botón de la sección activa,
-permitiendo al usuario consultarla por interfaz o por voz («ayuda» / «manual»)
+con soporte adaptativo para Modo Claro y Modo Oscuro según la configuración del usuario.
+Permite consultar la ayuda por interfaz o por voz («ayuda» / «manual»)
 y cerrarla mediante el comando «cerrar ayuda» o «cerrar» (o tecla Escape / botón Cerrar).
 """
 
@@ -41,6 +42,45 @@ for mod_name in ("PySide", "PySide6", "PySide2"):
         pass
 
 
+def detect_theme(parent=None) -> str:
+    """Detecta el tema activo (light o dark) según el panel, settings o FreeCAD."""
+    if parent is not None and hasattr(parent, "_theme"):
+        theme_val = str(getattr(parent, "_theme", "")).strip().lower()
+        if theme_val in ("light", "dark"):
+            return theme_val
+
+    try:
+        from GUIFreeCad.core.settings import settings
+        if hasattr(settings, "theme") and settings.theme:
+            return str(settings.theme).strip().lower()
+    except Exception:
+        pass
+
+    try:
+        import json
+        from pathlib import Path
+        cfg = Path(__file__).resolve().parents[1] / "config" / "settings.json"
+        if cfg.exists():
+            data = json.loads(cfg.read_text(encoding="utf-8-sig"))
+            if "theme" in data and str(data["theme"]).strip().lower() in ("light", "dark"):
+                return str(data["theme"]).strip().lower()
+    except Exception:
+        pass
+
+    try:
+        import FreeCADGui as Gui
+        palette = Gui.getMainWindow().palette()
+        colour = palette.color(palette.ColorRole.Window)
+        luminance = (
+            0.299 * colour.red() + 0.587 * colour.green() + 0.114 * colour.blue()
+        ) / 255.0
+        return "dark" if luminance < 0.5 else "light"
+    except Exception:
+        pass
+
+    return "light"
+
+
 _active_dialog: Any = None
 
 
@@ -49,10 +89,17 @@ class AtriaHelpDialog:
 
     _active_instance = None
 
-    def __init__(self, title: str, items: list[tuple[str, str]], parent=None) -> None:
+    def __init__(
+        self,
+        title: str,
+        items: list[tuple[str, str]],
+        parent=None,
+        theme: str | None = None,
+    ) -> None:
         self.title = title
         self.items = items
         self._parent = parent
+        self.theme = theme or detect_theme(parent)
         self._qt_dialog = None
 
         if QtWidgets and hasattr(QtWidgets, "QDialog"):
@@ -85,61 +132,129 @@ class AtriaHelpDialog:
         dlg.resize(620, 520)
         dlg.setMinimumSize(480, 380)
 
-        # Paleta oscura coherente con ATRIA
-        dlg.setStyleSheet("""
-            QDialog#AtriaHelpDialog {
-                background-color: #1e1e24;
-                color: #e0e0e0;
-                font-family: 'Segoe UI', Arial, sans-serif;
-            }
-            QLabel {
-                color: #f0f0f4;
-            }
-            QScrollArea {
-                background-color: #26262d;
-                border: 1px solid #383842;
-                border-radius: 6px;
-            }
-            QScrollBar:vertical {
-                border: none;
-                background: #1e1e24;
-                width: 10px;
-                margin: 0px;
-            }
-            QScrollBar::handle:vertical {
-                background: #484854;
-                min-height: 25px;
-                border-radius: 5px;
-            }
-            QScrollBar::handle:vertical:hover {
-                background: #00828A;
-            }
-            QFrame.cardFrame {
-                background-color: #2d2d36;
-                border: 1px solid #3c3c4a;
-                border-radius: 6px;
-                padding: 6px;
-            }
-            QFrame.cardFrame:hover {
-                border: 1px solid #00a896;
-                background-color: #33333e;
-            }
-            QPushButton#closeBtn {
-                background-color: #00828A;
-                color: #ffffff;
-                border: none;
-                border-radius: 6px;
-                font-weight: bold;
-                font-size: 11pt;
-                padding: 8px 24px;
-            }
-            QPushButton#closeBtn:hover {
-                background-color: #00a896;
-            }
-            QPushButton#closeBtn:pressed {
-                background-color: #005f66;
-            }
-        """)
+        is_dark = self.theme == "dark"
+
+        if is_dark:
+            dlg.setStyleSheet("""
+                QDialog#AtriaHelpDialog {
+                    background-color: #1e1e24;
+                    color: #e0e0e0;
+                    font-family: 'Segoe UI', Arial, sans-serif;
+                }
+                QLabel {
+                    color: #f0f0f4;
+                }
+                QScrollArea {
+                    background-color: #26262d;
+                    border: 1px solid #383842;
+                    border-radius: 6px;
+                }
+                QScrollBar:vertical {
+                    border: none;
+                    background: #1e1e24;
+                    width: 10px;
+                    margin: 0px;
+                }
+                QScrollBar::handle:vertical {
+                    background: #484854;
+                    min-height: 25px;
+                    border-radius: 5px;
+                }
+                QScrollBar::handle:vertical:hover {
+                    background: #00828A;
+                }
+                QFrame.cardFrame {
+                    background-color: #2d2d36;
+                    border: 1px solid #3c3c4a;
+                    border-radius: 6px;
+                    padding: 6px;
+                }
+                QFrame.cardFrame:hover {
+                    border: 1px solid #00a896;
+                    background-color: #33333e;
+                }
+                QPushButton#closeBtn {
+                    background-color: #00828A;
+                    color: #ffffff;
+                    border: none;
+                    border-radius: 6px;
+                    font-weight: bold;
+                    font-size: 11pt;
+                    padding: 8px 24px;
+                }
+                QPushButton#closeBtn:hover {
+                    background-color: #00a896;
+                }
+                QPushButton#closeBtn:pressed {
+                    background-color: #005f66;
+                }
+            """)
+            title_style = "color: #00e5ff; font-weight: bold;"
+            sub_style = "color: #b0b0bc;"
+            cmd_style = "color: #72efdd; font-weight: bold;"
+            desc_style = "color: #e2e2e8;"
+            hint_style = "color: #94d2bd; font-style: italic;"
+        else:
+            # Modo Claro: paleta limpia, profesional y de alto contraste
+            dlg.setStyleSheet("""
+                QDialog#AtriaHelpDialog {
+                    background-color: #f8f9fa;
+                    color: #1a202c;
+                    font-family: 'Segoe UI', Arial, sans-serif;
+                }
+                QLabel {
+                    color: #1a202c;
+                }
+                QScrollArea {
+                    background-color: #ffffff;
+                    border: 1.5px solid #dcdfe4;
+                    border-radius: 6px;
+                }
+                QScrollBar:vertical {
+                    border: none;
+                    background: #f1f5f9;
+                    width: 10px;
+                    margin: 0px;
+                }
+                QScrollBar::handle:vertical {
+                    background: #cbd5e1;
+                    min-height: 25px;
+                    border-radius: 5px;
+                }
+                QScrollBar::handle:vertical:hover {
+                    background: #00828A;
+                }
+                QFrame.cardFrame {
+                    background-color: #ffffff;
+                    border: 1.5px solid #e2e8f0;
+                    border-radius: 6px;
+                    padding: 6px;
+                }
+                QFrame.cardFrame:hover {
+                    border: 1.5px solid #00828A;
+                    background-color: #f0fdfa;
+                }
+                QPushButton#closeBtn {
+                    background-color: #00828A;
+                    color: #ffffff;
+                    border: none;
+                    border-radius: 6px;
+                    font-weight: bold;
+                    font-size: 11pt;
+                    padding: 8px 24px;
+                }
+                QPushButton#closeBtn:hover {
+                    background-color: #006d77;
+                }
+                QPushButton#closeBtn:pressed {
+                    background-color: #00535a;
+                }
+            """)
+            title_style = "color: #006d77; font-weight: bold;"
+            sub_style = "color: #4a5568;"
+            cmd_style = "color: #007a82; font-weight: bold;"
+            desc_style = "color: #2d3748;"
+            hint_style = "color: #0d9488; font-style: italic;"
 
         main_layout = QVBoxLayout(dlg)
         main_layout.setContentsMargins(18, 16, 18, 16)
@@ -152,13 +267,13 @@ class AtriaHelpDialog:
         title_lbl = QLabel(self.title)
         if QFont:
             title_lbl.setFont(QFont("Segoe UI", 14, QFont.Bold))
-        title_lbl.setStyleSheet("color: #00e5ff; font-weight: bold;")
+        title_lbl.setStyleSheet(title_style)
         header_box.addWidget(title_lbl)
 
         sub_lbl = QLabel("Pronuncia el comando por voz o haz clic sobre su botón en la pantalla:")
         if QFont:
             sub_lbl.setFont(QFont("Segoe UI", 9))
-        sub_lbl.setStyleSheet("color: #b0b0bc;")
+        sub_lbl.setStyleSheet(sub_style)
         header_box.addWidget(sub_lbl)
 
         main_layout.addLayout(header_box)
@@ -182,14 +297,14 @@ class AtriaHelpDialog:
             cmd_lbl = QLabel(f"🎤 {cmd}")
             if QFont:
                 cmd_lbl.setFont(QFont("Segoe UI", 10, QFont.Bold))
-            cmd_lbl.setStyleSheet("color: #72efdd; font-weight: bold;")
+            cmd_lbl.setStyleSheet(cmd_style)
             card_layout.addWidget(cmd_lbl)
 
             desc_lbl = QLabel(desc)
             desc_lbl.setWordWrap(True)
             if QFont:
                 desc_lbl.setFont(QFont("Segoe UI", 9))
-            desc_lbl.setStyleSheet("color: #e2e2e8;")
+            desc_lbl.setStyleSheet(desc_style)
             card_layout.addWidget(desc_lbl)
 
             cards_layout.addWidget(card)
@@ -205,7 +320,7 @@ class AtriaHelpDialog:
         voice_hint = QLabel("💡 Di: «cerrar ayuda» o «cerrar» para cerrar esta ventana")
         if QFont:
             voice_hint.setFont(QFont("Segoe UI", 9))
-        voice_hint.setStyleSheet("color: #94d2bd; font-style: italic;")
+        voice_hint.setStyleSheet(hint_style)
         footer_layout.addWidget(voice_hint)
 
         footer_layout.addStretch(1)
@@ -266,8 +381,9 @@ class AtriaHelpDialog:
         title: str,
         content: str | list[tuple[str, str]],
         parent=None,
+        theme: str | None = None,
     ) -> AtriaHelpDialog:
-        """Crea y muestra la ventana de ayuda emergente."""
+        """Crea y muestra la ventana de ayuda emergente en el tema correspondiente."""
         # Cerrar ventana previa si está abierta
         cls.CloseHelp()
 
@@ -289,7 +405,7 @@ class AtriaHelpDialog:
                 else:
                     items.append((line, ""))
 
-        dialog = cls(title, items, parent=parent)
+        dialog = cls(title, items, parent=parent, theme=theme)
         dialog.show()
         cls._active_instance = dialog
         return dialog

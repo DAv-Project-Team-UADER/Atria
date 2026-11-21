@@ -82,26 +82,31 @@ class TestButtonVoiceLabels(unittest.TestCase):
         )
         panel.RenderContext(view)
 
-        # Buttons: 1 back button + 1 subcontext + 3 commands = 5 buttons
-        self.assertEqual(len(panel._toolButtons), 5)
+        # Buttons: 1 back button + 1 help button + 1 subcontext + 3 commands = 6 buttons
+        self.assertEqual(len(panel._toolButtons), 6)
 
-        # Back button
+        # Back button (index 0)
         back_btn = panel._toolButtons[0]
         self.assertIn("Subir", back_btn.text())
         self.assertIn("⬅", back_btn.text())
 
+        # Help button (index 1: al inicio, cerca del botón volver)
+        help_btn = panel._toolButtons[1]
+        self.assertIn("Ayuda", help_btn.text())
+        self.assertIn("❓", help_btn.text())
+
         # Submenu button
-        sub_btn = panel._toolButtons[1]
+        sub_btn = panel._toolButtons[2]
         self.assertEqual(sub_btn.text(), "Explorador")
 
         # Command buttons
-        cmd_muro = panel._toolButtons[2]
+        cmd_muro = panel._toolButtons[3]
         self.assertEqual(cmd_muro.text(), "Muro")
 
-        cmd_columna = panel._toolButtons[3]
+        cmd_columna = panel._toolButtons[4]
         self.assertEqual(cmd_columna.text(), "Columna")
 
-        cmd_viga = panel._toolButtons[4]
+        cmd_viga = panel._toolButtons[5]
         self.assertEqual(cmd_viga.text(), "Nueva\nViga")
 
 

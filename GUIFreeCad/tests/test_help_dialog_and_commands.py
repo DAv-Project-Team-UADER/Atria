@@ -92,6 +92,81 @@ class TestAtriaHelpDialogLifecycle(unittest.TestCase):
         AtriaHelpDialog.CloseHelp()
         self.assertFalse(AtriaHelpDialog.CloseHelp())
 
+    def test_help_dialog_theme_support(self) -> None:
+        """Verifica que el diálogo de ayuda acepte y aplique Modo Claro y Modo Oscuro."""
+        # Modo Claro
+        dlg_light = AtriaHelpDialog.ShowHelp("Ayuda Claro", [("linea", "Dibuja una linea")], theme="light")
+        self.assertEqual(dlg_light.theme, "light")
+
+        # Modo Oscuro
+        dlg_dark = AtriaHelpDialog.ShowHelp("Ayuda Oscuro", [("linea", "Dibuja una linea")], theme="dark")
+        self.assertEqual(dlg_dark.theme, "dark")
+
+
+class TestAtriaPanelSectionHelpButton(unittest.TestCase):
+    """Verifica que cada sección tenga visible el botón de Ayuda al inicio, cerca del botón volver."""
+
+    def test_help_button_present_in_subcontext_near_back(self) -> None:
+        try:
+            from PySide6.QtWidgets import QApplication
+            from ui.AtriaPanel import AtriaPanel
+            from ui.ContextView import ContextEntryView, ContextView
+            _app = QApplication.instance() or QApplication([])
+        except ImportError:
+            self.skipTest("PySide6 no disponible en el entorno de pruebas")
+
+        panel = AtriaPanel()
+        view = ContextView(
+            "Base > Modify",
+            [ContextEntryView("mover", "move"), ContextEntryView("copiar", "copy")],
+            []
+        )
+        panel.RenderContext(view)
+
+        # En secciones (no root):
+        # Index 0: Botón Volver (⬅ Subir)
+        # Index 1: Botón Ayuda (❓ Ayuda) al inicio, cerca del botón volver
+        self.assertGreaterEqual(len(panel._toolButtons), 2)
+        btn_back = panel._toolButtons[0]
+        btn_help = panel._toolButtons[1]
+
+        self.assertIn("⬅", btn_back.text())
+        self.assertIn("subir", btn_back.text().lower())
+
+        self.assertIn("❓", btn_help.text())
+        self.assertIn("ayuda", btn_help.text().lower())
+
+    def test_help_button_in_base_main_menu(self) -> None:
+        try:
+            from PySide6.QtWidgets import QApplication
+            from ui.AtriaPanel import AtriaPanel
+            from ui.ContextView import ContextEntryView, ContextView
+            _app = QApplication.instance() or QApplication([])
+        except ImportError:
+            self.skipTest("PySide6 no disponible en el entorno de pruebas")
+
+        panel = AtriaPanel()
+        view = ContextView(
+            "Base",
+            [
+                ContextEntryView("3d", "3D-BIM", IsSubContext=True),
+                ContextEntryView("explorador", "Explorer", IsSubContext=True),
+                ContextEntryView("2d", "2D-Drafting", IsSubContext=True),
+            ],
+            []
+        )
+        panel.RenderContext(view)
+
+        # En Base:
+        # Index 0: Explorador (primero de la lista)
+        # Index 1: Ayuda (al inicio, cerca de Explorador)
+        self.assertGreaterEqual(len(panel._toolButtons), 2)
+        btn_explorer = panel._toolButtons[0]
+        btn_help = panel._toolButtons[1]
+
+        self.assertIn("explorador", btn_explorer.text().lower())
+        self.assertIn("ayuda", btn_help.text().lower())
+
 
 class TestVoiceHelpCommands(unittest.TestCase):
     """Verifica la invocación por voz de ayuda/manual y su cierre con «cerrar ayuda» y «cerrar»."""
