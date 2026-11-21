@@ -471,9 +471,10 @@ class AtriaPanel(QWidget):
         self._helpButton.setFixedSize(38, 34)
         self._helpButton.setFont(QFont(FONT_SANS, 15, QFont.Bold))
         self._helpButton.setToolTip(
-            "? Ayuda de Comandos Activos\n"
-            "🎤 Di: «ayuda» o «contexto»\n"
-            "🖱️ Muestra qué comandos puedes decir ahora"
+            "? Ayuda y Manual de la Sección\n"
+            "🎤 Di: «ayuda» o «manual»\n"
+            "🖱️ Abre una ventana emergente que explica cada botón de la sección\n"
+            "🎤 Para cerrar di: «cerrar ayuda» o «cerrar»"
         )
         if hand_cursor is not None:
             self._helpButton.setCursor(hand_cursor)
