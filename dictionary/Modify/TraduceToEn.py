@@ -108,7 +108,6 @@ try:
     from .commands import Upgrade
 except ImportError:
     Upgrade = None
-
 try:
     from .commands import CutWithPlane
 except ImportError:
@@ -118,13 +117,13 @@ try:
 except ImportError:
     Difference = None
 try:
-    from .commands import Extrude
-except ImportError:
-    Extrude = None
-try:
     from .commands import ExtrudeFace
 except ImportError:
     ExtrudeFace = None
+try:
+    from .commands import Extrude
+except ImportError:
+    Extrude = None
 try:
     from .commands import Intersection
 except ImportError:
@@ -306,10 +305,10 @@ TraduceToEn = {
     'extract common part': Intersection,
     'shared volume': Intersection,
     # PointArray
-    'crear matriz por puntos': PointArray,
-    'nueva matriz de puntos': PointArray,
-    'arreglo por puntos': PointArray,
-    'distribuir en puntos': PointArray,
+    'create point array': PointArray,
+    'new point array': PointArray,
+    'array by points': PointArray,
+    'distribute copies at points': PointArray,
     # PolarArray
     'create polar array': PolarArray,
     'new polar array': PolarArray,
