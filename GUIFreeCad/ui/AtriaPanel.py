@@ -704,6 +704,16 @@ class AtriaPanel(QWidget):
             "unidades pulgadas": "Pulgadas",
             "mostrar panel": "Mostrar\nPanel",
             "ocultar panel": "Ocultar\nPanel",
+            "centrar vista": "Centrar\nVista",
+            "ajustar todo": "Ajustar\nTodo",
+            "enfocar seleccion": "Enfocar\nSelec.",
+            "enfocar selección": "Enfocar\nSelec.",
+            "girar izquierda": "Girar\nIzq.",
+            "girar derecha": "Girar\nDer.",
+            "girar arriba": "Girar\nArriba",
+            "girar abajo": "Girar\nAbajo",
+            "mover camara": "Mover\nCámara",
+            "mover cámara": "Mover\nCámara",
         }
         low = s.lower()
         if low in short_overrides:

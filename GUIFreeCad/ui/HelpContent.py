@@ -37,6 +37,7 @@ HELP_BY_CATEGORY: dict[str, list[tuple[str, str]]] = {
         ("enganche", "Modos de referencia a objetos (Snapping), rejilla y selección del plano de trabajo."),
         ("barra de estado", "Alternar modo IFC, visibilidad de vistas BIM y estilo de fondo de vista 3D."),
         ("utilidades", "Herramientas auxiliares de medición, verificación del modelo y utilidades geométricas."),
+        ("vistas", "Control de vistas estándar, rotación, encuadre y cambio de perspectiva o cámara ortogonal."),
     ],
     "3D-BIM": [
         ("crear sitio", "Crea el emplazamiento o terreno del proyecto y agrupa los edificios."),
@@ -212,11 +213,32 @@ HELP_BY_CATEGORY: dict[str, list[tuple[str, str]]] = {
         ("instancias", "Selecciona automáticamente todas las instancias asociadas al objeto."),
         ("variables", "Crea un conjunto de variables de diseño paramétricas (VarSet)."),
     ],
+    "Views": [
+        ("perspectiva", "Activa la cámara con perspectiva cónica 3D (profundidad realista con punto de fuga)."),
+        ("ortogonal", "Activa la cámara ortogonal/paralela sin distorsión de perspectiva (para planos técnicos)."),
+        ("isometrica", "Orienta la vista en perspectiva isométrica 3D clásica."),
+        ("frontal", "Orienta la cámara de frente (vista de alzado frontal, plano XZ)."),
+        ("superior", "Orienta la cámara desde arriba (vista de planta, plano XY)."),
+        ("derecha", "Orienta la cámara en vista lateral derecha (plano YZ)."),
+        ("izquierda", "Orienta la cámara en vista lateral izquierda."),
+        ("posterior", "Orienta la cámara en vista posterior (trasera)."),
+        ("inferior", "Orienta la cámara en vista inferior (desde abajo)."),
+        ("centrar vista", "Encuadra y ajusta todo el modelo visible en la pantalla (Fit All)."),
+        ("enfocar seleccion", "Centra y acerca la vista al objeto actualmente seleccionado."),
+        ("acercar", "Acerca la cámara aumentando el zoom sobre el modelo (Zoom In)."),
+        ("alejar", "Aleja la cámara disminuyendo el zoom sobre el modelo (Zoom Out)."),
+        ("girar izquierda", "Rota la cámara 15° hacia la izquierda alrededor del modelo."),
+        ("girar derecha", "Rota la cámara 15° hacia la derecha alrededor del modelo."),
+        ("girar arriba", "Inclina la cámara 15° hacia arriba."),
+        ("girar abajo", "Inclina la cámara 15° hacia abajo."),
+        ("mover camara", "Centra la cámara en unas coordenadas específicas dictadas por voz (X, Y, Z)."),
+    ],
 }
 
 # Alias de carpetas espejo
 HELP_BY_CATEGORY["BIM3D"] = HELP_BY_CATEGORY["3D-BIM"]
 HELP_BY_CATEGORY["Drafting2D"] = HELP_BY_CATEGORY["2D-Drafting"]
+HELP_BY_CATEGORY["Vistas"] = HELP_BY_CATEGORY["Views"]
 
 
 def get_help_for_category(

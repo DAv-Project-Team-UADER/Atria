@@ -32,7 +32,14 @@ except ImportError:
     App = None
     FreeCAD = None
 
-from measure import dimensionMode
+try:
+    from measure import dimensionMode
+except ImportError:
+    try:
+        from dictionary.measure import dimensionMode
+    except ImportError:
+        def dimensionMode():
+            return "3D", None
 
 try:
     import FreeCADGui as Gui

@@ -50,8 +50,8 @@ def _is_view_command(target) -> bool:
 
 
 def _in_view_context(context_path: str) -> bool:
-    """True when the Browser is inside the standard-views context (``stdview``)."""
-    return any(name.strip().lower() == "stdview" for name in context_path.split(">"))
+    """True when the Browser is inside the views context (``views``, ``stdview``)."""
+    return any(name.strip().lower() in ("stdview", "views", "vistas") for name in context_path.split(">"))
 
 
 def _notify_panel_failure(message: str) -> None:
