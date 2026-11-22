@@ -71,11 +71,71 @@ def _notify_panel_failure(message: str) -> None:
 
 
 def _bring_to_front(dock) -> None:
-    """Bring a dock to the front, compatible with test doubles and Qt versions."""
-    dock.show()
-    dock.raise_()
+    """Bring a dock to the front, unminimizing and restoring it if needed."""
+    try:
+        from PySide6.QtCore import Qt
+    except ImportError:
+        try:
+            from PySide2.QtCore import Qt  # type: ignore[assignment]
+        except ImportError:
+            Qt = None
+
+    # Si está minimizado (el dock o su ventana contenedora flotante), restaurar con showNormal
+    is_min = False
+    if hasattr(dock, "isMinimized") and callable(getattr(dock, "isMinimized")):
+        try:
+            is_min = bool(dock.isMinimized())
+        except Exception:
+            pass
+
+    win = getattr(dock, "window", lambda: None)() if hasattr(dock, "window") else None
+    win_min = False
+    if win is not None and hasattr(win, "isMinimized") and callable(getattr(win, "isMinimized")):
+        try:
+            win_min = bool(win.isMinimized())
+        except Exception:
+            pass
+
+    # showNormal() restaura ventanas minimizadas en Qt
+    if is_min or win_min:
+        if hasattr(dock, "showNormal") and callable(getattr(dock, "showNormal")):
+            try:
+                dock.showNormal()
+            except Exception:
+                pass
+        if win is not None and hasattr(win, "showNormal") and callable(getattr(win, "showNormal")):
+            try:
+                win.showNormal()
+            except Exception:
+                pass
+
+    if Qt is not None:
+        win_min_flag = getattr(Qt, "WindowMinimized", 0x00000001)
+        win_active_flag = getattr(Qt, "WindowActive", 0x00000008)
+        for target in (dock, win):
+            if target is not None and hasattr(target, "windowState") and hasattr(target, "setWindowState"):
+                try:
+                    st = target.windowState()
+                    if st & win_min_flag:
+                        target.setWindowState((st & ~win_min_flag) | win_active_flag)
+                except Exception:
+                    pass
+
+    # Mostrar, traer al frente y activar
+    if hasattr(dock, "show") and callable(getattr(dock, "show")):
+        dock.show()
+    if hasattr(dock, "raise_") and callable(getattr(dock, "raise_")):
+        dock.raise_()
     if hasattr(dock, "activateWindow") and callable(getattr(dock, "activateWindow")):
         dock.activateWindow()
+
+    if win is not None and win is not dock:
+        if hasattr(win, "show") and callable(getattr(win, "show")):
+            win.show()
+        if hasattr(win, "raise_") and callable(getattr(win, "raise_")):
+            win.raise_()
+        if hasattr(win, "activateWindow") and callable(getattr(win, "activateWindow")):
+            win.activateWindow()
 
 
 def hide_atria_panel() -> bool:
@@ -85,6 +145,19 @@ def hide_atria_panel() -> bool:
         True if the panel was hidden or was already hidden, False if no dock
         is mounted (nothing to hide).
     """
+    global _dock
+    if _dock is None:
+        try:
+            import FreeCADGui as Gui
+            from PySide6.QtWidgets import QDockWidget
+            mw = Gui.getMainWindow()
+            if mw is not None:
+                existing = mw.findChild(QDockWidget, _DOCK_OBJECT_NAME)
+                if existing is not None:
+                    _dock = existing
+        except Exception:
+            pass
+
     if _dock is None:
         return False
     _dock.hide()
@@ -94,7 +167,7 @@ def hide_atria_panel() -> bool:
 def show_atria_panel() -> bool:
     """Show and foreground the ATRIA dock panel, mounting it on demand if needed.
 
-    If the dock is already mounted it is shown and raised. If it is not yet
+    If the dock is already mounted it is shown, restored and raised. If it is not yet
     mounted the existing ``integration.voice_bootstrap.show_dock_panel()`` flow
     is reused so the panel is created without duplicating mount logic.
 
@@ -104,16 +177,31 @@ def show_atria_panel() -> bool:
         logging/messaging channel so the voice command does not appear to have
         succeeded silently.
     """
+    global _dock
+    if _dock is None:
+        try:
+            import FreeCADGui as Gui
+            from PySide6.QtWidgets import QDockWidget
+            mw = Gui.getMainWindow()
+            if mw is not None:
+                existing = mw.findChild(QDockWidget, _DOCK_OBJECT_NAME)
+                if existing is not None:
+                    _dock = existing
+        except Exception:
+            pass
+
     if _dock is not None:
         _bring_to_front(_dock)
-        # Avoid false success: confirm the dock reports itself as visible when
-        # the Qt API is available. Test doubles expose isVisible(); real
-        # QDockWidgets do as well.
         if hasattr(_dock, "isVisible"):
             try:
                 if not _dock.isVisible():
-                    _notify_panel_failure("No se pudo mostrar el panel ATRIA.")
-                    return False
+                    if hasattr(_dock, "showNormal") and callable(getattr(_dock, "showNormal")):
+                        _dock.showNormal()
+                    _dock.show()
+                    _dock.raise_()
+                    if not _dock.isVisible():
+                        _notify_panel_failure("No se pudo mostrar el panel ATRIA.")
+                        return False
             except Exception:  # noqa: BLE001 - visibility check must not hide panel errors
                 pass
         return True
@@ -499,8 +587,7 @@ def install_dock_panel(browser, adapter):
         _install_selection_observer(source)
         _install_estilo()
         source.PublishSelection()
-        existing.show()
-        existing.raise_()
+        _bring_to_front(existing)
         return source
 
     panel = AtriaPanel(Theme=_detect_theme())
@@ -537,8 +624,7 @@ def install_dock_panel(browser, adapter):
     _install_selection_observer(source)
     _install_estilo()
     source.PublishSelection()
-    dock.show()
-    dock.raise_()
+    _bring_to_front(dock)
 
     _dock, _source = dock, source
     return source

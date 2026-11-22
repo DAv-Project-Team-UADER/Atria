@@ -20,12 +20,45 @@ Views = {"name": "Views"}
 
 def show_atria_panel():
     try:
-        from integration.voice_bootstrap import show_dock_panel
-        show_dock_panel()
+        from GUIFreeCad.integration.atria_dock_panel import show_atria_panel as _show
+        if _show():
+            return True
+    except ImportError:
+        try:
+            from integration.atria_dock_panel import show_atria_panel as _show
+            if _show():
+                return True
+        except Exception:
+            pass
     except Exception:
         pass
+    try:
+        from GUIFreeCad.integration.voice_bootstrap import show_dock_panel
+        return show_dock_panel()
+    except ImportError:
+        try:
+            from integration.voice_bootstrap import show_dock_panel
+            return show_dock_panel()
+        except Exception:
+            pass
+    except Exception:
+        pass
+    return False
 
 def hide_atria_panel():
+    try:
+        from GUIFreeCad.integration.atria_dock_panel import hide_atria_panel as _hide
+        if _hide():
+            return True
+    except ImportError:
+        try:
+            from integration.atria_dock_panel import hide_atria_panel as _hide
+            if _hide():
+                return True
+        except Exception:
+            pass
+    except Exception:
+        pass
     try:
         import FreeCADGui as Gui
         from PySide6.QtWidgets import QDockWidget
@@ -34,8 +67,10 @@ def hide_atria_panel():
             for dock in mw.findChildren(QDockWidget):
                 if "ATRIA" in dock.objectName() or "Atria" in dock.windowTitle():
                     dock.hide()
+                    return True
     except Exception:
         pass
+    return False
 
 Base = {
     "Explorer": Explorer,

@@ -30,6 +30,11 @@ except ImportError:
     App = None  # type: ignore[assignment,misc]
 
 
+def _GetApp() -> Any:
+    import sys
+    return sys.modules.get("FreeCAD") or App
+
+
 class LanguageCode(Enum):
     En = "en"
     Es = "es"
@@ -346,9 +351,10 @@ class Validator:
                         return int(parser.ParseInteger(s)), None
                     except Exception:
                         pass
-                if App is not None and hasattr(App, "Units"):
+                app = _GetApp()
+                if app is not None and hasattr(app, "Units"):
                     try:
-                        q_val = float(App.Units.Quantity(s).Value)
+                        q_val = float(app.Units.Quantity(s).Value)
                         if q_val.is_integer():
                             return int(q_val), None
                     except Exception:
@@ -379,9 +385,10 @@ class Validator:
                         return float(parser.ParseFloat(s)), None
                     except Exception:
                         pass
-                if App is not None and hasattr(App, "Units"):
+                app = _GetApp()
+                if app is not None and hasattr(app, "Units"):
                     try:
-                        return float(App.Units.Quantity(s).Value), None
+                        return float(app.Units.Quantity(s).Value), None
                     except Exception:
                         pass
             return None, _Text(language, "coerce_fail").format(name=name, expected=expected)
@@ -455,9 +462,10 @@ class Validator:
         object_name: str,
         language: LanguageCode,
     ) -> tuple[Any | None, str | None]:
-        if App is None:
+        app = _GetApp()
+        if app is None:
             return object_name, None
-        doc = App.activeDocument()
+        doc = app.activeDocument()
         if doc is None:
             return None, _Text(language, "no_document")
         obj = doc.getObject(object_name)
@@ -466,9 +474,10 @@ class Validator:
         return obj, None
 
     def _ObjectExists(self, obj: Any) -> bool:
-        if App is None:
+        app = _GetApp()
+        if app is None:
             return True
-        doc = App.activeDocument()
+        doc = app.activeDocument()
         if doc is None:
             return False
         return doc.getObject(getattr(obj, "Name", "")) is not None

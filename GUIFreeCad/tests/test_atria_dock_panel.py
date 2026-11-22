@@ -62,6 +62,21 @@ class _FakeDockWithActivate(_FakeDock):
         self.activate_calls += 1
 
 
+class _FakeDockWithMinimized(_FakeDockWithActivate):
+    def __init__(self, visible: bool, minimized: bool = True) -> None:
+        super().__init__(visible)
+        self.minimized = minimized
+        self.show_normal_calls = 0
+
+    def isMinimized(self) -> bool:
+        return self.minimized
+
+    def showNormal(self) -> None:
+        self.show_normal_calls += 1
+        self.minimized = False
+        self.visible = True
+
+
 class TestAtriaDockPanelVisibility(unittest.TestCase):
     """Verify explicit ATRIA panel visibility actions."""
 
@@ -163,6 +178,20 @@ class TestAtriaDockPanelVisibility(unittest.TestCase):
         self.assertEqual(dock.show_calls, 1)
         self.assertEqual(dock.raise_calls, 1)
         self.assertTrue(result)
+
+    def test_show_atria_panel_restores_minimized_dock(self) -> None:
+        dock = _FakeDockWithMinimized(visible=False, minimized=True)
+        self.module._dock = dock
+
+        result = self.module.show_atria_panel()
+
+        self.assertTrue(result)
+        self.assertEqual(dock.show_normal_calls, 1)
+        self.assertFalse(dock.minimized)
+        self.assertTrue(dock.visible)
+        self.assertEqual(dock.show_calls, 1)
+        self.assertEqual(dock.raise_calls, 1)
+        self.assertEqual(dock.activate_calls, 1)
 
     def test_show_atria_panel_when_dock_is_none_tries_bootstrap(self) -> None:
         self.module._dock = None
