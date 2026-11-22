@@ -315,6 +315,12 @@ class ATRIA_ShowPanelCommand:
 
     def Activated(self):
         _ensure_gui_path()
+        try:
+            from GUIFreeCad.integration.atria_dock_panel import show_atria_panel
+            if show_atria_panel():
+                return
+        except Exception:
+            pass
         from GUIFreeCad.integration.voice_bootstrap import show_dock_panel
 
         show_dock_panel()

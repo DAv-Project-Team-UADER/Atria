@@ -163,10 +163,35 @@ class ParameterCollector:
         tokens = SpokenNumberParser.Tokenize(Text)
         if any(token in SpokenNumberParser.CancellationWords for token in tokens):
             return PromptResult.Cancel()
-        if not any(token in SpokenNumberParser.ConfirmationWords for token in tokens):
-            return PromptResult.Fail(f"Missing confirmation for '{Spec.name}'.")
 
         kind = getattr(Spec, "kind", "object")
+        has_confirmation = any(token in SpokenNumberParser.ConfirmationWords for token in tokens)
+
+        if not has_confirmation:
+            cleaned = Text.strip().replace(",", ".")
+            if kind in ("float", "int"):
+                try:
+                    f_val = float(cleaned)
+                    if kind == "int":
+                        return PromptResult.Ok(int(f_val))
+                    return PromptResult.Ok(f_val)
+                except ValueError:
+                    pass
+                try:
+                    if kind == "int":
+                        return PromptResult.Ok(SpokenNumberParser.ParseInteger(Text))
+                    return PromptResult.Ok(SpokenNumberParser.ParseFloat(Text))
+                except Exception:
+                    pass
+            elif kind in ("coord", "point", "vector"):
+                from InputPrompts.CoordinateInputPrompt import CoordinateInputPrompt
+
+                prompt = CoordinateInputPrompt()
+                coords = prompt._ExtractCoordinates(Text)
+                if coords:
+                    return PromptResult.Ok(coords)
+            return PromptResult.Fail(f"Missing confirmation for '{Spec.name}'.")
+
         try:
             if kind in ("coord", "point", "vector"):
                 from InputPrompts.CoordinateInputPrompt import CoordinateInputPrompt
@@ -174,8 +199,20 @@ class ParameterCollector:
                 prompt = CoordinateInputPrompt()
                 return prompt.ProcessFinalText(Text)
             if kind == "int":
+                cleaned = Text.strip().replace(",", ".")
+                try:
+                    f_val = float(cleaned)
+                    if f_val.is_integer():
+                        return PromptResult.Ok(int(f_val))
+                except ValueError:
+                    pass
                 return PromptResult.Ok(SpokenNumberParser.ParseInteger(Text))
             if kind == "float":
+                cleaned = Text.strip().replace(",", ".")
+                try:
+                    return PromptResult.Ok(float(cleaned))
+                except ValueError:
+                    pass
                 return PromptResult.Ok(SpokenNumberParser.ParseFloat(Text))
             if kind == "str":
                 value = self._StripConfirmation(Text)

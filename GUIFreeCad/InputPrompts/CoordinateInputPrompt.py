@@ -86,6 +86,7 @@ class CoordinateInputPrompt(BaseInputPrompt):
                 if self._AccumulatedText
                 else phrase_part
             )
+            self.SetHeardText(self._AccumulatedText)
 
         if self._HasConfirmation(tokens):
             phrase = self._AccumulatedText
@@ -107,6 +108,33 @@ class CoordinateInputPrompt(BaseInputPrompt):
         else:
             self.SetStatus(T(self._Language, "numeric_prompt"))
         return self.GetResult()
+
+    def _OnOkClicked(self) -> None:
+        phrase = (getattr(self, "_AccumulatedText", "") or self.GetCurrentText() or "").strip()
+        if not phrase:
+            self.Fail(T(self._Language, "value_not_empty"))
+            return
+        coords = self._ExtractCoordinates(phrase)
+        if not coords:
+            self.Fail(
+                "No se detectaron coordenadas válidas. Dictá al menos dos números."
+                if self._Language == "es"
+                else "No valid coordinates detected. Say at least two numbers."
+            )
+            return
+        self.AcceptValue(coords)
+
+    def AcceptValue(self, Value: Any | None = None) -> PromptResult:
+        if isinstance(Value, str):
+            coords = self._ExtractCoordinates(Value)
+            if not coords:
+                return self.Fail(
+                    "No se detectaron coordenadas válidas."
+                    if self._Language == "es"
+                    else "No valid coordinates detected."
+                )
+            Value = coords
+        return super().AcceptValue(Value)
 
     def _ExtractCoordinates(self, Phrase: str) -> tuple[float, ...] | None:
         """Extract two or three coordinate values from spoken phrase."""

@@ -30,6 +30,11 @@ except ImportError:
     App = None  # type: ignore[assignment,misc]
 
 
+def _GetApp() -> Any:
+    import sys
+    return sys.modules.get("FreeCAD") or App
+
+
 class LanguageCode(Enum):
     En = "en"
     Es = "es"
@@ -288,6 +293,20 @@ class Validator:
             if index < len(values)
         }
 
+    @staticmethod
+    def _GetSpokenNumberParser():
+        for mod_name in (
+            "InputPrompts.SpokenNumberParser",
+            "GUIFreeCad.InputPrompts.SpokenNumberParser",
+            "SpokenNumberParser",
+        ):
+            try:
+                mod = __import__(mod_name, fromlist=["SpokenNumberParser"])
+                return getattr(mod, "SpokenNumberParser")
+            except Exception:
+                pass
+        return None
+
     def _ConvertValue(
         self,
         name: str,
@@ -307,27 +326,85 @@ class Validator:
                 return value, None
             if isinstance(value, float) and value.is_integer():
                 return int(value), None
-            if isinstance(value, str):
+            if hasattr(value, "Value"):
                 try:
-                    return int(value.strip()), None
+                    q_val = float(value.Value)
+                    if q_val.is_integer():
+                        return int(q_val), None
+                except Exception:
+                    pass
+            if isinstance(value, str):
+                s = value.strip()
+                try:
+                    return int(s), None
                 except ValueError:
                     pass
+                try:
+                    f_val = float(s.replace(",", "."))
+                    if f_val.is_integer():
+                        return int(f_val), None
+                except ValueError:
+                    pass
+                parser = self._GetSpokenNumberParser()
+                if parser is not None:
+                    try:
+                        return int(parser.ParseInteger(s)), None
+                    except Exception:
+                        pass
+                app = _GetApp()
+                if app is not None and hasattr(app, "Units"):
+                    try:
+                        q_val = float(app.Units.Quantity(s).Value)
+                        if q_val.is_integer():
+                            return int(q_val), None
+                    except Exception:
+                        pass
             return None, _Text(language, "coerce_fail").format(name=name, expected=expected)
 
         if kind == "float":
-            if isinstance(value, (int, float)) and not isinstance(value, bool):
+            if isinstance(value, bool):
+                return None, _Text(language, "wrong_type").format(
+                    name=name, expected=expected, received=received
+                )
+            if isinstance(value, (int, float)):
                 return float(value), None
-            if isinstance(value, str):
+            if hasattr(value, "Value"):
                 try:
-                    return float(value.strip()), None
+                    return float(value.Value), None
+                except Exception:
+                    pass
+            if isinstance(value, str):
+                s = value.strip()
+                try:
+                    return float(s.replace(",", ".")), None
                 except ValueError:
                     pass
+                parser = self._GetSpokenNumberParser()
+                if parser is not None:
+                    try:
+                        return float(parser.ParseFloat(s)), None
+                    except Exception:
+                        pass
+                app = _GetApp()
+                if app is not None and hasattr(app, "Units"):
+                    try:
+                        return float(app.Units.Quantity(s).Value), None
+                    except Exception:
+                        pass
             return None, _Text(language, "coerce_fail").format(name=name, expected=expected)
 
         if kind == "coord":
             if isinstance(value, (tuple, list)):
                 try:
-                    return tuple(float(x) for x in value), None
+                    coords = []
+                    for x in value:
+                        if isinstance(x, (int, float)):
+                            coords.append(float(x))
+                        elif isinstance(x, str):
+                            coords.append(float(x.strip().replace(",", ".")))
+                        else:
+                            coords.append(float(x))
+                    return tuple(coords), None
                 except (ValueError, TypeError):
                     pass
             if hasattr(value, "x") and hasattr(value, "y"):
@@ -336,9 +413,22 @@ class Validator:
             if isinstance(value, str):
                 import re
 
-                nums = re.findall(r"-?\d+(?:\.\d+)?", value)
-                if nums:
-                    return tuple(float(x) for x in nums), None
+                nums = re.findall(r"-?\d+(?:[.,]\d+)?", value)
+                if nums and len(nums) >= 2:
+                    try:
+                        return tuple(float(x.replace(",", ".")) for x in nums), None
+                    except ValueError:
+                        pass
+                parser = self._GetSpokenNumberParser()
+                if parser is not None:
+                    try:
+                        from InputPrompts.CoordinateInputPrompt import CoordinateInputPrompt
+
+                        res = CoordinateInputPrompt()._ExtractCoordinates(value)
+                        if res:
+                            return res, None
+                    except Exception:
+                        pass
             return None, _Text(language, "coerce_fail").format(name=name, expected=expected)
 
         if kind == "str":
@@ -372,9 +462,10 @@ class Validator:
         object_name: str,
         language: LanguageCode,
     ) -> tuple[Any | None, str | None]:
-        if App is None:
+        app = _GetApp()
+        if app is None:
             return object_name, None
-        doc = App.activeDocument()
+        doc = app.activeDocument()
         if doc is None:
             return None, _Text(language, "no_document")
         obj = doc.getObject(object_name)
@@ -383,9 +474,10 @@ class Validator:
         return obj, None
 
     def _ObjectExists(self, obj: Any) -> bool:
-        if App is None:
+        app = _GetApp()
+        if app is None:
             return True
-        doc = App.activeDocument()
+        doc = app.activeDocument()
         if doc is None:
             return False
         return doc.getObject(getattr(obj, "Name", "")) is not None

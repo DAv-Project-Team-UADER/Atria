@@ -301,6 +301,71 @@ class TestParametricVoiceDialogs(unittest.TestCase):
         self.assertTrue(self.executor.LastResult.Success)
         self.assertEqual(self.executor.LastResult.Value, {"dx": 15.0, "dy": 25.0})
 
+    def test_execute_circle_with_direct_digits_and_no_ok(self) -> None:
+        circle_fn = GetDictionaryFunction("2d-drafting", "circle")
+        entry = ContextEntry(Spoken="circulo", InternalKey="circle", Target=circle_fn)
+
+        # User provides parameters: 5, 6, 7 directly
+        result = self.executor.ExecuteEntry(
+            entry,
+            SimulatedFinalTexts=["5", "6", "7"],
+        )
+        self.assertTrue(self.executor.LastResult.Success)
+        self.assertEqual(
+            self.executor.LastResult.Value,
+            {"x": 5.0, "y": 6.0, "radius": 7.0},
+        )
+        self.assertIsNotNone(result)
+
+    def test_execute_circle_with_direct_spanish_words_and_no_ok(self) -> None:
+        circle_fn = GetDictionaryFunction("2d-drafting", "circle")
+        entry = ContextEntry(Spoken="circulo", InternalKey="circle", Target=circle_fn)
+
+        # User provides parameters: cinco, seis, siete
+        result = self.executor.ExecuteEntry(
+            entry,
+            SimulatedFinalTexts=["cinco", "seis", "siete"],
+        )
+        self.assertTrue(self.executor.LastResult.Success)
+        self.assertEqual(
+            self.executor.LastResult.Value,
+            {"x": 5.0, "y": 6.0, "radius": 7.0},
+        )
+        self.assertIsNotNone(result)
+
+    def test_float_input_prompt_on_ok_clicked(self) -> None:
+        from GUIFreeCad.InputPrompts.FloatInputPrompt import FloatInputPrompt
+
+        prompt = FloatInputPrompt()
+        prompt.SetHeardText("cinco")
+        prompt._OnOkClicked()
+        self.assertTrue(prompt.GetResult().Success)
+        self.assertEqual(prompt.GetResult().Value, 5.0)
+
+    def test_integer_input_prompt_on_ok_clicked(self) -> None:
+        from GUIFreeCad.InputPrompts.IntegerInputPrompt import IntegerInputPrompt
+
+        prompt = IntegerInputPrompt()
+        prompt.SetHeardText("ocho")
+        prompt._OnOkClicked()
+        self.assertTrue(prompt.GetResult().Success)
+        self.assertEqual(prompt.GetResult().Value, 8)
+
+    def test_execute_polygon_by_voice_dictation(self) -> None:
+        poly_fn = GetDictionaryFunction("2d-drafting", "polygon")
+        entry = ContextEntry(Spoken="poligono", InternalKey="polygon", Target=poly_fn)
+
+        result = self.executor.ExecuteEntry(
+            entry,
+            SimulatedFinalTexts=["seis", "diez coma cinco"],
+        )
+        self.assertTrue(self.executor.LastResult.Success)
+        self.assertEqual(
+            self.executor.LastResult.Value,
+            {"nfaces": 6, "radius": 10.5},
+        )
+        self.assertIsNotNone(result)
+
 
 if __name__ == "__main__":
     unittest.main()

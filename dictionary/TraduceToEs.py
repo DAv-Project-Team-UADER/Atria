@@ -46,6 +46,12 @@ TraduceToEs = {
     "herramientas": Base.get("Utils"),
     "utils": Base.get("Utils"),
 
+    # Vistas y Cámara
+    "vistas": Base.get("Views"),
+    "vista": Base.get("Views"),
+    "camara": Base.get("Views"),
+    "cámara": Base.get("Views"),
+
     # Panel ATRIA
     "mostrar panel": Base.get("show_atria_panel"),
     "maximizar": Base.get("show_atria_panel"),
@@ -56,3 +62,31 @@ TraduceToEs = {
     "reducir": Base.get("hide_atria_panel"),
     "disminuir": Base.get("hide_atria_panel"),
 }
+
+try:
+    from .Views import commands as _view_cmds
+except ImportError:
+    try:
+        from Views import commands as _view_cmds
+    except ImportError:
+        _view_cmds = None
+
+if _view_cmds is not None:
+    TraduceToEs.update({
+        "perspectiva": _view_cmds.perspective,
+        "vista perspectiva": _view_cmds.perspective,
+        "ortogonal": _view_cmds.orthographic,
+        "vista ortogonal": _view_cmds.orthographic,
+        "isometrica": _view_cmds.isometric,
+        "isométrica": _view_cmds.isometric,
+        "vista isometrica": _view_cmds.isometric,
+        "vista isométrica": _view_cmds.isometric,
+        "centrar vista": _view_cmds.fit_all,
+        "ajustar todo": _view_cmds.fit_all,
+        "acercar": _view_cmds.zoom_in,
+        "alejar": _view_cmds.zoom_out,
+        "girar izquierda": _view_cmds.rotate_left,
+        "girar derecha": _view_cmds.rotate_right,
+        "girar arriba": _view_cmds.rotate_up,
+        "girar abajo": _view_cmds.rotate_down,
+    })

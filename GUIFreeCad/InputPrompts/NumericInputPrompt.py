@@ -63,6 +63,7 @@ class NumericInputPrompt(BaseInputPrompt):
                 if self._AccumulatedText
                 else phrase_part
             )
+            self.SetHeardText(self._AccumulatedText)
 
         if self._HasConfirmation(tokens):
             if not self._AccumulatedText:
@@ -78,6 +79,29 @@ class NumericInputPrompt(BaseInputPrompt):
 
         self.SetStatus(T(self._Language, "numeric_prompt"))
         return self.GetResult()
+
+    def _OnOkClicked(self) -> None:
+        text = (getattr(self, "_AccumulatedText", "") or self.GetCurrentText() or "").strip()
+        if not text:
+            self.Fail(T(self._Language, "numeric_no_value"))
+            return
+        try:
+            value = self._ParseAccumulatedText(text)
+        except ValueError as error:
+            self.Fail(str(error))
+            return
+        self.AcceptValue(value)
+
+    def AcceptValue(self, Value: Any | None = None) -> PromptResult:
+        if isinstance(Value, str):
+            trimmed = Value.strip()
+            if not trimmed:
+                return self.Fail(T(self._Language, "value_not_empty"))
+            try:
+                Value = self._ParseAccumulatedText(trimmed)
+            except ValueError as error:
+                return self.Fail(str(error))
+        return super().AcceptValue(Value)
 
     def _ParseAccumulatedText(self, Text: str):
         """Parse the accumulated spoken text into a numeric value.

@@ -100,6 +100,26 @@ class ValidatorTests(unittest.TestCase):
         self.assertFalse(ok)
         self.assertIsNone(kwargs)
 
+    def test_validate_with_spanish_spoken_numbers(self) -> None:
+        ok, kwargs = Validator().ValidateRequirements(
+            "es",
+            _SampleFunction,
+            {"radius": "cinco", "label": "circulo", "profile": _FakeDocObject()},
+        )
+        self.assertTrue(ok)
+        assert kwargs is not None
+        self.assertEqual(kwargs["radius"], 5.0)
+
+    def test_validate_with_comma_decimal(self) -> None:
+        ok, kwargs = Validator().ValidateRequirements(
+            "es",
+            _SampleFunction,
+            {"radius": "7,5", "label": "circulo", "profile": _FakeDocObject()},
+        )
+        self.assertTrue(ok)
+        assert kwargs is not None
+        self.assertEqual(kwargs["radius"], 7.5)
+
 
 if __name__ == "__main__":
     unittest.main()

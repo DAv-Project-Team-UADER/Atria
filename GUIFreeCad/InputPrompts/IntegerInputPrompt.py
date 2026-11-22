@@ -1,4 +1,4 @@
-﻿# Copyright (C) 2026 El Equipo del Proyecto Atria
+# Copyright (C) 2026 El Equipo del Proyecto Atria
 # Universidad Autónoma de Entre Ríos (UADER FCYT, sede Concepción del Uruguay)
 # Bajo la dirección de Ernesto Ledesma
 # Encargados: Micaela Saül, Tadeo Rochas y Camila Viñeg
@@ -41,4 +41,11 @@ class IntegerInputPrompt(NumericInputPrompt):
         )
 
     def _ParseAccumulatedText(self, Text: str) -> int:
+        cleaned = Text.strip().replace(",", ".")
+        try:
+            val = float(cleaned)
+            if val.is_integer():
+                return int(val)
+        except ValueError:
+            pass
         return SpokenNumberParser.ParseInteger(Text)
