@@ -41,4 +41,11 @@ class IntegerInputPrompt(NumericInputPrompt):
         )
 
     def _ParseAccumulatedText(self, Text: str) -> int:
+        cleaned = Text.strip().replace(",", ".")
+        try:
+            val = float(cleaned)
+            if val.is_integer():
+                return int(val)
+        except ValueError:
+            pass
         return SpokenNumberParser.ParseInteger(Text)

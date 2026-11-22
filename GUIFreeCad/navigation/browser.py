@@ -316,11 +316,15 @@ class Browser:
                     if self._DescendToSubContext(entry):
                         return BrowserResult(True, "descend", f"Context set to {self._ActionLabel(entry)}")
                     if entry.IsCallable():
-                        self._ExecuteEntry(entry)
+                        ok = self._ExecuteEntry(entry)
+                        if not ok:
+                            return BrowserResult(False, "execute_failed", f"No se pudo ejecutar {self._ActionLabel(entry)}")
                         return BrowserResult(True, "execute", f"Executed {self._ActionLabel(entry)}")
                     return BrowserResult(False, "descend_failed", f"No se pudo entrar a {self._ActionLabel(entry)}")
                 if entry.IsCallable():
-                    self._ExecuteEntry(entry)
+                    ok = self._ExecuteEntry(entry)
+                    if not ok:
+                        return BrowserResult(False, "execute_failed", f"No se pudo ejecutar {self._ActionLabel(entry)}")
                     return BrowserResult(True, "execute", f"Executed {self._ActionLabel(entry)}")
 
         # Requirement 2 (Developer 2): direct jump for BaseContext commands
@@ -339,11 +343,15 @@ class Browser:
                 if self._DescendToSubContext(entry):
                     return BrowserResult(True, "descend", f"Context set to {self._ActionLabel(entry)}")
                 if entry.IsCallable():
-                    self._ExecuteEntry(entry)
+                    ok = self._ExecuteEntry(entry)
+                    if not ok:
+                        return BrowserResult(False, "execute_failed", f"No se pudo ejecutar {self._ActionLabel(entry)}")
                     return BrowserResult(True, "execute", f"Executed {self._ActionLabel(entry)}")
                 return BrowserResult(False, "descend_failed", f"No se pudo entrar a {self._ActionLabel(entry)}")
             if entry.IsCallable():
-                self._ExecuteEntry(entry)
+                ok = self._ExecuteEntry(entry)
+                if not ok:
+                    return BrowserResult(False, "execute_failed", f"No se pudo ejecutar {self._ActionLabel(entry)}")
                 return BrowserResult(True, "execute", f"Executed {self._ActionLabel(entry)}")
 
         upward = self._SearchUpwardAndExecute(normalized)
@@ -374,7 +382,9 @@ class Browser:
                 InternalKey=getattr(target, "__name__", spoken),
                 Target=target,
             )
-            self._ExecuteEntry(entry)
+            ok = self._ExecuteEntry(entry)
+            if not ok:
+                return BrowserResult(False, "execute_failed", f"No se pudo ejecutar {self._ActionLabel(entry)}")
             return BrowserResult(True, "execute", f"Executed {self._ActionLabel(entry)}")
         return None
 
@@ -806,23 +816,27 @@ class Browser:
                     if descended:
                         return BrowserResult(True, "descend", f"Ascending: descended into {self._ActionLabel(entry)}")
                     if entry.IsCallable():
-                        self._ExecuteEntry(entry)
+                        ok = self._ExecuteEntry(entry)
                         self._NotifyContextChanged()
+                        if not ok:
+                            return BrowserResult(False, "execute_failed", f"Ascending: no se pudo ejecutar {self._ActionLabel(entry)}")
                         return BrowserResult(True, "execute", f"Ascending: executed {self._ActionLabel(entry)}")
                     return BrowserResult(False, "descend_failed", f"No se pudo entrar a {self._ActionLabel(entry)}")
                 elif entry.IsCallable():
-                    self._ExecuteEntry(entry)
+                    ok = self._ExecuteEntry(entry)
                     self._stack = temp_stack
                     self.Context = parent_context
                     self.OriginalContext = parent_context
                     self._NotifyContextChanged()
+                    if not ok:
+                        return BrowserResult(False, "execute_failed", f"Ascending: no se pudo ejecutar {self._ActionLabel(entry)}")
                     return BrowserResult(True, "execute", f"Ascending: executed {self._ActionLabel(entry)}")
         
         self.Context = self.OriginalContext
         return BrowserResult(False, "not_found", "Command not found in upward search")
 
-    def _ExecuteEntry(self, entry: ContextEntry) -> None:
-        """Execute a leaf command entry."""
+    def _ExecuteEntry(self, entry: ContextEntry) -> bool:
+        """Execute a leaf command entry. Returns True on success, False on failure or cancellation."""
         target = entry.Target
         if isinstance(target, dict):
             for v in target.values():
@@ -832,9 +846,18 @@ class Browser:
 
         if self._on_execute is not None:
             unwrapped = ContextEntry(Spoken=entry.Spoken, InternalKey=entry.InternalKey, Target=target)
-            self._on_execute(unwrapped)
+            result = self._on_execute(unwrapped)
+            last_res = getattr(self._on_execute, "LastResult", None)
+            if last_res is not None:
+                if getattr(last_res, "Cancelled", False):
+                    return False
+                if not getattr(last_res, "Success", True):
+                    return False
+            return True
         elif callable(target):
             target()
+            return True
+        return False
 
     @staticmethod
     def _SnapshotContext(entries: list[ContextEntry]) -> list[ContextEntry]:

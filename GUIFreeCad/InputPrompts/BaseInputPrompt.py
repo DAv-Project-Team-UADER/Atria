@@ -251,7 +251,7 @@ class BaseInputPrompt(QDialog):
                 "QPushButton:pressed { background-color: #d1d5db; }"
             )
 
-        self._OkButton.clicked.connect(lambda: self.AcceptValue(self.GetCurrentText()))
+        self._OkButton.clicked.connect(self._OnOkClicked)
         self._CancelButton.clicked.connect(self.Cancel)
         button_row.addWidget(self._OkButton)
         button_row.addWidget(self._CancelButton)
@@ -259,6 +259,10 @@ class BaseInputPrompt(QDialog):
         layout.addLayout(button_row)
 
         self.SetHeardText("")
+
+    def _OnOkClicked(self) -> None:
+        """Invoked when the OK button is clicked or Enter is pressed."""
+        self.AcceptValue(self.GetCurrentText())
 
     def SetTitle(self, Title: str) -> None:
         """Update the dialog title."""
@@ -371,3 +375,39 @@ class BaseInputPrompt(QDialog):
         if hasattr(self, "exec"):
             return self.exec()
         return self.exec_()
+
+    def keyPressEvent(self, event) -> None:
+        key = getattr(event, "key", lambda: -1)()
+        return_keys = (getattr(Qt, "Key_Return", 16777220), getattr(Qt, "Key_Enter", 16777221))
+        if key in return_keys:
+            self._OnOkClicked()
+            if hasattr(event, "accept"):
+                event.accept()
+            return
+        if key == getattr(Qt, "Key_Escape", 16777216):
+            self.Cancel()
+            if hasattr(event, "accept"):
+                event.accept()
+            return
+        if key == getattr(Qt, "Key_Backspace", 16777219):
+            current = self.GetCurrentText()
+            if current:
+                new_text = current[:-1]
+                self.SetHeardText(new_text)
+                if hasattr(self, "_AccumulatedText"):
+                    self._AccumulatedText = new_text
+            if hasattr(event, "accept"):
+                event.accept()
+            return
+        text = getattr(event, "text", lambda: "")()
+        if text and (text.isalnum() or text in ".,-+ "):
+            current = self.GetCurrentText()
+            new_text = current + text
+            self.SetHeardText(new_text)
+            if hasattr(self, "_AccumulatedText"):
+                self._AccumulatedText = (getattr(self, "_AccumulatedText", "") + text).strip()
+            if hasattr(event, "accept"):
+                event.accept()
+            return
+        if hasattr(super(), "keyPressEvent"):
+            super().keyPressEvent(event)

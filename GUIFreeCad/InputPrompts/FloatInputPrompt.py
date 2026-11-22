@@ -41,4 +41,9 @@ class FloatInputPrompt(NumericInputPrompt):
         )
 
     def _ParseAccumulatedText(self, Text: str) -> float:
+        cleaned = Text.strip().replace(",", ".")
+        try:
+            return float(cleaned)
+        except ValueError:
+            pass
         return SpokenNumberParser.ParseFloat(Text)
