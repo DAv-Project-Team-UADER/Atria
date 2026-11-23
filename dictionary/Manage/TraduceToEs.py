@@ -72,8 +72,8 @@ except ImportError:
 
 TraduceToEs = {
     # ArchSchedule
-    'crear tabla de planificación': ArchSchedule,
-    'generar schedule': ArchSchedule,
+    'generar tabla de planificación': ArchSchedule,
+    'generar planificación': ArchSchedule,
     'crear lista de materiales': ArchSchedule,
     'cuantificar modelo': ArchSchedule,
     'generar cuadro de superficies': ArchSchedule,
@@ -83,10 +83,10 @@ TraduceToEs = {
     'clasificar objeto': BIMClassification,
     'gestionar clasificación BIM': BIMClassification,
     # BIMIfcProperties
-    'gestionar propiedades IFC': BIMIfcProperties,
-    'administrar propiedades IFC': BIMIfcProperties,
+    'gestionar propiedades del modelo': BIMIfcProperties,
+    'administrar propiedades del modelo': BIMIfcProperties,
     'asignar propiedades BIM': BIMIfcProperties,
-    'configurar Psets': BIMIfcProperties,
+    'configurar conjuntos de propiedades': BIMIfcProperties,
     # BIMLayers
     'gestionar capas': BIMLayers,
     'administrar capas': BIMLayers,
@@ -101,7 +101,7 @@ TraduceToEs = {
     # BIMPreflight
     'comprobar modelo BIM': BIMPreflight,
     'validar modelo': BIMPreflight,
-    'ejecutar preflight': BIMPreflight,
+    'ejecutar revisión previa': BIMPreflight,
     'diagnóstico del proyecto': BIMPreflight,
     # BIMReport
     'crear informe BIM': BIMReport,
@@ -117,20 +117,20 @@ TraduceToEs = {
     'editar estilos de anotación': DraftAnnotationStyleEditor,
     'gestionar estilos de anotación': DraftAnnotationStyleEditor,
     'configurar estilos de texto': DraftAnnotationStyleEditor,
-    'administrar estilos de cotas': DraftAnnotationStyleEditor,
+    'administrar estilos de dimensiones': DraftAnnotationStyleEditor,
     # ManageDoorsAndWindows
     'gestionar puertas y ventanas': ManageDoorsAndWindows,
     'administrar ventanas': ManageDoorsAndWindows,
     'modificar aberturas': ManageDoorsAndWindows,
     'gestor de puertas': ManageDoorsAndWindows,
     # ManageIFCElements
-    'gestionar elementos IFC': ManageIFCElements,
-    'administrar tipos IFC': ManageIFCElements,
+    'gestionar elementos del modelo': ManageIFCElements,
+    'administrar tipos de elementos': ManageIFCElements,
     'gestor de elementos BIM': ManageIFCElements,
-    'asignar materiales IFC': ManageIFCElements,
+    'asignar materiales a elementos': ManageIFCElements,
     # ManageIFCQuantities
-    'gestionar cantidades IFC': ManageIFCQuantities,
-    'administrar medidas IFC': ManageIFCQuantities,
+    'gestionar cantidades del modelo': ManageIFCQuantities,
+    'administrar medidas del modelo': ManageIFCQuantities,
     'verificar cantidades': ManageIFCQuantities,
     'gestor de cantidades BIM': ManageIFCQuantities,
     # SetupProject
