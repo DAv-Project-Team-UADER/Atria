@@ -92,7 +92,7 @@ TraduceToEs = {
     'redondear esquina': Fillet,
     'redondear': Fillet,
     'redondear borde': Fillet,
-    'recortar borde': Fillet,
+    'redondear esquina de dibujo': Fillet,
     # Line
     'línea': Line,
     'crear línea': Line,
