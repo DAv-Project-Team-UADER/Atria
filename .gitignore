@@ -38,6 +38,7 @@ desktop.ini
 models/vosk-model*
 *.zip
 
-# Runtime logs y status
+# Runtime logs, libs locales y status
 *.log
 **/voice_status.json
+.libs/
