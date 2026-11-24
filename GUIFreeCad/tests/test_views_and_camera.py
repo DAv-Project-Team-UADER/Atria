@@ -114,10 +114,10 @@ class TestViewsAndCameraModule(unittest.TestCase):
 
     def test_section_title_views(self) -> None:
         title_es = format_section_title("Base > Views", "es")
-        self.assertEqual(title_es, "📍 Sección: Vistas y Cámara")
+        self.assertEqual(title_es, "Sección: Vistas y Cámara")
 
         title_en = format_section_title("Base > Views", "en")
-        self.assertEqual(title_en, "📍 Section: Views & Camera")
+        self.assertEqual(title_en, "Section: Views & Camera")
 
 
 class TestGlobalCameraVoiceCommands(unittest.TestCase):
