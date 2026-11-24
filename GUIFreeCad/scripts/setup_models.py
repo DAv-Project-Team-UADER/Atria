@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Download small Vosk models (en, es, pt) into models/."""
 
 import os

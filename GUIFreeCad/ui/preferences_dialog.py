@@ -1,4 +1,4 @@
-﻿"""Preferences dialog — click and voice configuration (FreeCAD style)."""
+"""Preferences dialog — click and voice configuration (FreeCAD style)."""
 
 from __future__ import annotations
 

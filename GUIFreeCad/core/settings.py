@@ -1,4 +1,4 @@
-﻿"""Persistent application settings."""
+"""Persistent application settings."""
 
 from __future__ import annotations
 
