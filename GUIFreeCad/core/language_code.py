@@ -23,11 +23,10 @@ from enum import Enum
 
 
 class LanguageCode(Enum):
-    """Preference language states (task specification: En, Es, PT)."""
+    """Preference language states (En, Es)."""
 
     En = "en"
     Es = "es"
-    PT = "pt"
 
     @classmethod
     def FromStorage(cls, value: str) -> "LanguageCode":
@@ -42,15 +41,11 @@ class LanguageCode(Enum):
         """TraduceTo file stem, e.g. TraduceToEs."""
         if self is LanguageCode.En:
             return "TraduceToEn"
-        if self is LanguageCode.PT:
-            return "TraduceToPT"
         return "TraduceToEs"
 
     @property
     def AlternateTranslateSuffixes(self) -> tuple[str, ...]:
-        """Fallback stems (some folders use TraduceToPt or TraduceToPtBr)."""
-        if self is LanguageCode.PT:
-            return ("TraduceToPT", "TraduceToPt", "TraduceToPtBr")
+        """Fallback stems."""
         if self is LanguageCode.En:
             return ("TraduceToEn",)
         return ("TraduceToEs",)

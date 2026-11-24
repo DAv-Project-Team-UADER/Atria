@@ -48,7 +48,6 @@ BASE_URL = "https://alphacephei.com/vosk/models/"
 SMALL_MODELS = [
     "vosk-model-small-en-us-0.15",
     "vosk-model-small-es-0.42",
-    "vosk-model-small-pt-0.3",
 ]
 
 

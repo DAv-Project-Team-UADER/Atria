@@ -219,8 +219,6 @@ class TestPreferences(unittest.TestCase):
         p = Preferences()
         p.SetLanguage = LanguageCode.En
         self.assertEqual(p.SetLanguage, LanguageCode.En)
-        p.SetLanguage = LanguageCode.PT
-        self.assertEqual(p.SetLanguage, LanguageCode.PT)
         p.SetLanguage = LanguageCode.Es
         self.assertEqual(p.SetLanguage, LanguageCode.Es)
 
