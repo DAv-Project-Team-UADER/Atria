@@ -89,7 +89,7 @@ TraduceToEn = {
     'chamfer': Fillet,
     'fillet': Fillet,
     'fillet edge': Fillet,
-    'trim edge': Fillet,
+    'round corner': Fillet,
     # Line
     'line': Line,
     'create line': Line,

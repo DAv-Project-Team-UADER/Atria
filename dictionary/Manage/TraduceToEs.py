@@ -107,7 +107,7 @@ TraduceToEs = {
     'crear informe BIM': BIMReport,
     'generar reporte': BIMReport,
     'consultar modelo': BIMReport,
-    'crear tabla de planificación': BIMReport,
+    'crear informe del modelo': BIMReport,
     # BIMSetup
     'abrir configuración BIM': BIMSetup,
     'configuración BIM': BIMSetup,
