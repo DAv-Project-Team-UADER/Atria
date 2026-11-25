@@ -108,6 +108,17 @@ class TestAtriaAllDictionaries(unittest.TestCase):
         if hasattr(self.gui, "calls"):
             self.gui.calls.clear()
 
+    def test_explorer_examples_submenu_is_removed(self) -> None:
+        from dictionary.Explorer.Explorer import explorer
+        from dictionary.Explorer.TraduceToEn import TraduceToEn
+        from dictionary.Explorer.TraduceToEs import TraduceToEs
+
+        self.assertNotIn("examples", explorer)
+        for phrase in ("ejemplos", "ejemplo", "quiero aprender", "aprender", "tutoriales"):
+            self.assertNotIn(phrase, TraduceToEs)
+        for phrase in ("examples", "example", "learn", "i want to learn", "want to learn", "tutorials"):
+            self.assertNotIn(phrase, TraduceToEn)
+
     def test_all_nine_sections_exist_on_disk(self) -> None:
         expected_sections = [
             "2D-Drafting",

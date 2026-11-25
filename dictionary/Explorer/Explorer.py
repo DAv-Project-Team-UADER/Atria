@@ -18,7 +18,6 @@ from .Windows.Windows                   import windows
 from .Expressions.Expressions           import expressions
 from .Tools.Tools                       import tools
 from .StructureToolbar.StructureToolbar import structure
-from .Examples.Examples                 import examples
 from .ayuda                             import ayuda
 
 # Subcontextos anidados: el Browser navega por niveles y explorer/TraduceTo*.py
@@ -32,7 +31,6 @@ explorer.update({'windows':     windows})
 explorer.update({'expressions': expressions})
 explorer.update({'tools':       tools})
 explorer.update({'structure':   structure})
-explorer.update({'examples':    examples})
 # Callables directos al ras (sin subcontexto)
 explorer.update({
     'refresh':      lambda: Gui.runCommand('Std_Refresh', 0),

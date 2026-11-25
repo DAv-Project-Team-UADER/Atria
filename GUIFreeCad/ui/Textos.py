@@ -157,7 +157,6 @@ SECTION_NAMES = {
         "expressions": "Expresiones",
         "tools": "Herramientas",
         "structure": "Estructura",
-        "examples": "Ejemplos y Tutoriales",
     },
     "en": {
         "Base": "Main Categories",
@@ -181,7 +180,6 @@ SECTION_NAMES = {
         "expressions": "Expressions",
         "tools": "Tools",
         "structure": "Structure",
-        "examples": "Examples & Tutorials",
     },
 }
 
