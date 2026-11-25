@@ -34,6 +34,10 @@ TraduceToEn = {
     "view": Base.get("Views"),
     "camera": Base.get("Views"),
 
+    # Selection
+    "select": Base.get("Select"),
+    "selection": Base.get("Select"),
+
     # Panel ATRIA
     "show panel": Base.get("show_atria_panel"),
     "maximize": Base.get("show_atria_panel"),

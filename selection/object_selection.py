@@ -15,8 +15,12 @@
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
-import FreeCAD as App
-import FreeCADGui as Gui
+try:
+    import FreeCAD as App
+    import FreeCADGui as Gui
+except ImportError:
+    App = None
+    Gui = None
 
 class ObjectSelection:
     def __init__(self):
@@ -34,15 +38,19 @@ class ObjectSelection:
         if not Obj:
             print("Error: The provided object is not valid.")
             return
-            
+
+        if not Gui or not hasattr(Gui, "Selection"):
+            return
+
         Gui.Selection.clearSelection()           # Clears previous selections
         Gui.Selection.addSelection(Obj)          # Makes the object glow (3D and Tree)
         try:
             Gui.Control.showInTree()                 # Focuses and scrolls the tree view to it
         except AttributeError:
             pass # Not available in FreeCAD 1.1+
-        Gui.SendMsgToActiveView("ViewSelection") # Centers the 3D camera onto the object
-        print(f"Successfully focused: '{Obj.Name}'")
+        if hasattr(Gui, "SendMsgToActiveView"):
+            Gui.SendMsgToActiveView("ViewSelection") # Centers the 3D camera onto the object
+        print(f"Successfully focused: '{getattr(Obj, 'Name', Obj)}'")
 
     def VectorSelection(self, ListNames):
         """Initializes the list of object names and resets the counter."""
@@ -65,6 +73,8 @@ class ObjectSelection:
 
         If the list is empty, loads all objects from the active document first.
         """
+        if not App or not hasattr(App, "activeDocument"):
+            return
         ActiveDoc = App.activeDocument()
 
         if not ActiveDoc:
@@ -96,6 +106,8 @@ class ObjectSelection:
 
         If the list is empty, loads all objects from the active document first.
         """
+        if not App or not hasattr(App, "activeDocument"):
+            return
         ActiveDoc = App.activeDocument()
 
         if not ActiveDoc:
@@ -129,10 +141,15 @@ class ObjectSelection:
 
     def SelectAll(self):
         """Selects all objects in the active document."""
+        if not App or not hasattr(App, "activeDocument"):
+            return
         ActiveDoc = App.activeDocument()
 
         if not ActiveDoc:
             print("Error: There is no active document in FreeCAD.")
+            return
+
+        if not Gui or not hasattr(Gui, "Selection"):
             return
 
         Gui.Selection.clearSelection()
@@ -144,8 +161,58 @@ class ObjectSelection:
 
     def DeselectAll(self):
         """Clears the current selection."""
-        Gui.Selection.clearSelection()
+        if Gui and hasattr(Gui, "Selection") and hasattr(Gui.Selection, "clearSelection"):
+            Gui.Selection.clearSelection()
         print("Selection cleared.")
+
+    def SelectCurrent(self):
+        """Agrega a la selección el objeto actualmente apuntado."""
+        if not App:
+            return
+        ActiveDoc = App.activeDocument()
+        if not ActiveDoc:
+            print("Error: There is no active document in FreeCAD.")
+            return
+
+        if not self._ObjectNames:
+            ObjectNames = [Obj.Name for Obj in ActiveDoc.Objects]
+            self.VectorSelection(ObjectNames)
+
+        if not self._ObjectNames:
+            print("Error: The document has no objects.")
+            return
+
+        target_idx = self._LastSelectedIndex if self._LastSelectedIndex >= 0 else 0
+        if 0 <= target_idx < len(self._ObjectNames):
+            name = self._ObjectNames[target_idx]
+            obj = ActiveDoc.getObject(name)
+            if obj and Gui and hasattr(Gui, "Selection"):
+                try:
+                    Gui.Selection.addSelection(obj)
+                    lbl = getattr(obj, "Label", obj.Name)
+                    print(f"Objeto seleccionado: '{lbl}'")
+                except Exception:
+                    pass
+
+    def DeselectCurrent(self):
+        """Quita de la selección el objeto actualmente apuntado."""
+        if not App:
+            return
+        ActiveDoc = App.activeDocument()
+        if not ActiveDoc or not self._ObjectNames:
+            return
+
+        target_idx = self._LastSelectedIndex if self._LastSelectedIndex >= 0 else 0
+        if 0 <= target_idx < len(self._ObjectNames):
+            name = self._ObjectNames[target_idx]
+            obj = ActiveDoc.getObject(name)
+            if obj and Gui and hasattr(Gui, "Selection"):
+                try:
+                    Gui.Selection.removeSelection(obj)
+                    lbl = getattr(obj, "Label", obj.Name)
+                    print(f"Objeto deseleccionado: '{lbl}'")
+                except Exception:
+                    pass
 
     def DeleteSelected(self):
         """Deletes the currently selected object.
@@ -155,6 +222,8 @@ class ObjectSelection:
         current Gui selection. Keeps the internal name list in sync
         and recomputes the document.
         """
+        if not App or not hasattr(App, "activeDocument"):
+            return
         ActiveDoc = App.activeDocument()
 
         if not ActiveDoc:

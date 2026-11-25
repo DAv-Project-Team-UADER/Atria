@@ -17,6 +17,7 @@ StatusBar = {"name": "StatusBar"}
 Utils = {"name": "Utils"}
 Explorer = {"name": "Explorer"}
 Views = {"name": "Views"}
+Select = {"name": "Select"}
 
 def show_atria_panel():
     try:
@@ -84,6 +85,7 @@ Base = {
     "StatusBar": StatusBar,
     "Utils": Utils,
     "Views": Views,
+    "Select": Select,
     "show_atria_panel": show_atria_panel,
     "hide_atria_panel": hide_atria_panel,
 }
