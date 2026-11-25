@@ -379,5 +379,18 @@ class TestBrowserPanelSourceLanguageRefresh(unittest.TestCase):
         self.assertEqual(panel.CommandRequested.slots, [])
 
 
+class TestBrowserPanelSourceMenuScroll(unittest.TestCase):
+    def test_scroll_request_is_forwarded_to_panel(self) -> None:
+        from integration.atria_dock_panel import BrowserPanelSource
+
+        panel = mock.Mock()
+        panel.ScrollMenu.return_value = True
+        source = BrowserPanelSource(object(), object())
+        source._panel = panel
+
+        self.assertTrue(source.ScrollMenu("right"))
+        panel.ScrollMenu.assert_called_once_with("right")
+
+
 if __name__ == "__main__":
     unittest.main()

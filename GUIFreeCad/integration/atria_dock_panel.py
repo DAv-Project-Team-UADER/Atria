@@ -382,6 +382,12 @@ class BrowserPanelSource:
         """Process a phrase picked in the UI as if it had been spoken."""
         self._adapter.procesar_frase_final(Spoken)
 
+    def ScrollMenu(self, Direction: str) -> bool:
+        """Move the panel's horizontal button scroll area."""
+        if self._panel is None:
+            return False
+        return self._panel.ScrollMenu(Direction)
+
     def PublishHistory(self, Line: str, Unknown: bool = False) -> None:
         """Show a line in the panel history."""
         if self._panel is not None:

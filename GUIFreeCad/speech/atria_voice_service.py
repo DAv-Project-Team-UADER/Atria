@@ -100,7 +100,7 @@ class AtriaVoiceService:
             self._mode = "cad"
         browser = getattr(cad_adapter, "_browser", getattr(cad_adapter, "browser", None))
         if browser is not None and hasattr(browser, "GetSpokenPhrases"):
-            self.set_grammar(browser.GetSpokenPhrases())
+            self._restore_cad_grammar(cad_adapter, browser)
         return self._ensure_mic(settings.language, settings.model_size)
 
     def attach_preferences(
@@ -167,11 +167,18 @@ class AtriaVoiceService:
         self._stop_event.clear()
         browser = getattr(adapter, "_browser", getattr(adapter, "browser", None))
         if browser is not None and hasattr(browser, "GetSpokenPhrases"):
-            self.set_grammar(browser.GetSpokenPhrases())
+            self._restore_cad_grammar(adapter, browser)
         if self._running and self._thread and self._thread.is_alive():
             self._accept_callbacks = True
             return
         self._ensure_mic(language, model_size)
+
+    def _restore_cad_grammar(self, adapter, browser) -> None:
+        restore_grammar = getattr(adapter, "RestoreGrammar", None)
+        if callable(restore_grammar):
+            restore_grammar()
+        else:
+            self.set_grammar(browser.GetSpokenPhrases())
 
     def set_preferences_listening(self, enabled: bool) -> None:
         with self._lock:

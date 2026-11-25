@@ -64,6 +64,11 @@ TEXTS = {
             "Haz clic para abrir la ayuda de esta sección\n"
             "Di: «cerrar ayuda» o «cerrar» para cerrarla"
         ),
+        "menu_scroll_hint": "Voz: «menú izquierda» / «menú derecha»",
+        "menu_scroll_tooltip": (
+            "Desplazá los botones con la barra o decí: "
+            "«menú izquierda» / «menú derecha»"
+        ),
         "help_window_title": "ATRIA - Manual y ayuda: {title}",
         "help_intro": "Di el comando o haz clic en su botón en la pantalla:",
         "help_close_hint": "Di: «cerrar ayuda» o «cerrar» para cerrar esta ventana",
@@ -121,6 +126,11 @@ TEXTS = {
             "Say: «help» or «manual»\n"
             "Click to open help for this section\n"
             "Say: «close help» or «close» to close it"
+        ),
+        "menu_scroll_hint": "Voice: “menu left” / “menu right”",
+        "menu_scroll_tooltip": (
+            "Scroll the buttons with the bar or say: "
+            "“menu left” / “menu right”"
         ),
         "help_window_title": "ATRIA - Help and Manual: {title}",
         "help_intro": "Say the command or click its button on the screen:",

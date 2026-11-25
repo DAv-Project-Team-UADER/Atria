@@ -31,6 +31,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QPushButton,
     QScrollArea,
+    QScrollBar,
     QSizePolicy,
     QSplitter,
     QTextEdit,
@@ -223,6 +224,18 @@ class AtriaPanel(QWidget):
         available = max(self._toolScroll.viewport().width() - 24, cell)
         return max(1, available // cell)
 
+    def ScrollMenu(self, Direction: str) -> bool:
+        """Move the context-button area one page horizontally."""
+        if Direction not in ("left", "right"):
+            raise ValueError(f"Unsupported menu scroll direction: {Direction}")
+
+        scrollbar = self._toolScroll.horizontalScrollBar()
+        previous = scrollbar.value()
+        step = max(scrollbar.pageStep(), self.BUTTON_WIDTH)
+        delta = step if Direction == "right" else -step
+        scrollbar.setValue(previous + delta)
+        return scrollbar.value() != previous
+
     def AddToHistory(self, Text: str, FromVoice: bool = True, Unknown: bool = False) -> None:
         """Append a line to the history panel, colour-coded by origin.
 
@@ -359,6 +372,9 @@ class AtriaPanel(QWidget):
             self._emptyHint.setText(self._texts["empty_context"])
         self._UpdateHeaderTooltips()
         self._UpdateSectionTitle()
+        self._menuScrollHint.setText(self._texts["menu_scroll_hint"])
+        self._menuScrollHint.setToolTip(self._texts["menu_scroll_tooltip"])
+        self._toolScroll.setToolTip(self._texts["menu_scroll_tooltip"])
         self.RenderContext(self._context)
         self.SetTree(self._treeObjects, self._treeDocumentName)
 
@@ -461,15 +477,38 @@ class AtriaPanel(QWidget):
         self._toolScroll.setAutoFillBackground(False)
         if self._toolScroll.viewport() is not None:
             self._toolScroll.viewport().setAutoFillBackground(False)
-        # Scroll horizontal: los botones se mantienen en filas de altura fija
-        # y, si no entran a lo ancho, se corren en vez de empujar el borde de
-        # la ventana. Asi el panel conserva el alto en cualquier contexto.
-        self._toolScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self._toolScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self._toolScroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self._toolScroll.setToolTip(texts["menu_scroll_tooltip"])
         self._toolScroll.setFixedHeight(
             self.TOOL_AREA_MAX_ROWS * (self.BUTTON_HEIGHT + 8) + 24
         )
-        layout.addWidget(self._toolScroll)
+
+        self._menuScrollHint = QLabel(texts["menu_scroll_hint"])
+        self._menuScrollHint.setAlignment(Qt.AlignCenter)
+        self._menuScrollHint.setFont(QFont(FONT_SANS, 9))
+        self._menuScrollHint.setToolTip(texts["menu_scroll_tooltip"])
+        self._menuScrollHint.hide()
+
+        self._menuScrollBar = QScrollBar(Qt.Horizontal)
+        self._menuScrollBar.setObjectName("toolScrollBar")
+        self._menuScrollBar.setToolTip(texts["menu_scroll_tooltip"])
+        self._menuScrollBar.hide()
+
+        menu_area = QWidget()
+        menu_layout = QVBoxLayout(menu_area)
+        menu_layout.setContentsMargins(0, 0, 0, 0)
+        menu_layout.setSpacing(2)
+        menu_layout.addWidget(self._toolScroll)
+        menu_layout.addWidget(self._menuScrollHint)
+        menu_layout.addWidget(self._menuScrollBar)
+        layout.addWidget(menu_area)
+
+        tool_scrollbar = self._toolScroll.horizontalScrollBar()
+        tool_scrollbar.rangeChanged.connect(self._UpdateMenuScrollControls)
+        tool_scrollbar.valueChanged.connect(self._menuScrollBar.setValue)
+        self._menuScrollBar.valueChanged.connect(tool_scrollbar.setValue)
+        self._UpdateMenuScrollControls()
 
         self._flash = FlashOverlay(self)
         self._flash.setGeometry(self.rect())
@@ -557,6 +596,20 @@ class AtriaPanel(QWidget):
         column.addWidget(self._historyList, stretch=1)
 
         return column
+
+    def _UpdateMenuScrollControls(self, *_args) -> None:
+        tool_scrollbar = self._toolScroll.horizontalScrollBar()
+        self._menuScrollBar.setRange(
+            tool_scrollbar.minimum(),
+            tool_scrollbar.maximum(),
+        )
+        self._menuScrollBar.setPageStep(tool_scrollbar.pageStep())
+        self._menuScrollBar.setSingleStep(tool_scrollbar.singleStep())
+        self._menuScrollBar.setValue(tool_scrollbar.value())
+
+        can_scroll = tool_scrollbar.maximum() > tool_scrollbar.minimum()
+        self._menuScrollHint.setVisible(can_scroll)
+        self._menuScrollBar.setVisible(can_scroll)
 
     # ================================================================
     # Botones del contexto
