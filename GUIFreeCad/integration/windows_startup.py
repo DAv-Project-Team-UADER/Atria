@@ -1,4 +1,4 @@
-﻿"""Registro en la carpeta Inicio de Windows para ATRIA + FreeCAD + voz."""
+"""Registro de inicio automatico del sistema para ATRIA + FreeCAD + voz."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ _STARTUP_ARGS = "-StartVoice -SkipModels"
 
 def _startup_dir() -> Path:
     if sys.platform != "win32":
-        raise OSError("El arranque con Windows solo esta disponible en Windows.")
+        raise OSError("El arranque automatico solo esta disponible en este sistema operativo.")
     appdata = os.environ.get("APPDATA", "").strip()
     if not appdata:
         raise OSError("Variable APPDATA no definida.")
@@ -56,13 +56,13 @@ def is_windows_startup_registered() -> bool:
 
 def sync_windows_startup(enabled: bool) -> tuple[bool, str]:
     """
-    Crea o quita el acceso directo en Inicio de Windows.
+    Crea o quita el acceso directo para el inicio automatico del sistema.
 
     Returns:
         (ok, mensaje para el usuario; vacio si no hubo cambios)
     """
     if sys.platform != "win32":
-        return False, "Solo disponible en Windows."
+        return False, "Solo disponible en este sistema operativo."
 
     registered = is_windows_startup_registered()
     if enabled and registered:
@@ -76,7 +76,7 @@ def sync_windows_startup(enabled: bool) -> tuple[bool, str]:
         try:
             if shortcut.is_file():
                 shortcut.unlink()
-            return True, "Se quito ATRIA del inicio de Windows."
+            return True, "Se quito ATRIA del inicio automatico del sistema."
         except OSError as exc:
             return False, f"No se pudo quitar el acceso directo: {exc}"
 
@@ -97,7 +97,7 @@ $s.TargetPath = '{bat_s}'
 $s.Arguments = '{args_s}'
 $s.WorkingDirectory = '{workdir_s}'
 $s.WindowStyle = 7
-$s.Description = 'ATRIA + FreeCAD con voz al iniciar Windows'
+$s.Description = 'ATRIA + FreeCAD con voz al iniciar el sistema'
 $s.Save()
 """
     try:
