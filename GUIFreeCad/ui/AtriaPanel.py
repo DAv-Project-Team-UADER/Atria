@@ -445,6 +445,7 @@ class AtriaPanel(QWidget):
         self._centerSplitter.setStretchFactor(0, 1)
         self._centerSplitter.setStretchFactor(1, 2)
         self._centerSplitter.setChildrenCollapsible(False)
+        self._centerSplitter.setHandleWidth(6)
         layout.addWidget(self._centerSplitter, stretch=1)
 
         self._sectionTitleLabel = QLabel()
@@ -519,20 +520,30 @@ class AtriaPanel(QWidget):
         row = QHBoxLayout()
         row.setSpacing(8)
 
-        logo = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Logos", "color.svg")
-        if os.path.exists(logo):
-            widget = QSvgWidget(logo)
-            widget.setFixedSize(40, 36)
-            widget.setStyleSheet("background-color: transparent;")
-            row.addWidget(widget)
+        logo_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "..",
+            "Logos",
+            "Atria.svg",
+        )
+        logo_widget = QSvgWidget()
+        logo_widget.setObjectName("atriaLogo")
+        logo_widget.setFixedSize(40, 44)
+        logo_widget.setStyleSheet("background-color: transparent;")
+        if os.path.isfile(logo_path):
+            with open(logo_path, "rb") as logo_file:
+                if logo_file.read().strip():
+                    logo_widget.load(logo_path)
+        row.addWidget(logo_widget)
 
-        self._titleLabel = QLabel("ATRIA")
+        self._titleLabel = QLabel("Atria")
         self._titleLabel.setFont(QFont(FONT_SANS, 22, QFont.Bold))
-        row.addWidget(self._titleLabel, stretch=1)
+        row.addWidget(self._titleLabel)
+        row.addStretch(1)
 
         self._dockButton = QPushButton("⧉")
-        self._dockButton.setFixedSize(38, 34)
-        self._dockButton.setFont(QFont(FONT_SANS, 15, QFont.Bold))
+        self._dockButton.setFixedSize(42, 40)
+        self._dockButton.setFont(QFont(FONT_SANS, 16, QFont.Bold))
         hand_cursor = getattr(Qt, "PointingHandCursor", None)
         if hand_cursor is not None:
             self._dockButton.setCursor(hand_cursor)
@@ -540,16 +551,16 @@ class AtriaPanel(QWidget):
         row.addWidget(self._dockButton)
 
         self._prefsButton = QPushButton("⚙")
-        self._prefsButton.setFixedSize(38, 34)
-        self._prefsButton.setFont(QFont(FONT_SANS, 15, QFont.Bold))
+        self._prefsButton.setFixedSize(42, 40)
+        self._prefsButton.setFont(QFont(FONT_SANS, 16, QFont.Bold))
         if hand_cursor is not None:
             self._prefsButton.setCursor(hand_cursor)
         self._prefsButton.clicked.connect(self.PreferencesRequested.emit)
         row.addWidget(self._prefsButton)
 
         self._helpButton = QPushButton("?")
-        self._helpButton.setFixedSize(38, 34)
-        self._helpButton.setFont(QFont(FONT_SANS, 15, QFont.Bold))
+        self._helpButton.setFixedSize(42, 40)
+        self._helpButton.setFont(QFont(FONT_SANS, 16, QFont.Bold))
         if hand_cursor is not None:
             self._helpButton.setCursor(hand_cursor)
         self._helpButton.clicked.connect(self.HelpRequested.emit)
@@ -875,8 +886,8 @@ class AtriaPanel(QWidget):
 
         if hasattr(self, "_centerSplitter") and self._centerSplitter is not None:
             self._centerSplitter.setStyleSheet(
-                f"QSplitter::handle {{ background-color: {palette['panel_border']}; width: 2px; }}"
-                f"QSplitter::handle:hover {{ background-color: #3b82f6; }}"
+                "QSplitter::handle { background-color: transparent; "
+                "border: none; width: 6px; }"
             )
 
         section_label = getattr(self, "_sectionTitleLabel", None)
@@ -1032,7 +1043,7 @@ class AtriaPanel(QWidget):
             f" stop:0 {palette['btn_top']}, stop:1 {palette['btn_bot']}) !important;"
             f" border: 1.5px solid {palette['btn_border']}; border-radius: 6px;"
             f" color: {palette['black']}; font-family: {FONT_SANS};"
-            f" font-size: 14px; font-weight: bold; }}"
+            f" font-size: 18px; font-weight: bold; padding: 0px; }}"
             f"QPushButton:hover {{ background: {palette['btn_hover']} !important; border-color: #3b82f6; }}"
             f"QPushButton:pressed {{ background: {palette['highlight']} !important; }}"
         )
