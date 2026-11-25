@@ -107,7 +107,7 @@ TraduceToEn = {
     'create BIM report': BIMReport,
     'generate report': BIMReport,
     'query model': BIMReport,
-    'create schedule table': BIMReport,
+    'create model report': BIMReport,
     # BIMSetup
     'open BIM setup': BIMSetup,
     'BIM setup': BIMSetup,

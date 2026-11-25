@@ -145,6 +145,10 @@ class AtriaPanel(QWidget):
             self._ShowEmptyHint()
             return
 
+        if hasattr(self, "_emptyHint") and self._emptyHint is not None:
+            self._emptyHint.hide()
+            self._toolAreaLayout.removeWidget(self._emptyHint)
+
         # Las entradas sin .svg no generan boton (siguen andando por voz).
         # El boton "subir" va primero (indice 0) para estar siempre visible arriba
         # a la izquierda, sin importar cuantos botones haya ni el scroll horizontal.
@@ -342,6 +346,8 @@ class AtriaPanel(QWidget):
         self._listenLabel.setText(self._texts["section_listen"])
         self._histLabel.setText(self._texts["section_history"])
         self._modelLabel.setText(self._texts["section_model"])
+        if hasattr(self, "_emptyHint") and self._emptyHint is not None:
+            self._emptyHint.setText(self._texts["empty_context"])
         self._UpdateSectionTitle()
 
     def SetDockState(self, Floating: bool) -> None:
@@ -422,15 +428,27 @@ class AtriaPanel(QWidget):
         # estiraba la ventana. La grilla envuelve y el scroll acota la altura,
         # asi el panel mide siempre lo mismo entre en el contexto que entre.
         self._toolArea = QWidget()
+        self._toolArea.setObjectName("toolArea")
+        self._toolArea.setAutoFillBackground(False)
         self._toolAreaLayout = QGridLayout(self._toolArea)
         self._toolAreaLayout.setSpacing(10)
         self._toolAreaLayout.setContentsMargins(10, 10, 10, 10)
         self._toolAreaLayout.setAlignment(Qt.AlignCenter)
 
+        self._emptyHint = QLabel(self._texts["empty_context"], self._toolArea)
+        self._emptyHint.setObjectName("emptyHintLabel")
+        self._emptyHint.setAlignment(Qt.AlignCenter)
+        self._emptyHint.setFont(QFont(FONT_SANS, 12))
+        self._emptyHint.hide()
+
         self._toolScroll = QScrollArea()
+        self._toolScroll.setObjectName("toolScroll")
         self._toolScroll.setWidget(self._toolArea)
         self._toolScroll.setWidgetResizable(True)
         self._toolScroll.setFrameShape(QFrame.NoFrame)
+        self._toolScroll.setAutoFillBackground(False)
+        if self._toolScroll.viewport() is not None:
+            self._toolScroll.viewport().setAutoFillBackground(False)
         # Scroll horizontal: los botones se mantienen en filas de altura fija
         # y, si no entran a lo ancho, se corren en vez de empujar el borde de
         # la ventana. Asi el panel conserva el alto en cualquier contexto.
@@ -540,16 +558,22 @@ class AtriaPanel(QWidget):
 
     def _ClearToolArea(self) -> None:
         self._toolButtons.clear()
+        if hasattr(self, "_emptyHint") and self._emptyHint is not None:
+            self._emptyHint.hide()
+            self._toolAreaLayout.removeWidget(self._emptyHint)
         while self._toolAreaLayout.count():
             item = self._toolAreaLayout.takeAt(0)
             widget = item.widget()
-            if widget is not None:
+            if widget is not None and widget is not getattr(self, "_emptyHint", None):
+                widget.hide()
+                widget.setParent(None)
                 widget.deleteLater()
 
     def _ShowEmptyHint(self) -> None:
-        hint = QLabel(self._texts["empty_context"])
-        hint.setAlignment(Qt.AlignCenter)
-        self._toolAreaLayout.addWidget(hint)
+        if hasattr(self, "_emptyHint") and self._emptyHint is not None:
+            self._emptyHint.setText(self._texts["empty_context"])
+            self._emptyHint.show()
+            self._toolAreaLayout.addWidget(self._emptyHint, 0, 0, 1, 1, Qt.AlignCenter)
 
     def _MakeEntryButton(self, Entry) -> QToolButton:
         icon = self._locator.Find(Entry.InternalKey)
@@ -775,8 +799,21 @@ class AtriaPanel(QWidget):
             f"QWidget#AtriaPanel > * {{ background-color: transparent !important; }}"
             f"QScrollArea {{ background-color: transparent !important; border: none; }}"
             f"QScrollArea > QWidget {{ background-color: transparent !important; }}"
+            f"QWidget#toolArea {{ background-color: transparent !important; }}"
             f"QLabel {{ background-color: transparent !important; }}"
         )
+        if hasattr(self, "_toolScroll") and self._toolScroll is not None:
+            self._toolScroll.setStyleSheet("background-color: transparent !important; border: none;")
+            if self._toolScroll.viewport() is not None:
+                self._toolScroll.viewport().setAutoFillBackground(False)
+                self._toolScroll.viewport().setStyleSheet("background-color: transparent !important;")
+        if hasattr(self, "_toolArea") and self._toolArea is not None:
+            self._toolArea.setAutoFillBackground(False)
+            self._toolArea.setStyleSheet("background-color: transparent !important;")
+        if hasattr(self, "_emptyHint") and self._emptyHint is not None:
+            self._emptyHint.setStyleSheet(
+                f"color: {palette['dark_text']}; background-color: transparent !important;"
+            )
         self._titleLabel.setStyleSheet(
             f"color: {palette['black']}; background-color: transparent !important;"
             f" font-size: 22pt; font-weight: bold;"

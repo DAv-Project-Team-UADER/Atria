@@ -20,10 +20,10 @@ TEXTS = {
         "title":           "ASISTENTE DE VOZ PARA TECNICOS",
         "mic_active":      "Microfono activo - Escuchando...",
         "mic_error":       "Esperando microfono",
-        "section_listen":  "🎤 Voz reconocida:",
+        "section_listen":  "Voz reconocida:",
         "detected":        "Detectado:",
-        "section_model":   "📦 Modelo 3D:",
-        "section_history": "📋 Historial:",
+        "section_model":   "Modelo 3D:",
+        "section_history": "Historial:",
         "mic_inactive":    "Microfono inactivo",
         "empty_context":   "Sin comandos en este contexto",
         "section_cmds":    "Comandos sugeridos",
@@ -59,10 +59,10 @@ TEXTS = {
         "title":           "VOICE ASSISTANT FOR TECHNICIANS",
         "mic_active":      "Microphone active - Listening...",
         "mic_error":       "Microphone error",
-        "section_listen":  "🎤 Recognized voice:",
+        "section_listen":  "Recognized voice:",
         "detected":        "Detected:",
-        "section_model":   "📦 3D Model:",
-        "section_history": "📋 History:",
+        "section_model":   "3D Model:",
+        "section_history": "History:",
         "mic_inactive":    "Microphone inactive",
         "empty_context":   "No commands in this context",
         "section_cmds":    "Suggested commands",
@@ -98,10 +98,10 @@ TEXTS = {
         "title":           "ASSISTENTE DE VOZ PARA TECNICOS",
         "mic_active":      "Microfone ativo - Escutando...",
         "mic_error":       "Erro de microfone",
-        "section_listen":  "🎤 Voz reconhecida:",
+        "section_listen":  "Voz reconhecida:",
         "detected":        "Detectado:",
-        "section_model":   "📦 Modelo 3D:",
-        "section_history": "📋 Histórico:",
+        "section_model":   "Modelo 3D:",
+        "section_history": "Histórico:",
         "mic_inactive":    "Microfone inativo",
         "empty_context":   "Sem comandos neste contexto",
         "section_cmds":    "Comandos sugeridos",
@@ -220,7 +220,7 @@ def format_section_title(context_path: str, lang: str = "es") -> str:
     """Genera el título legible y descriptivo para la sección activa de comandos."""
     lang_key = "en" if str(lang).lower().startswith("en") else ("pt" if str(lang).lower().startswith("pt") else "es")
     names = SECTION_NAMES.get(lang_key, SECTION_NAMES["es"])
-    prefix = "📍 Section:" if lang_key == "en" else ("📍 Seção:" if lang_key == "pt" else "📍 Sección:")
+    prefix = "Section:" if lang_key == "en" else ("Seção:" if lang_key == "pt" else "Sección:")
 
     path = (context_path or "Base").strip()
     if not path or path == "Base":

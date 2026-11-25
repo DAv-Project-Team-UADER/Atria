@@ -16,7 +16,6 @@ MODEL_BASE_URL = "https://alphacephei.com/vosk/models/"
 MODEL_CATALOG: dict[str, tuple[str, str]] = {
     "en": ("vosk-model-small-en-us-0.15", "vosk-model-en-us-0.22"),
     "es": ("vosk-model-small-es-0.42", "vosk-model-es-0.42"),
-    "pt": ("vosk-model-small-pt-0.3", "vosk-model-pt-fb-v0.1.1-20220516_2113"),
 }
 
 

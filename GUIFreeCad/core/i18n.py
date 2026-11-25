@@ -46,17 +46,8 @@ def tr(key: str, target_lang: str = _DEFAULT_LANG, **kwargs: Any) -> str:
 
 
 def get_available_languages() -> list[str]:
-    """Return a list of available language codes."""
-    if not I18N_DIR.is_dir():
-        return [_DEFAULT_LANG]
-    
-    langs = []
-    for p in I18N_DIR.glob("*.json"):
-        langs.append(p.stem)
-    
-    if not langs:
-        return [_DEFAULT_LANG]
-    return sorted(langs)
+    """Return a list of available language codes (English and Spanish only)."""
+    return ["en", "es"]
 
 
 def clear_cache() -> None:

@@ -89,23 +89,52 @@ def _toggle_fullscreen():
 
 
 
+def _safe_view_call(view_method_name, cmd_name, msg_name=None):
+    if not Gui:
+        return
+    view = getattr(Gui.ActiveDocument, 'ActiveView', None) if getattr(Gui, 'ActiveDocument', None) else None
+    if view is None and hasattr(Gui, 'activeView'):
+        view = Gui.activeView()
+    if view and hasattr(view, view_method_name):
+        try:
+            getattr(view, view_method_name)()
+            if hasattr(view, 'redraw'):
+                view.redraw()
+            return
+        except Exception:
+            pass
+    if msg_name and hasattr(Gui, 'SendMsgToActiveView'):
+        try:
+            Gui.SendMsgToActiveView(msg_name)
+            return
+        except Exception:
+            pass
+    try:
+        Gui.runCommand(cmd_name)
+    except Exception:
+        try:
+            Gui.runCommand(cmd_name, 0)
+        except Exception:
+            pass
+
+
 # Diccionario ATRIA - StdView / StandardViews
 StandardViews = {
-    'bottom':       lambda: Gui.runCommand('Std_ViewBottom', 0),
-    'boxzoom':      lambda: Gui.runCommand('Std_ViewBoxZoom', 0),
-    'newview':      lambda: Gui.runCommand('Std_ViewCreate', 0),
-    'dimetric':     lambda: Gui.runCommand('Std_ViewDimetric', 0),
-    'fitall':       lambda: Gui.runCommand('Std_ViewFitAll', 0),
-    'fitselection': lambda: Gui.runCommand('Std_ViewFitSelection', 0),
-    'front':        lambda: Gui.runCommand('Std_ViewFront', 0),
+    'bottom':       lambda: _safe_view_call('viewBottom', 'Std_ViewBottom', 'ViewBottom'),
+    'boxzoom':      lambda: Gui.runCommand('Std_ViewBoxZoom') if Gui else None,
+    'newview':      lambda: Gui.runCommand('Std_ViewCreate') if Gui else None,
+    'dimetric':     lambda: _safe_view_call('viewDimetric', 'Std_ViewDimetric', 'ViewDimetric'),
+    'fitall':       lambda: _safe_view_call('fitAll', 'Std_ViewFitAll', 'FitAll'),
+    'fitselection': lambda: _safe_view_call('fitSelection', 'Std_ViewFitSelection', 'FitSelection'),
+    'front':        lambda: _safe_view_call('viewFront', 'Std_ViewFront', 'ViewFront'),
     'fullscreen':   _toggle_fullscreen,
-    'home':         lambda: Gui.runCommand('Std_ViewHome', 0),
-    'isometric':    lambda: Gui.runCommand('Std_ViewIsometric', 0),
-    'left':         lambda: Gui.runCommand('Std_ViewLeft', 0),
-    'rear':         lambda: Gui.runCommand('Std_ViewRear', 0),
-    'right':        lambda: Gui.runCommand('Std_ViewRight', 0),
-    'top':          lambda: Gui.runCommand('Std_ViewTop', 0),
-    'trimetric':    lambda: Gui.runCommand('Std_ViewTrimetric', 0),
+    'home':         lambda: Gui.runCommand('Std_ViewHome') if Gui else None,
+    'isometric':    lambda: _safe_view_call('viewIsometric', 'Std_ViewIsometric', 'ViewIsometric'),
+    'left':         lambda: _safe_view_call('viewLeft', 'Std_ViewLeft', 'ViewLeft'),
+    'rear':         lambda: _safe_view_call('viewRear', 'Std_ViewRear', 'ViewRear'),
+    'right':        lambda: _safe_view_call('viewRight', 'Std_ViewRight', 'ViewRight'),
+    'top':          lambda: _safe_view_call('viewTop', 'Std_ViewTop', 'ViewTop'),
+    'trimetric':    lambda: _safe_view_call('viewTrimetric', 'Std_ViewTrimetric', 'ViewTrimetric'),
     'zoomin':       _zoom_in,
     'zoomout':      _zoom_out,
     'help':         ayuda,

@@ -42,6 +42,8 @@ class TestViewsAndCameraModule(unittest.TestCase):
         commands.perspective()
         commands.orthographic()
         commands.isometric()
+        commands.dimetric()
+        commands.trimetric()
         commands.front()
         commands.top()
         commands.right()
@@ -59,10 +61,10 @@ class TestViewsAndCameraModule(unittest.TestCase):
 
     def test_views_dictionary_contains_all_actions(self) -> None:
         required_keys = [
-            "perspective", "orthographic", "isometric", "front", "top",
-            "right", "left", "rear", "bottom", "fitall", "fitselection",
-            "zoomin", "zoomout", "rotateleft", "rotateright", "rotateup",
-            "rotatedown", "movecamera", "help",
+            "perspective", "orthographic", "isometric", "dimetric", "trimetric",
+            "front", "top", "right", "left", "rear", "bottom", "fitall",
+            "fitselection", "zoomin", "zoomout", "rotateleft", "rotateright",
+            "rotateup", "rotatedown", "movecamera", "help",
         ]
         for key in required_keys:
             self.assertIn(key, Views, f"Falta clave {key} en Views dictionary")
@@ -72,9 +74,23 @@ class TestViewsAndCameraModule(unittest.TestCase):
         self.assertIn("perspectiva", TraduceToEs)
         self.assertIn("ortogonal", TraduceToEs)
         self.assertIn("isometrica", TraduceToEs)
+        self.assertIn("isométrica", TraduceToEs)
+        self.assertIn("isometrico", TraduceToEs)
+        self.assertIn("isométrico", TraduceToEs)
+        self.assertIn("iso", TraduceToEs)
+        self.assertIn("vista isometrica", TraduceToEs)
+        self.assertIn("vista isométrica", TraduceToEs)
+        self.assertIn("dimetrica", TraduceToEs)
+        self.assertIn("trimetrica", TraduceToEs)
         self.assertIn("frontal", TraduceToEs)
         self.assertIn("superior", TraduceToEs)
+        self.assertIn("planta", TraduceToEs)
+        self.assertIn("derecha", TraduceToEs)
+        self.assertIn("izquierda", TraduceToEs)
+        self.assertIn("trasera", TraduceToEs)
+        self.assertIn("inferior", TraduceToEs)
         self.assertIn("centrar vista", TraduceToEs)
+        self.assertIn("enfocar seleccion", TraduceToEs)
         self.assertIn("acercar", TraduceToEs)
         self.assertIn("alejar", TraduceToEs)
         self.assertIn("girar izquierda", TraduceToEs)
@@ -85,9 +101,17 @@ class TestViewsAndCameraModule(unittest.TestCase):
         self.assertIn("perspective", TraduceToEn)
         self.assertIn("orthographic", TraduceToEn)
         self.assertIn("isometric", TraduceToEn)
+        self.assertIn("iso", TraduceToEn)
+        self.assertIn("dimetric", TraduceToEn)
+        self.assertIn("trimetric", TraduceToEn)
         self.assertIn("front", TraduceToEn)
         self.assertIn("top", TraduceToEn)
+        self.assertIn("right", TraduceToEn)
+        self.assertIn("left", TraduceToEn)
+        self.assertIn("rear", TraduceToEn)
+        self.assertIn("bottom", TraduceToEn)
         self.assertIn("fit all", TraduceToEn)
+        self.assertIn("fit selection", TraduceToEn)
         self.assertIn("zoom in", TraduceToEn)
         self.assertIn("zoom out", TraduceToEn)
         self.assertIn("rotate left", TraduceToEn)
@@ -114,10 +138,10 @@ class TestViewsAndCameraModule(unittest.TestCase):
 
     def test_section_title_views(self) -> None:
         title_es = format_section_title("Base > Views", "es")
-        self.assertEqual(title_es, "📍 Sección: Vistas y Cámara")
+        self.assertEqual(title_es, "Sección: Vistas y Cámara")
 
         title_en = format_section_title("Base > Views", "en")
-        self.assertEqual(title_en, "📍 Section: Views & Camera")
+        self.assertEqual(title_en, "Section: Views & Camera")
 
 
 class TestGlobalCameraVoiceCommands(unittest.TestCase):
@@ -145,6 +169,76 @@ class TestGlobalCameraVoiceCommands(unittest.TestCase):
         res_up = browser.ProcessPhrase("subir")
         self.assertTrue(res_up.Success)
         self.assertEqual(browser.ContextPath, "Base")
+
+    def test_camera_and_views_from_inside_bim_context(self) -> None:
+        """Verifica que desde dentro de 3D-BIM las vistas estándar e isométrica se detecten y ejecuten por búsqueda ascendente."""
+        dic_root = ATRIA_DIR / "dictionary"
+        browser = Browser(dictionary_root=dic_root)
+        # Entrar a 3D-BIM
+        res_bim = browser.ProcessPhrase("bim")
+        self.assertTrue(res_bim.Success)
+        self.assertIn("bim", browser.ContextPath.lower())
+
+        # Probar isométrica y variantes desde dentro de BIM
+        for phrase in ["isometrica", "isométrica", "isométrico", "iso", "vista isométrica", "vista isometrica"]:
+            res = browser.ProcessPhrase(phrase)
+            self.assertTrue(res.Success, f"Falló comando '{phrase}' en contexto BIM")
+            self.assertEqual(res.Action, "execute")
+            # El contexto debe mantenerse en BIM tras la búsqueda ascendente
+            self.assertIn("bim", browser.ContextPath.lower())
+
+        # Probar vistas ortogonales y encuadre desde dentro de BIM
+        for phrase in ["frontal", "superior", "planta", "derecha", "izquierda", "trasera", "inferior", "centrar vista", "enfocar seleccion"]:
+            res = browser.ProcessPhrase(phrase)
+            self.assertTrue(res.Success, f"Falló comando '{phrase}' en contexto BIM")
+            self.assertEqual(res.Action, "execute")
+            self.assertIn("bim", browser.ContextPath.lower())
+
+    def test_views_commands_invoke_view_api(self) -> None:
+        """Verifica que los comandos de Views invoquen la API directa de la vista activa y llamen a redraw."""
+        mock_view = MagicMock()
+        mock_gui = MagicMock()
+        mock_gui.ActiveDocument.ActiveView = mock_view
+        commands.Gui = mock_gui
+
+        commands.isometric()
+        mock_view.viewIsometric.assert_called_once()
+        mock_view.redraw.assert_called_once()
+
+        mock_view.reset_mock()
+        commands.dimetric()
+        mock_view.viewDimetric.assert_called_once()
+        mock_view.redraw.assert_called_once()
+
+        mock_view.reset_mock()
+        commands.trimetric()
+        mock_view.viewTrimetric.assert_called_once()
+        mock_view.redraw.assert_called_once()
+
+        mock_view.reset_mock()
+        commands.front()
+        mock_view.viewFront.assert_called_once()
+        mock_view.redraw.assert_called_once()
+
+        mock_view.reset_mock()
+        commands.top()
+        mock_view.viewTop.assert_called_once()
+
+        mock_view.reset_mock()
+        commands.fit_all()
+        mock_view.fitAll.assert_called_once()
+
+        mock_view.reset_mock()
+        commands.fit_selection()
+        mock_view.fitSelection.assert_called_once()
+
+        mock_view.reset_mock()
+        commands.perspective()
+        mock_view.setCameraType.assert_called_once_with("Perspective")
+
+        mock_view.reset_mock()
+        commands.orthographic()
+        mock_view.setCameraType.assert_called_once_with("Orthographic")
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Download small Vosk models (en, es, pt) into models/."""
 
 import os
@@ -48,7 +48,6 @@ BASE_URL = "https://alphacephei.com/vosk/models/"
 SMALL_MODELS = [
     "vosk-model-small-en-us-0.15",
     "vosk-model-small-es-0.42",
-    "vosk-model-small-pt-0.3",
 ]
 
 

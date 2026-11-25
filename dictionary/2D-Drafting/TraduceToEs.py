@@ -65,35 +65,34 @@ TraduceToEs = {
     'crear curva por 3 puntos': ArcFrom3Points,
     'crear arco por 3 puntos': ArcFrom3Points,
     # B-Spline
-    'b spline': BSpline,
-    'curva b': BSpline,
-    'curva b spline': BSpline,
-    'crear curva b': BSpline,
-    'crear curva b spline': BSpline,
+    'curva suave': BSpline,
+    'crear curva suave': BSpline,
+    'curva flexible': BSpline,
+    'crear curva flexible': BSpline,
+    'curva de ajuste': BSpline,
     # BezierCurve
-    'curva de bezier': BezierCurve,
-    'crear curva de bezier': BezierCurve,
-    'crear curva bezier': BezierCurve,
-    'curva bezier': BezierCurve,
+    'curva de control': BezierCurve,
+    'crear curva de control': BezierCurve,
+    'curva con puntos de control': BezierCurve,
+    'crear curva con puntos de control': BezierCurve,
     # Circle
     'crear círculo': Circle,
     'círculo': Circle,
     'circunferencia': Circle,
     'crear circunferencia': Circle,
     # CubicBezierCurve
-    'curva de bezier cúbica': CubicBezierCurve,
-    'curva bezier cúbica': CubicBezierCurve,
-    'crear curva bezier cúbica': CubicBezierCurve,
-    'crear curva de bezier cúbica': CubicBezierCurve,
     'curva cúbica': CubicBezierCurve,
+    'crear curva cúbica': CubicBezierCurve,
+    'curva cúbica de control': CubicBezierCurve,
+    'crear curva cúbica de control': CubicBezierCurve,
     # Ellipse
     'elipse': Ellipse,
     'crear elipse': Ellipse,
     # Fillet
-    'chaflán': Fillet,
+    'redondear esquina': Fillet,
     'redondear': Fillet,
     'redondear borde': Fillet,
-    'recortar borde': Fillet,
+    'redondear esquina de dibujo': Fillet,
     # Line
     'línea': Line,
     'crear línea': Line,
@@ -110,8 +109,8 @@ TraduceToEs = {
     'crear polígono regular': Polygon,
     'polígono regular': Polygon,
     # Polyline
-    'polilínea': Polyline,
-    'crear polilínea': Polyline,
+    'línea de varios puntos': Polyline,
+    'crear línea de varios puntos': Polyline,
     'conectar puntos': Polyline,
     # Rectangle
     'rectángulo': Rectangle,
@@ -120,6 +119,6 @@ TraduceToEs = {
     'boceto': Sketch,
     'nuevo boceto': Sketch,
     'crear boceto': Sketch,
-    'sketch': Sketch,
     'bosquejo': Sketch,
+    'crear bosquejo': Sketch,
 }

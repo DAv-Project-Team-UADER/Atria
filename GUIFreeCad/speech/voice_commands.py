@@ -31,18 +31,14 @@ def _buffer_to_bytes(indata) -> bytes:
 # Phrases mapped to internal command ids (multi-language)
 COMMAND_MAP: dict[str, list[str]] = {
     "lang_en": [
-        "english", "inglés", "ingles", "inglês", "inglesh",
+        "english", "inglés", "ingles", "inglesh",
     ],
     "lang_es": [
-        "spanish", "español", "espanol", "espanhol", "castellano",
-    ],
-    "lang_pt": [
-        "portuguese", "portugués", "portugues", "português", "portuguesa",
-        "brasil", "brazil", "idioma portugues", "idioma português",
+        "spanish", "español", "espanol", "castellano",
     ],
     "model_small": [
-        "small model", "modelo pequeño", "modelo pequeno",
-        "pequeño modelo", "modelo chico", "modelo menor",
+        "small model", "modelo pequeño",
+        "pequeño modelo", "modelo chico",
     ],
     "model_large": [
         "large model", "modelo grande", "modelo largo", "grande modelo",
@@ -52,18 +48,16 @@ COMMAND_MAP: dict[str, list[str]] = {
     ],
     "theme_dark": [
         "dark theme", "tema oscuro", "oscuro", "dark", "negro", "tema negro",
-        "tema escuro", "escuro", "preto", "tema preto",
     ],
     "startup_on": [
-        "startup on", "arranque activado", "inicialização ativada", "activado", "ativado",
+        "startup on", "arranque activado", "activado",
     ],
     "startup_off": [
-        "startup off", "arranque desactivado", "arranque desactivado",
-        "inicialização desativada", "desactivado", "desativado",
+        "startup off", "arranque desactivado", "desactivado",
     ],
-    "yes": ["yes", "sí", "si", "sim", "yeah", "confirmar", "confirmar sim", "quero sim"],
-    "no": ["no", "não", "nao", "nop", "negativo", "cancelar", "nao quero", "não quero"],
-    "apply": ["apply", "aplicar", "aplicar"],
+    "yes": ["yes", "sí", "si", "yeah", "confirmar"],
+    "no": ["no", "nop", "negativo", "cancelar"],
+    "apply": ["apply", "aplicar"],
     "ok": ["ok", "aceptar", "accept", "confirmar"],
     "open_preferences": [
         "preferencias", "abrir preferencias", "open preferences",

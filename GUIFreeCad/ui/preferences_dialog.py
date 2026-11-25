@@ -1,4 +1,4 @@
-﻿"""Preferences dialog — click and voice configuration (FreeCAD style)."""
+"""Preferences dialog — click and voice configuration (FreeCAD style)."""
 
 from __future__ import annotations
 
@@ -87,15 +87,12 @@ class PreferencesDialog(QDialog):
         self._lang_buttons = QButtonGroup(self)
         self._rb_en = QRadioButton(self)
         self._rb_es = QRadioButton(self)
-        self._rb_pt = QRadioButton(self)
         self._flag_en = QLabel(self)
         self._flag_es = QLabel(self)
-        self._flag_pt = QLabel(self)
         for i, (rb, flag) in enumerate(
             (
                 (self._rb_en, self._flag_en),
                 (self._rb_es, self._flag_es),
-                (self._rb_pt, self._flag_pt),
             )
         ):
             self._lang_buttons.addButton(rb, i)
@@ -189,7 +186,7 @@ class PreferencesDialog(QDialog):
 
     def _load_from_settings(self) -> None:
         settings.load()
-        lang_map = {"en": self._rb_en, "es": self._rb_es, "pt": self._rb_pt}
+        lang_map = {"en": self._rb_en, "es": self._rb_es}
         lang_map.get(settings.language, self._rb_es).setChecked(True)
         if settings.model_size == "large":
             self._rb_large.setChecked(True)
@@ -209,10 +206,8 @@ class PreferencesDialog(QDialog):
         self._lang_group_box.setTitle(tr("section_language", self._lang))
         self._rb_en.setText(tr("lang_en", self._lang))
         self._rb_es.setText(tr("lang_es", self._lang))
-        self._rb_pt.setText(tr("lang_pt", self._lang))
         apply_lang_flag(self._flag_en, "en")
         apply_lang_flag(self._flag_es, "es")
-        apply_lang_flag(self._flag_pt, "pt")
         self._model_group_box.setTitle(tr("section_model", self._lang))
         self._rb_small.setText(tr("model_small", self._lang))
         self._rb_large.setText(tr("model_large", self._lang))
@@ -239,8 +234,6 @@ class PreferencesDialog(QDialog):
     def _current_language(self) -> str:
         if self._rb_en.isChecked():
             return "en"
-        if self._rb_pt.isChecked():
-            return "pt"
         return "es"
 
     def _on_language_changed(self) -> None:
@@ -355,7 +348,6 @@ class PreferencesDialog(QDialog):
     _AUTO_VOICE_LABELS: dict[str, tuple[str, str]] = {
         "es": ("Micrófono: iniciar al abrir FreeCAD ✓", "Micrófono: iniciar al abrir FreeCAD"),
         "en": ("Microphone: start on FreeCAD open ✓", "Microphone: start on FreeCAD open"),
-        "pt": ("Microfone: iniciar ao abrir FreeCAD ✓", "Microfone: iniciar ao abrir FreeCAD"),
     }
 
     def _on_auto_voice_toggled(self, checked: bool) -> None:
@@ -493,11 +485,11 @@ class PreferencesDialog(QDialog):
                 self._voice_label.setText(tr("voice_listening", self._lang))
 
     def _block_lang_signals(self, block: bool) -> None:
-        for rb in (self._rb_en, self._rb_es, self._rb_pt):
+        for rb in (self._rb_en, self._rb_es):
             rb.blockSignals(block)
 
     def _apply_language(self, code: str) -> None:
-        lang_map = {"en": self._rb_en, "es": self._rb_es, "pt": self._rb_pt}
+        lang_map = {"en": self._rb_en, "es": self._rb_es}
         rb = lang_map.get(code)
         if rb is None or rb.isChecked():
             return
@@ -532,7 +524,6 @@ class PreferencesDialog(QDialog):
         labels = {
             "lang_en": tr("lang_en", self._lang),
             "lang_es": tr("lang_es", self._lang),
-            "lang_pt": tr("lang_pt", self._lang),
             "model_small": tr("model_small", self._lang),
             "model_large": tr("model_large", self._lang),
             "theme_light": tr("theme_light", self._lang),
@@ -550,8 +541,6 @@ class PreferencesDialog(QDialog):
             self._apply_language("en")
         elif command == "lang_es":
             self._apply_language("es")
-        elif command == "lang_pt":
-            self._apply_language("pt")
         elif command == "model_small":
             self._rb_small.setChecked(True)
         elif command == "model_large":

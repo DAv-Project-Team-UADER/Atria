@@ -1,4 +1,4 @@
-﻿"""Persistent application settings."""
+"""Persistent application settings."""
 
 from __future__ import annotations
 
@@ -64,11 +64,12 @@ class Settings:
 
     @property
     def language(self) -> str:
-        return self._data["language"]
+        lang = self._data.get("language", "es")
+        return lang if lang in ("en", "es") else "es"
 
     @language.setter
     def language(self, value: str) -> None:
-        if value in ("en", "es", "pt"):
+        if value in ("en", "es"):
             self._data["language"] = value
 
     @property

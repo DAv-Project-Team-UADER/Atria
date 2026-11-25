@@ -31,21 +31,21 @@ class TestSectionTitles(unittest.TestCase):
         from ui.Textos import format_section_title
 
         expected = {
-            "Base": "📍 Sección: Categorías Principales",
-            "": "📍 Sección: Categorías Principales",
-            "Base > 3D-BIM": "📍 Sección: 3D - Modelado BIM",
-            "Base > 2D-Drafting": "📍 Sección: 2D - Dibujo y Boceto",
-            "Base > Annotation": "📍 Sección: Anotación y Cotas",
-            "Base > Manage": "📍 Sección: Administración y Gestión BIM",
-            "Base > Modify": "📍 Sección: Modificar y Transformar",
-            "Base > Preferences": "📍 Sección: Preferencias y Ajustes",
-            "Base > Snapping": "📍 Sección: Enganche (Snapping)",
-            "Base > StatusBar": "📍 Sección: Barra de Estado y Vistas",
-            "Base > Utils": "📍 Sección: Utilidades y Herramientas",
-            "Base > Explorer": "📍 Sección: Explorador de Archivos",
-            "Base > Explorer > file": "📍 Sección: Explorador de Archivos > Archivo",
-            "Base > Explorer > edit": "📍 Sección: Explorador de Archivos > Edición",
-            "Base > Explorer > print": "📍 Sección: Explorador de Archivos > Imprimir / Exportar PDF",
+            "Base": "Sección: Categorías Principales",
+            "": "Sección: Categorías Principales",
+            "Base > 3D-BIM": "Sección: 3D - Modelado BIM",
+            "Base > 2D-Drafting": "Sección: 2D - Dibujo y Boceto",
+            "Base > Annotation": "Sección: Anotación y Cotas",
+            "Base > Manage": "Sección: Administración y Gestión BIM",
+            "Base > Modify": "Sección: Modificar y Transformar",
+            "Base > Preferences": "Sección: Preferencias y Ajustes",
+            "Base > Snapping": "Sección: Enganche (Snapping)",
+            "Base > StatusBar": "Sección: Barra de Estado y Vistas",
+            "Base > Utils": "Sección: Utilidades y Herramientas",
+            "Base > Explorer": "Sección: Explorador de Archivos",
+            "Base > Explorer > file": "Sección: Explorador de Archivos > Archivo",
+            "Base > Explorer > edit": "Sección: Explorador de Archivos > Edición",
+            "Base > Explorer > print": "Sección: Explorador de Archivos > Imprimir / Exportar PDF",
         }
 
         for path, exp in expected.items():
@@ -59,17 +59,17 @@ class TestSectionTitles(unittest.TestCase):
         # English
         self.assertEqual(
             format_section_title("Base > 3D-BIM", "en"),
-            "📍 Section: 3D - BIM Modeling"
+            "Section: 3D - BIM Modeling"
         )
         self.assertEqual(
             format_section_title("Base > Explorer > file", "en"),
-            "📍 Section: File Explorer > File"
+            "Section: File Explorer > File"
         )
 
         # Portuguese
         self.assertEqual(
             format_section_title("Base > 3D-BIM", "pt"),
-            "📍 Seção: 3D - Modelagem BIM"
+            "Seção: 3D - Modelagem BIM"
         )
 
     def test_panel_section_title_updates_on_render_context(self) -> None:
@@ -83,20 +83,20 @@ class TestSectionTitles(unittest.TestCase):
             self.skipTest("PySide6 not available in test runner")
 
         panel = AtriaPanel()
-        self.assertEqual(panel.CurrentSectionTitle, "📍 Sección: Categorías Principales")
+        self.assertEqual(panel.CurrentSectionTitle, "Sección: Categorías Principales")
 
         # Render 3D-BIM
         panel.RenderContext(ContextView("Base > 3D-BIM"))
-        self.assertEqual(panel.CurrentSectionTitle, "📍 Sección: 3D - Modelado BIM")
-        self.assertEqual(panel._sectionTitleLabel.text(), "📍 Sección: 3D - Modelado BIM")
+        self.assertEqual(panel.CurrentSectionTitle, "Sección: 3D - Modelado BIM")
+        self.assertEqual(panel._sectionTitleLabel.text(), "Sección: 3D - Modelado BIM")
 
         # Render Modify
         panel.RenderContext(ContextView("Base > Modify"))
-        self.assertEqual(panel.CurrentSectionTitle, "📍 Sección: Modificar y Transformar")
+        self.assertEqual(panel.CurrentSectionTitle, "Sección: Modificar y Transformar")
 
         # Switch to English
         panel.SetLanguage("en")
-        self.assertEqual(panel.CurrentSectionTitle, "📍 Section: Modify & Transform")
+        self.assertEqual(panel.CurrentSectionTitle, "Section: Modify & Transform")
 
     def test_explorer_button_is_first_in_base_context(self) -> None:
         """Explorer must be the first button in Base icon list."""
