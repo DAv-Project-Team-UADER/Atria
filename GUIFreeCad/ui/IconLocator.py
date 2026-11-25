@@ -148,6 +148,11 @@ class IconLocator:
         "selectall": "selectall",
         "deselectall": "selectability",
         "deselect": "selectability",
+        "edit": "edit",
+        "editar": "edit",
+        "delete": "delete",
+        "borrar": "delete",
+        "eliminar": "delete",
         # 2D-Drafting
         "arcfrom3points": "3points",
         "beziercurve": "bezier",

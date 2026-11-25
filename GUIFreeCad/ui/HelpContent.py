@@ -241,6 +241,8 @@ HELP_BY_CATEGORY: dict[str, list[tuple[str, str]]] = {
         ("deseleccionar", "Quita la selección del objeto actual sin afectar los demás."),
         ("seleccionar todos", "Selecciona todos los objetos del documento activo de FreeCAD."),
         ("deseleccionar todos", "Limpia y anula la selección de todos los objetos en el documento."),
+        ("editar", "Pone el objeto seleccionado en modo de edición interactiva."),
+        ("borrar", "Elimina del documento el objeto actualmente seleccionado."),
     ],
 }
 

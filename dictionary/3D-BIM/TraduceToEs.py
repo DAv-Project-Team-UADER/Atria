@@ -266,6 +266,11 @@ TraduceToEs = {
     'insertar equipo': Objects_Library,
     'agregar equipo': Objects_Library,
     # Pipe
+    'tubo': Pipe,
+    'caño': Pipe,
+    'cano': Pipe,
+    'tubería': Pipe,
+    'tuberia': Pipe,
     'crear tubo': Pipe,
     'nueva tubería': Pipe,
     'generar caño': Pipe,
@@ -391,8 +396,10 @@ TraduceToEs = {
     'generar techo': ArchRoof,
     'añadir techo': ArchRoof,
     # ArchStairs
+    'escalera': ArchStairs,
     'crear escalera': ArchStairs,
     'nueva escalera': ArchStairs,
+    'insertar escalera': ArchStairs,
     'generar escalera': ArchStairs,
     'añadir escalera': ArchStairs,
     # ArchTruss

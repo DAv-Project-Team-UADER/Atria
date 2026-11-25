@@ -44,7 +44,7 @@ class TestObjectSelectionVoiceCategory(unittest.TestCase):
         self.assertIn("select", browser.ContextPath.lower())
 
         # Dentro de Select, probar comandos
-        for cmd in ["avanzar", "siguiente", "retroceder", "anterior", "seleccionar", "deseleccionar", "seleccionar todos", "deseleccionar todos"]:
+        for cmd in ["avanzar", "siguiente", "retroceder", "anterior", "seleccionar", "deseleccionar", "seleccionar todos", "deseleccionar todos", "editar", "borrar"]:
             res_cmd = browser.ProcessPhrase(cmd)
             self.assertTrue(res_cmd.Success, f"Falló comando '{cmd}' dentro de Select")
             self.assertEqual(res_cmd.Action, "execute")
@@ -67,7 +67,7 @@ class TestObjectSelectionVoiceCategory(unittest.TestCase):
         self.assertTrue(res.Success)
         self.assertIn("select", browser.ContextPath.lower())
 
-        for cmd in ["next", "previous", "select", "deselect", "select all", "clear selection"]:
+        for cmd in ["next", "previous", "select", "deselect", "select all", "clear selection", "edit", "delete"]:
             res_cmd = browser.ProcessPhrase(cmd)
             self.assertTrue(res_cmd.Success, f"Failed voice command '{cmd}' in English Select")
             self.assertEqual(res_cmd.Action, "execute")

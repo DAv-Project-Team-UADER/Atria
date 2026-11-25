@@ -18,4 +18,6 @@ def ayuda():
     print("- 'deseleccionar': Quita el objeto actual de la selección.")
     print("- 'seleccionar todos': Selecciona todos los objetos creados.")
     print("- 'deseleccionar todos' / 'limpiar selección': Deselecciona todos los objetos.")
+    print("- 'editar': Pone el objeto seleccionado en modo de edición interactiva.")
+    print("- 'borrar' / 'eliminar': Elimina el objeto seleccionado del documento.")
     print("- 'volver' / 'subir': Regresa al menú anterior.")

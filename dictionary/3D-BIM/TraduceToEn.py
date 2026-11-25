@@ -273,6 +273,9 @@ TraduceToEn = {
     'insert equipment': Objects_Library,
     'add equipment': Objects_Library,
     # Pipe
+    'pipe': Pipe,
+    'conduit': Pipe,
+    'tube': Pipe,
     'create pipe': Pipe,
     'new piping': Pipe,
     'generate conduit': Pipe,
@@ -383,6 +386,8 @@ TraduceToEn = {
     'generate roof': ArchRoof,
     'add roof': ArchRoof,
     # ArchStairs
+    'stairs': ArchStairs,
+    'stair': ArchStairs,
     'create stairs': ArchStairs,
     'new stairs': ArchStairs,
     'generate stairs': ArchStairs,

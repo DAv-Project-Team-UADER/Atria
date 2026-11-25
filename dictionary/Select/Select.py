@@ -13,5 +13,7 @@ Select = {
     "deselect": commands.deselect_current,
     "selectall": commands.select_all,
     "deselectall": commands.deselect_all,
+    "edit": commands.edit_object,
+    "delete": commands.delete_selected,
     "help": ayuda,
 }

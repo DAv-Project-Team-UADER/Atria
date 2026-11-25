@@ -222,6 +222,8 @@ class ObjectSelection:
         current Gui selection. Keeps the internal name list in sync
         and recomputes the document.
         """
+        if not App or not hasattr(App, "activeDocument"):
+            return
         ActiveDoc = App.activeDocument()
 
         if not ActiveDoc:

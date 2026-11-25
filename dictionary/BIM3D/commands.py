@@ -690,8 +690,14 @@ Level = {
 }
 
 # --- Pipe ---
-def pipe(length: float = 2000.0, diameter: float = 50.0):
-    """Crea un tubo paramétrico."""
+def pipe(
+    length: float = 2000.0,
+    diameter: float = 50.0,
+    x: float = 0.0,
+    y: float = 0.0,
+    z: float = 0.0,
+):
+    """Crea un tubo paramétrico en la posición (x, y, z)."""
     doc = FreeCAD.ActiveDocument if FreeCAD else None
     if doc is None and FreeCAD and hasattr(FreeCAD, "newDocument"):
         doc = FreeCAD.newDocument()
@@ -699,11 +705,12 @@ def pipe(length: float = 2000.0, diameter: float = 50.0):
         import Arch
         import Draft
 
-        p1 = FreeCAD.Vector(0, 0, 0) if FreeCAD else (0, 0, 0)
-        p2 = FreeCAD.Vector(length, 0, 0) if FreeCAD else (length, 0, 0)
+        p1 = FreeCAD.Vector(x, y, z) if FreeCAD else (x, y, z)
+        p2 = FreeCAD.Vector(x + length, y, z) if FreeCAD else (x + length, y, z)
         base = Draft.make_line(p1, p2)
         p_obj = Arch.makePipe(base, diameter=diameter)
-        Draft.autogroup(p_obj)
+        if hasattr(Draft, "autogroup"):
+            Draft.autogroup(p_obj)
         if doc and hasattr(doc, "recompute"):
             doc.recompute()
         return p_obj
@@ -716,6 +723,9 @@ def pipe(length: float = 2000.0, diameter: float = 50.0):
 pipe._param_specs = [
     _ParamSpec(1, "length", float, True),
     _ParamSpec(2, "diameter", float, True),
+    _ParamSpec(3, "x", float, True),
+    _ParamSpec(4, "y", float, True),
+    _ParamSpec(5, "z", float, True),
 ]
 
 Pipe = {"pipe": pipe}
@@ -963,8 +973,11 @@ def stairs(
     step_length: float = 280.0,
     step_height: float = 175.0,
     step_width: float = 1000.0,
+    x: float = 0.0,
+    y: float = 0.0,
+    z: float = 0.0,
 ):
-    """Crea una escalera paramétrica."""
+    """Crea una escalera paramétrica en la posición (x, y, z)."""
     doc = FreeCAD.ActiveDocument if FreeCAD else None
     if doc is None and FreeCAD and hasattr(FreeCAD, "newDocument"):
         doc = FreeCAD.newDocument()
@@ -973,12 +986,15 @@ def stairs(
         import Draft
 
         st = Arch.makeStairs(
-            steps=steps,
-            length=steps * step_length,
-            height=steps * step_height,
-            width=step_width,
+            steps=int(steps),
+            length=float(steps) * float(step_length),
+            height=float(steps) * float(step_height),
+            width=float(step_width),
         )
-        Draft.autogroup(st)
+        if st and FreeCAD and hasattr(st, "Placement"):
+            st.Placement.Base = FreeCAD.Vector(float(x), float(y), float(z))
+        if hasattr(Draft, "autogroup"):
+            Draft.autogroup(st)
         if doc and hasattr(doc, "recompute"):
             doc.recompute()
         return st
@@ -990,6 +1006,12 @@ def stairs(
 
 stairs._param_specs = [
     _ParamSpec(1, "steps", int, True),
+    _ParamSpec(2, "step_length", float, True),
+    _ParamSpec(3, "step_height", float, True),
+    _ParamSpec(4, "step_width", float, True),
+    _ParamSpec(5, "x", float, True),
+    _ParamSpec(6, "y", float, True),
+    _ParamSpec(7, "z", float, True),
 ]
 
 def _stairs():

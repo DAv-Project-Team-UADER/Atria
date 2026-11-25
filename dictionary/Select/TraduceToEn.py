@@ -27,5 +27,15 @@ TraduceToEn = {
     "deselect all": Select["deselectall"],
     "clear selection": Select["deselectall"],
 
+    # Editing and deletion of selected object
+    "edit": Select["edit"],
+    "edit object": Select["edit"],
+    "modify": Select["edit"],
+
+    "delete": Select["delete"],
+    "remove": Select["delete"],
+    "erase": Select["delete"],
+    "delete object": Select["delete"],
+
     "help": Select["help"],
 }

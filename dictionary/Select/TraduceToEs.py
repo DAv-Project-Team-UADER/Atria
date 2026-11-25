@@ -48,6 +48,19 @@ TraduceToEs = {
     "limpiar selección": Select["deselectall"],
     "quitar todo": Select["deselectall"],
 
+    # Edición y borrado del objeto seleccionado
+    "editar": Select["edit"],
+    "modo edicion": Select["edit"],
+    "modo edición": Select["edit"],
+    "modificar": Select["edit"],
+    "editar objeto": Select["edit"],
+
+    "borrar": Select["delete"],
+    "eliminar": Select["delete"],
+    "suprimir": Select["delete"],
+    "borrar objeto": Select["delete"],
+    "eliminar objeto": Select["delete"],
+
     # Ayuda contextual
     "ayuda": Select["help"],
     "manual": Select["help"],

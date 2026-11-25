@@ -73,3 +73,16 @@ def deselect_all() -> None:
     mgr = _get_manager()
     if mgr:
         mgr.DeselectAll()
+
+
+def edit_object() -> None:
+    """Pone el objeto seleccionado en modo de edición interactivo de FreeCAD/Draft."""
+    if Gui and hasattr(Gui, "runCommand"):
+        Gui.runCommand("Draft_Edit", 0)
+
+
+def delete_selected() -> None:
+    """Elimina el objeto actualmente seleccionado en FreeCAD."""
+    mgr = _get_manager()
+    if mgr:
+        mgr.DeleteSelected()
