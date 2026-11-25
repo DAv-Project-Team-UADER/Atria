@@ -52,6 +52,15 @@ TraduceToEs = {
     "camara": Base.get("Views"),
     "cámara": Base.get("Views"),
 
+    # Selección y Navegación de Objetos
+    "seleccionar": Base.get("Select"),
+    "seleccion": Base.get("Select"),
+    "selección": Base.get("Select"),
+    "select": Base.get("Select"),
+    "navegar objetos": Base.get("Select"),
+    "arbol de objetos": Base.get("Select"),
+    "árbol de objetos": Base.get("Select"),
+
     # Panel ATRIA
     "mostrar panel": Base.get("show_atria_panel"),
     "maximizar": Base.get("show_atria_panel"),

@@ -105,6 +105,8 @@ if "Draft" not in sys.modules:
     draft.scale = lambda *a, **k: [types.SimpleNamespace(Name="ScaledObj")]
     draft.rotate = lambda *a, **k: [types.SimpleNamespace(Name="RotatedObj")]
     draft.make_clone = lambda *a, **k: types.SimpleNamespace(Name="CloneObj")
+    draft.make_wire = lambda *a, **k: types.SimpleNamespace(Name="Wire", Label="Wire")
+    draft.autogroup = lambda *a, **k: None
     sys.modules["Draft"] = draft
 
 if "Arch" not in sys.modules:
@@ -112,6 +114,7 @@ if "Arch" not in sys.modules:
     arch.makeWall = lambda *a, **k: types.SimpleNamespace(Name="Wall", Label="Wall")
     arch.makeStructure = lambda *a, **k: types.SimpleNamespace(Name="Structure", Label="Structure")
     arch.makeWindow = lambda *a, **k: types.SimpleNamespace(Name="Window", Label="Window")
+    arch.makeRoof = lambda *a, **k: types.SimpleNamespace(Name="Roof", Label="Roof")
     arch.makePipe = lambda *a, **k: types.SimpleNamespace(Name="Pipe", Label="Pipe")
     arch.makeFloor = lambda *a, **k: types.SimpleNamespace(Name="Floor", Label="Floor")
     sys.modules["Arch"] = arch
@@ -249,15 +252,15 @@ class TestParametricVoiceDialogs(unittest.TestCase):
         box_fn = GetDictionaryFunction("3d-bim", "box")
         entry = ContextEntry(Spoken="caja", InternalKey="box", Target=box_fn)
 
-        # User dictates: length=100, width=50, height=30
+        # User dictates: length=100, width=50, height=30, x=10, y=20, z=0
         result = self.executor.ExecuteEntry(
             entry,
-            SimulatedFinalTexts=["cien ok", "cincuenta ok", "treinta ok"],
+            SimulatedFinalTexts=["cien ok", "cincuenta ok", "treinta ok", "diez ok", "veinte ok", "cero ok"],
         )
         self.assertTrue(self.executor.LastResult.Success)
         self.assertEqual(
             self.executor.LastResult.Value,
-            {"length": 100.0, "width": 50.0, "height": 30.0},
+            {"length": 100.0, "width": 50.0, "height": 30.0, "x": 10.0, "y": 20.0, "z": 0.0},
         )
         self.assertIsNotNone(result)
 
@@ -265,15 +268,63 @@ class TestParametricVoiceDialogs(unittest.TestCase):
         wall_fn = GetDictionaryFunction("3d-bim", "wall")
         entry = ContextEntry(Spoken="muro", InternalKey="wall", Target=wall_fn)
 
-        # User dictates: length=5000, width=200, height=3000
+        # User dictates: length=5000, width=200, height=3000, x=0, y=500, z=0
         result = self.executor.ExecuteEntry(
             entry,
-            SimulatedFinalTexts=["cinco mil ok", "doscientos ok", "tres mil ok"],
+            SimulatedFinalTexts=["cinco mil ok", "doscientos ok", "tres mil ok", "cero ok", "quinientos ok", "cero ok"],
         )
         self.assertTrue(self.executor.LastResult.Success)
         self.assertEqual(
             self.executor.LastResult.Value,
-            {"length": 5000.0, "width": 200.0, "height": 3000.0},
+            {"length": 5000.0, "width": 200.0, "height": 3000.0, "x": 0.0, "y": 500.0, "z": 0.0},
+        )
+        self.assertIsNotNone(result)
+
+    def test_execute_door_3d_by_voice_dictation(self) -> None:
+        door_fn = GetDictionaryFunction("3d-bim", "door")
+        entry = ContextEntry(Spoken="puerta", InternalKey="door", Target=door_fn)
+
+        # User dictates: width=900, height=2100, x=1000, y=0, z=0
+        result = self.executor.ExecuteEntry(
+            entry,
+            SimulatedFinalTexts=["novecientos ok", "dos mil cien ok", "mil ok", "cero ok", "cero ok"],
+        )
+        self.assertTrue(self.executor.LastResult.Success)
+        self.assertEqual(
+            self.executor.LastResult.Value,
+            {"width": 900.0, "height": 2100.0, "x": 1000.0, "y": 0.0, "z": 0.0},
+        )
+        self.assertIsNotNone(result)
+
+    def test_execute_window_3d_by_voice_dictation(self) -> None:
+        window_fn = GetDictionaryFunction("3d-bim", "window")
+        entry = ContextEntry(Spoken="ventana", InternalKey="window", Target=window_fn)
+
+        # User dictates: width=1200, height=1200, x=2500, y=0, z=1000
+        result = self.executor.ExecuteEntry(
+            entry,
+            SimulatedFinalTexts=["mil doscientos ok", "mil doscientos ok", "dos mil quinientos ok", "cero ok", "mil ok"],
+        )
+        self.assertTrue(self.executor.LastResult.Success)
+        self.assertEqual(
+            self.executor.LastResult.Value,
+            {"width": 1200.0, "height": 1200.0, "x": 2500.0, "y": 0.0, "z": 1000.0},
+        )
+        self.assertIsNotNone(result)
+
+    def test_execute_roof_3d_by_voice_dictation(self) -> None:
+        roof_fn = GetDictionaryFunction("3d-bim", "roof")
+        entry = ContextEntry(Spoken="techo", InternalKey="roof", Target=roof_fn)
+
+        # User dictates: length=6000, width=4000, thickness=150, x=0, y=0, z=3000
+        result = self.executor.ExecuteEntry(
+            entry,
+            SimulatedFinalTexts=["seis mil ok", "cuatro mil ok", "ciento cincuenta ok", "cero ok", "cero ok", "tres mil ok"],
+        )
+        self.assertTrue(self.executor.LastResult.Success)
+        self.assertEqual(
+            self.executor.LastResult.Value,
+            {"length": 6000.0, "width": 4000.0, "thickness": 150.0, "x": 0.0, "y": 0.0, "z": 3000.0},
         )
         self.assertIsNotNone(result)
 

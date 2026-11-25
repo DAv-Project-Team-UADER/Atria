@@ -14,7 +14,7 @@
 #
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
-"""Mapa de voz (ES) para la seccion BIM3D (consolidado)."""
+"""Mapa de voz (ES) para la seccion 3D-BIM (consolidado)."""
 
 try:
     from .commands import Beam
@@ -151,7 +151,10 @@ except ImportError:
 
 TraduceToEs = {
     # Beam
+    'viga': Beam,
+    'crear viga': Beam,
     'nueva viga': Beam,
+    'insertar viga': Beam,
     'generar haz': Beam,
     'crear haz': Beam,
     'añadir viga': Beam,
@@ -166,8 +169,11 @@ TraduceToEs = {
     'agregar armadura de viga': Beam_Reinforcement,
     'añadir armadura de viga': Beam_Reinforcement,
     # Box
+    'caja': Box,
+    'cubo': Box,
     'crear caja': Box,
     'insertar caja': Box,
+    'nueva caja': Box,
     'agregar caja': Box,
     'crear bloque': Box,
     'insertar bloque': Box,
@@ -180,8 +186,11 @@ TraduceToEs = {
     'generar edificio': Building,
     'añadir edificio': Building,
     # Column
+    'columna': Column,
+    'pilar': Column,
     'crear columna': Column,
     'nueva columna': Column,
+    'insertar columna': Column,
     'generar pilar': Column,
     'añadir columna': Column,
     # Column_Reinforcement
@@ -208,8 +217,10 @@ TraduceToEs = {
     'generar fachada de cristal': CurtainWall,
     'añadir curtain wall': CurtainWall,
     # Door
+    'puerta': Door,
     'crear puerta': Door,
     'nueva puerta': Door,
+    'insertar puerta': Door,
     'generar puerta': Door,
     'añadir puerta': Door,
     # External_Reference
@@ -275,8 +286,16 @@ TraduceToEs = {
     'insertar perfil parametrico': Profile,
     'perfil parametrico': Profile,
     # Roof
-    'crear cubierta': Roof,
+    'techo': Roof,
+    'cubierta': Roof,
+    'crear techo': Roof,
     'nuevo techo': Roof,
+    'insertar techo': Roof,
+    'generar techo': Roof,
+    'añadir techo': Roof,
+    'crear cubierta': Roof,
+    'nueva cubierta': Roof,
+    'insertar cubierta': Roof,
     'generar cubierta': Roof,
     'añadir techo inclinado': Roof,
     # Shape_Builder
@@ -297,8 +316,11 @@ TraduceToEs = {
     'generar terreno': Site,
     'añadir emplazamiento': Site,
     # Slab
+    'losa': Slab,
     'crear losa': Slab,
     'nueva losa': Slab,
+    'insertar losa': Slab,
+    'generar losa': Slab,
     'generar placa': Slab,
     'añadir losa': Slab,
     # Slab_Reinforcement
@@ -316,13 +338,23 @@ TraduceToEs = {
     'generar habitación': Space,
     'añadir espacio': Space,
     # Wall
+    'pared': Wall,
+    'muro': Wall,
+    'crear pared': Wall,
     'crear muro': Wall,
+    'nueva pared': Wall,
     'nuevo muro': Wall,
+    'insertar pared': Wall,
+    'insertar muro': Wall,
     'generar pared': Wall,
+    'generar muro': Wall,
+    'añadir pared': Wall,
     'añadir muro': Wall,
     # Window
+    'ventana': Window,
     'crear ventana': Window,
     'nueva ventana': Window,
+    'insertar ventana': Window,
     'generar ventana': Window,
     'añadir ventana': Window,
     # ArchEquipment

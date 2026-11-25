@@ -15,7 +15,7 @@
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
 
-"""Comandos FreeCAD de la seccion BIM3D (consolidado).
+"""Comandos FreeCAD de la seccion 3D-BIM (consolidado).
 
 Cada funcion conserva su comportamiento original; este modulo
 reune lo que antes vivia en una carpeta por funcion.
@@ -202,6 +202,9 @@ box._param_specs = [
     _ParamSpec(1, "length", float, True),
     _ParamSpec(2, "width", float, True),
     _ParamSpec(3, "height", float, True),
+    _ParamSpec(4, "x", float, True),
+    _ParamSpec(5, "y", float, True),
+    _ParamSpec(6, "z", float, True),
 ]
 
 # --- Column_Reinforcement ---
@@ -564,6 +567,9 @@ beam._param_specs = [
     _ParamSpec(1, "length", float, True),
     _ParamSpec(2, "width", float, True),
     _ParamSpec(3, "height", float, True),
+    _ParamSpec(4, "x", float, True),
+    _ParamSpec(5, "y", float, True),
+    _ParamSpec(6, "z", float, True),
 ]
 
 Beam = {"beam": beam}
@@ -615,6 +621,9 @@ column._param_specs = [
     _ParamSpec(1, "length", float, True),
     _ParamSpec(2, "width", float, True),
     _ParamSpec(3, "height", float, True),
+    _ParamSpec(4, "x", float, True),
+    _ParamSpec(5, "y", float, True),
+    _ParamSpec(6, "z", float, True),
 ]
 
 Column = {"column": column}
@@ -626,14 +635,28 @@ CurtainWall = {
 }
 
 # --- Door ---
-def door(width: float = 900.0, height: float = 2100.0):
-    """Crea una puerta con ancho y alto especificados."""
+def door(
+    width: float = 900.0,
+    height: float = 2100.0,
+    x: float = 0.0,
+    y: float = 0.0,
+    z: float = 0.0,
+):
+    """Crea una puerta con ancho y alto especificados en la posición (x, y, z)."""
     doc = FreeCAD.ActiveDocument if FreeCAD else None
     if doc is None and FreeCAD and hasattr(FreeCAD, "newDocument"):
         doc = FreeCAD.newDocument()
     try:
         import Arch
-        d = Arch.makeWindowPreset("Simple door", width=width, height=height)
+        import Draft
+        try:
+            d = Arch.makeWindowPreset("Simple door", float(width), float(height), 50.0, 50.0, 50.0, 100.0, 50.0, 0.0, 0.0)
+        except Exception:
+            d = Arch.makeWindow(width=float(width), height=float(height))
+        if d and FreeCAD and hasattr(d, "Placement"):
+            d.Placement.Base = FreeCAD.Vector(float(x), float(y), float(z))
+        if hasattr(Draft, "autogroup"):
+            Draft.autogroup(d)
         if doc and hasattr(doc, "recompute"):
             doc.recompute()
         return d
@@ -646,6 +669,9 @@ def door(width: float = 900.0, height: float = 2100.0):
 door._param_specs = [
     _ParamSpec(1, "width", float, True),
     _ParamSpec(2, "height", float, True),
+    _ParamSpec(3, "x", float, True),
+    _ParamSpec(4, "y", float, True),
+    _ParamSpec(5, "z", float, True),
 ]
 
 Door = {"door": door}
@@ -700,9 +726,64 @@ PipeConnector = {
 }
 
 # --- Roof ---
-Roof = {
-    "roof": lambda: Gui.runCommand('Arch_Roof',0)
-}
+def roof(
+    length: float = 6000.0,
+    width: float = 4000.0,
+    thickness: float = 150.0,
+    x: float = 0.0,
+    y: float = 0.0,
+    z: float = 3000.0,
+):
+    """Crea una cubierta / techo paramétrico a partir de sus dimensiones y posición."""
+    doc = FreeCAD.ActiveDocument if FreeCAD else None
+    if doc is None and FreeCAD and hasattr(FreeCAD, "newDocument"):
+        doc = FreeCAD.newDocument()
+    try:
+        import Arch
+        import Draft
+
+        p1 = FreeCAD.Vector(x, y, z) if FreeCAD else (x, y, z)
+        p2 = FreeCAD.Vector(x + length, y, z) if FreeCAD else (x + length, y, z)
+        p3 = FreeCAD.Vector(x + length, y + width, z) if FreeCAD else (x + length, y + width, z)
+        p4 = FreeCAD.Vector(x, y + width, z) if FreeCAD else (x, y + width, z)
+        wire = None
+        if hasattr(Draft, "make_wire"):
+            try:
+                wire = Draft.make_wire([p1, p2, p3, p4], closed=True)
+            except Exception:
+                wire = None
+        if wire is None and hasattr(Draft, "make_rectangle"):
+            try:
+                wire = Draft.make_rectangle(length, width)
+            except Exception:
+                wire = None
+        if doc and hasattr(doc, "recompute"):
+            doc.recompute()
+        if hasattr(Arch, "makeRoof"):
+            r = Arch.makeRoof(wire, angles=[30.0], thickness=[float(thickness)])
+        else:
+            r = None
+        if r and hasattr(Draft, "autogroup"):
+            Draft.autogroup(r)
+        if doc and hasattr(doc, "recompute"):
+            doc.recompute()
+        return r
+    except Exception:
+        if Gui and hasattr(Gui, "runCommand"):
+            Gui.runCommand("Arch_Roof", 0)
+        return None
+
+
+roof._param_specs = [
+    _ParamSpec(1, "length", float, True),
+    _ParamSpec(2, "width", float, True),
+    _ParamSpec(3, "thickness", float, True),
+    _ParamSpec(4, "x", float, True),
+    _ParamSpec(5, "y", float, True),
+    _ParamSpec(6, "z", float, True),
+]
+
+Roof = {"roof": roof}
 
 # --- Site ---
 def _site():
@@ -751,6 +832,9 @@ slab._param_specs = [
     _ParamSpec(1, "length", float, True),
     _ParamSpec(2, "width", float, True),
     _ParamSpec(3, "thickness", float, True),
+    _ParamSpec(4, "x", float, True),
+    _ParamSpec(5, "y", float, True),
+    _ParamSpec(6, "z", float, True),
 ]
 
 Slab = {"slab": slab}
@@ -794,19 +878,36 @@ wall._param_specs = [
     _ParamSpec(1, "length", float, True),
     _ParamSpec(2, "width", float, True),
     _ParamSpec(3, "height", float, True),
+    _ParamSpec(4, "x", float, True),
+    _ParamSpec(5, "y", float, True),
+    _ParamSpec(6, "z", float, True),
 ]
 
 Wall = {"wall": wall}
 
 # --- Window ---
-def window(width: float = 1200.0, height: float = 1200.0):
-    """Crea una ventana con ancho y alto especificados."""
+def window(
+    width: float = 1200.0,
+    height: float = 1200.0,
+    x: float = 0.0,
+    y: float = 0.0,
+    z: float = 0.0,
+):
+    """Crea una ventana con ancho y alto especificados en la posición (x, y, z)."""
     doc = FreeCAD.ActiveDocument if FreeCAD else None
     if doc is None and FreeCAD and hasattr(FreeCAD, "newDocument"):
         doc = FreeCAD.newDocument()
     try:
         import Arch
-        w = Arch.makeWindowPreset("Open 1-pane", width=width, height=height)
+        import Draft
+        try:
+            w = Arch.makeWindowPreset("Open 1-pane", float(width), float(height), 50.0, 50.0, 50.0, 100.0, 50.0, 0.0, 0.0)
+        except Exception:
+            w = Arch.makeWindow(width=float(width), height=float(height))
+        if w and FreeCAD and hasattr(w, "Placement"):
+            w.Placement.Base = FreeCAD.Vector(float(x), float(y), float(z))
+        if hasattr(Draft, "autogroup"):
+            Draft.autogroup(w)
         if doc and hasattr(doc, "recompute"):
             doc.recompute()
         return w
@@ -819,6 +920,9 @@ def window(width: float = 1200.0, height: float = 1200.0):
 window._param_specs = [
     _ParamSpec(1, "width", float, True),
     _ParamSpec(2, "height", float, True),
+    _ParamSpec(3, "x", float, True),
+    _ParamSpec(4, "y", float, True),
+    _ParamSpec(5, "z", float, True),
 ]
 
 Window = {"window": window}
@@ -850,7 +954,7 @@ ArchRebar = {
 
 # --- ArchRoof ---
 ArchRoof = {
-    "arch roof": lambda: Gui.runCommand('Arch_Roof', 0)
+    "arch roof": roof
 }
 
 # --- ArchStairs ---
@@ -896,10 +1000,6 @@ def _stairs():
 def CurtainWall():
     if Gui and hasattr(Gui, "runCommand"):
         Gui.runCommand("BIM_CurtainWall", 0)
-
-def Roof():
-    if Gui and hasattr(Gui, "runCommand"):
-        Gui.runCommand("BIM_Roof", 0)
 
 def ArchEquipment():
     if Gui and hasattr(Gui, "runCommand"):

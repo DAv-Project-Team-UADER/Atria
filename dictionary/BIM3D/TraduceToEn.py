@@ -14,7 +14,7 @@
 #
 # Deberías haber recibido una copia de la Licencia Pública General GNU
 # junto con este programa. Si no es así, consulte <http://www.gnu.org/licenses/>.
-"""Mapa de voz (EN) para la seccion BIM3D (consolidado)."""
+"""Mapa de voz (EN) para la seccion 3D-BIM (consolidado)."""
 
 try:
     from .commands import Beam
@@ -151,8 +151,10 @@ except ImportError:
 
 TraduceToEn = {
     # Beam
+    'beam': Beam,
     'create beam': Beam,
     'new beam': Beam,
+    'insert beam': Beam,
     'generate beam': Beam,
     'add beam': Beam,
     # Beam_Reinforcement
@@ -166,6 +168,10 @@ TraduceToEn = {
     'add beam rebar': Beam_Reinforcement,
     'create beam rebar': Beam_Reinforcement,
     # Box
+    'box': Box,
+    'create box': Box,
+    'insert box': Box,
+    'new box': Box,
     'create ': Box,
     'insert ': Box,
     'add ': Box,
@@ -183,8 +189,11 @@ TraduceToEn = {
     'generate building': Building,
     'add building': Building,
     # Column
+    'column': Column,
+    'pillar': Column,
     'create column': Column,
     'new column': Column,
+    'insert column': Column,
     'generate pillar': Column,
     'add column': Column,
     # Column_Reinforcement
@@ -211,8 +220,10 @@ TraduceToEn = {
     'generate glass facade': CurtainWall,
     'add curtain wall': CurtainWall,
     # Door
+    'door': Door,
     'create door': Door,
     'new door': Door,
+    'insert door': Door,
     'generate door': Door,
     'add door': Door,
     # External_Reference
@@ -282,9 +293,12 @@ TraduceToEn = {
     'insert parametric profile': Profile,
     'parametric profile': Profile,
     # Roof
+    'roof': Roof,
     'create roof': Roof,
     'new roof': Roof,
+    'insert roof': Roof,
     'generate roof': Roof,
+    'add roof': Roof,
     'add sloped roof': Roof,
     # Shape_Builder
     'shape builder': Shape_Builder,
@@ -302,8 +316,10 @@ TraduceToEn = {
     'generate terrain': Site,
     'add site': Site,
     # Slab
+    'slab': Slab,
     'create slab': Slab,
     'new slab': Slab,
+    'insert slab': Slab,
     'generate plate': Slab,
     'add slab': Slab,
     # Slab_Reinforcement
@@ -322,13 +338,17 @@ TraduceToEn = {
     'generate room': Space,
     'add space': Space,
     # Wall
+    'wall': Wall,
     'create wall': Wall,
     'new wall': Wall,
+    'insert wall': Wall,
     'generate wall': Wall,
     'add wall': Wall,
     # Window
+    'window': Window,
     'create window': Window,
     'new window': Window,
+    'insert window': Window,
     'generate window': Window,
     'add window': Window,
     # ArchEquipment
