@@ -13,6 +13,8 @@ Views = {
 
     # Vistas estándar
     "isometric": commands.isometric,
+    "dimetric": commands.dimetric,
+    "trimetric": commands.trimetric,
     "front": commands.front,
     "top": commands.top,
     "right": commands.right,

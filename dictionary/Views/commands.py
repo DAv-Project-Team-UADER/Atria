@@ -26,117 +26,158 @@ except ImportError:
     Gui = None
 
 
-def perspective() -> None:
-    """Activa la cámara con perspectiva cónica (3D realista con profundidad)."""
-    if Gui:
+def _get_active_view():
+    """Obtiene de forma segura la vista 3D activa de FreeCAD."""
+    if not Gui:
+        return None
+    try:
+        if getattr(Gui, 'ActiveDocument', None):
+            view = getattr(Gui.ActiveDocument, 'ActiveView', None)
+            if view:
+                return view
+    except Exception:
+        pass
+    try:
+        if hasattr(Gui, 'activeView'):
+            return Gui.activeView()
+    except Exception:
+        pass
+    return None
+
+
+def _safe_view_call(view_method_name: str, cmd_name: str, msg_name: str | None = None) -> None:
+    """Invoca una acción de vista sobre la cámara activa con múltiples fallbacks."""
+    view = _get_active_view()
+    if view and hasattr(view, view_method_name):
         try:
-            Gui.runCommand('Std_PerspectiveCamera', 1)
+            getattr(view, view_method_name)()
+            if hasattr(view, 'redraw'):
+                view.redraw()
+            return
         except Exception:
             pass
+    if Gui:
+        if msg_name and hasattr(Gui, 'SendMsgToActiveView'):
+            try:
+                Gui.SendMsgToActiveView(msg_name)
+                return
+            except Exception:
+                pass
+        try:
+            Gui.runCommand(cmd_name)
+            return
+        except Exception:
+            pass
+        try:
+            Gui.runCommand(cmd_name, 0)
+        except Exception:
+            pass
+
+
+def perspective() -> None:
+    """Activa la cámara con perspectiva cónica (3D realista con profundidad)."""
+    view = _get_active_view()
+    if view and hasattr(view, 'setCameraType'):
+        try:
+            view.setCameraType("Perspective")
+            if hasattr(view, 'redraw'):
+                view.redraw()
+            return
+        except Exception:
+            pass
+    if Gui:
+        try:
+            Gui.runCommand('Std_PerspectiveCamera')
+        except Exception:
+            try:
+                Gui.runCommand('Std_PerspectiveCamera', 1)
+            except Exception:
+                pass
 
 
 def orthographic() -> None:
     """Activa la cámara ortogonal / paralela (sin distorsión de perspectiva, ideal para planos técnicos)."""
-    if Gui:
+    view = _get_active_view()
+    if view and hasattr(view, 'setCameraType'):
         try:
-            Gui.runCommand('Std_OrthographicCamera', 1)
+            view.setCameraType("Orthographic")
+            if hasattr(view, 'redraw'):
+                view.redraw()
+            return
         except Exception:
             pass
+    if Gui:
+        try:
+            Gui.runCommand('Std_OrthographicCamera')
+        except Exception:
+            try:
+                Gui.runCommand('Std_OrthographicCamera', 1)
+            except Exception:
+                pass
 
 
 def isometric() -> None:
     """Orienta la cámara en la vista isométrica 3D estándar."""
-    if Gui:
-        try:
-            Gui.runCommand('Std_ViewIsometric', 0)
-        except Exception:
-            pass
+    _safe_view_call('viewIsometric', 'Std_ViewIsometric', 'ViewIsometric')
+
+
+def dimetric() -> None:
+    """Orienta la cámara en la vista dimétrica 3D."""
+    _safe_view_call('viewDimetric', 'Std_ViewDimetric', 'ViewDimetric')
+
+
+def trimetric() -> None:
+    """Orienta la cámara en la vista trimétrica 3D."""
+    _safe_view_call('viewTrimetric', 'Std_ViewTrimetric', 'ViewTrimetric')
 
 
 def front() -> None:
     """Orienta la cámara en la vista frontal."""
-    if Gui:
-        try:
-            Gui.runCommand('Std_ViewFront', 0)
-        except Exception:
-            pass
+    _safe_view_call('viewFront', 'Std_ViewFront', 'ViewFront')
 
 
 def top() -> None:
     """Orienta la cámara en la vista superior (planta)."""
-    if Gui:
-        try:
-            Gui.runCommand('Std_ViewTop', 0)
-        except Exception:
-            pass
+    _safe_view_call('viewTop', 'Std_ViewTop', 'ViewTop')
 
 
 def right() -> None:
     """Orienta la cámara en la vista lateral derecha."""
-    if Gui:
-        try:
-            Gui.runCommand('Std_ViewRight', 0)
-        except Exception:
-            pass
+    _safe_view_call('viewRight', 'Std_ViewRight', 'ViewRight')
 
 
 def left() -> None:
     """Orienta la cámara en la vista lateral izquierda."""
-    if Gui:
-        try:
-            Gui.runCommand('Std_ViewLeft', 0)
-        except Exception:
-            pass
+    _safe_view_call('viewLeft', 'Std_ViewLeft', 'ViewLeft')
 
 
 def rear() -> None:
     """Orienta la cámara en la vista posterior (trasera)."""
-    if Gui:
-        try:
-            Gui.runCommand('Std_ViewRear', 0)
-        except Exception:
-            pass
+    _safe_view_call('viewRear', 'Std_ViewRear', 'ViewRear')
 
 
 def bottom() -> None:
     """Orienta la cámara en la vista inferior (desde abajo)."""
-    if Gui:
-        try:
-            Gui.runCommand('Std_ViewBottom', 0)
-        except Exception:
-            pass
+    _safe_view_call('viewBottom', 'Std_ViewBottom', 'ViewBottom')
 
 
 def fit_all() -> None:
     """Encuadra y centra todo el modelo en la pantalla (Fit All)."""
-    if Gui:
-        try:
-            Gui.runCommand('Std_ViewFitAll', 0)
-        except Exception:
-            pass
+    _safe_view_call('fitAll', 'Std_ViewFitAll', 'FitAll')
 
 
 def fit_selection() -> None:
     """Enfoca la cámara en el objeto o geometría seleccionada."""
-    if Gui:
-        try:
-            Gui.runCommand('Std_ViewFitSelection', 0)
-        except Exception:
-            pass
+    _safe_view_call('fitSelection', 'Std_ViewFitSelection', 'FitSelection')
 
 
 ZOOM_FACTOR = 0.85
 
 def _apply_zoom(factor: float) -> None:
-    if not Gui:
+    view = _get_active_view()
+    if view is None:
         return
     try:
-        view = getattr(Gui.ActiveDocument, 'ActiveView', None) if getattr(Gui, 'ActiveDocument', None) else None
-        if view is None and hasattr(Gui, 'activeView'):
-            view = Gui.activeView()
-        if view is None:
-            return
-
         cam = view.getCameraNode() if hasattr(view, 'getCameraNode') else None
         if cam is None:
             return
@@ -174,62 +215,70 @@ def zoom_out() -> None:
 
 def rotate_left() -> None:
     """Gira la cámara hacia la izquierda alrededor del modelo."""
-    if not Gui:
-        return
-    try:
-        view = getattr(Gui.ActiveDocument, 'ActiveView', None) if getattr(Gui, 'ActiveDocument', None) else None
-        if view is None and hasattr(Gui, 'activeView'):
-            view = Gui.activeView()
-        if view and hasattr(view, 'viewRotateLeft'):
+    view = _get_active_view()
+    if view and hasattr(view, 'viewRotateLeft'):
+        try:
             view.viewRotateLeft()
-        else:
-            Gui.runCommand('Std_ViewRotateLeft', 0)
-    except Exception:
-        pass
+            if hasattr(view, 'redraw'):
+                view.redraw()
+            return
+        except Exception:
+            pass
+    if Gui:
+        try:
+            Gui.runCommand('Std_ViewRotateLeft')
+        except Exception:
+            try:
+                Gui.runCommand('Std_ViewRotateLeft', 0)
+            except Exception:
+                pass
 
 
 def rotate_right() -> None:
     """Gira la cámara hacia la derecha alrededor del modelo."""
-    if not Gui:
-        return
-    try:
-        view = getattr(Gui.ActiveDocument, 'ActiveView', None) if getattr(Gui, 'ActiveDocument', None) else None
-        if view is None and hasattr(Gui, 'activeView'):
-            view = Gui.activeView()
-        if view and hasattr(view, 'viewRotateRight'):
+    view = _get_active_view()
+    if view and hasattr(view, 'viewRotateRight'):
+        try:
             view.viewRotateRight()
-        else:
-            Gui.runCommand('Std_ViewRotateRight', 0)
-    except Exception:
-        pass
+            if hasattr(view, 'redraw'):
+                view.redraw()
+            return
+        except Exception:
+            pass
+    if Gui:
+        try:
+            Gui.runCommand('Std_ViewRotateRight')
+        except Exception:
+            try:
+                Gui.runCommand('Std_ViewRotateRight', 0)
+            except Exception:
+                pass
 
 
 def rotate_up() -> None:
     """Inclina la cámara hacia arriba."""
-    if not Gui:
-        return
-    try:
-        view = getattr(Gui.ActiveDocument, 'ActiveView', None) if getattr(Gui, 'ActiveDocument', None) else None
-        if view is None and hasattr(Gui, 'activeView'):
-            view = Gui.activeView()
-        if view and hasattr(view, 'viewRotateUp'):
+    view = _get_active_view()
+    if view and hasattr(view, 'viewRotateUp'):
+        try:
             view.viewRotateUp()
-    except Exception:
-        pass
+            if hasattr(view, 'redraw'):
+                view.redraw()
+            return
+        except Exception:
+            pass
 
 
 def rotate_down() -> None:
     """Inclina la cámara hacia abajo."""
-    if not Gui:
-        return
-    try:
-        view = getattr(Gui.ActiveDocument, 'ActiveView', None) if getattr(Gui, 'ActiveDocument', None) else None
-        if view is None and hasattr(Gui, 'activeView'):
-            view = Gui.activeView()
-        if view and hasattr(view, 'viewRotateDown'):
+    view = _get_active_view()
+    if view and hasattr(view, 'viewRotateDown'):
+        try:
             view.viewRotateDown()
-    except Exception:
-        pass
+            if hasattr(view, 'redraw'):
+                view.redraw()
+            return
+        except Exception:
+            pass
 
 
 try:
