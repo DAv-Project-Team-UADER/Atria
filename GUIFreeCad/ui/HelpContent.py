@@ -240,11 +240,227 @@ HELP_BY_CATEGORY["BIM3D"] = HELP_BY_CATEGORY["3D-BIM"]
 HELP_BY_CATEGORY["Drafting2D"] = HELP_BY_CATEGORY["2D-Drafting"]
 HELP_BY_CATEGORY["Vistas"] = HELP_BY_CATEGORY["Views"]
 
+HELP_BY_CATEGORY_EN: dict[str, list[tuple[str, str]]] = {
+    "Base": [
+        ("explorer", "Browse files, projects, editing commands, windows, and general tools."),
+        ("two d", "Open 2D drawing tools such as lines, circles, dimensions, text, and curves."),
+        ("three d", "Open 3D architectural and structural modeling tools, including walls, doors, columns, and slabs."),
+        ("annotation", "Create drawing dimensions, axes, sections, layers, and technical sheets."),
+        ("manage", "Manage projects, IFC classification, materials, quantity schedules, and views."),
+        ("modify", "Modify and transform objects with move, rotate, copy, trim, and boolean tools."),
+        ("preferences", "Configure the workspace, units, language, and tool preferences."),
+        ("snapping", "Configure object snapping, the grid, and the working plane."),
+        ("status bar", "Toggle IFC mode, BIM views, and the 3D viewport background style."),
+        ("utils", "Open measurement, model-checking, and geometry utility tools."),
+        ("views", "Control standard views, camera rotation, framing, and projection mode."),
+    ],
+    "3D-BIM": [
+        ("create site", "Create the project site or terrain and organize its buildings."),
+        ("create building", "Create a building group to organize the model's levels."),
+        ("create level", "Create a story or floor that groups objects at a shared elevation."),
+        ("create space", "Define a room volume and calculate its floor area."),
+        ("create wall", "Create an architectural wall from scratch or from a line, face, or sketch."),
+        ("create curtain wall", "Divide a base face into mullions, transoms, and glazed panels."),
+        ("create column", "Create a vertical structural element."),
+        ("create beam", "Create a horizontal structural element between two points."),
+        ("create slab", "Create a horizontal slab by extruding a planar shape."),
+        ("create roof", "Create a parametric sloped roof from a closed outline."),
+        ("create sloped roof", "Create a sloped roof with a pitch and an overhang on each edge."),
+        ("create stairs", "Create straight stairs, stairs with a landing, or stairs with stringers."),
+        ("create frame", "Extrude a profile along a path to create railings or frames."),
+        ("create truss", "Create a parametric truss from a line or from scratch."),
+        ("create fence", "Repeat fence posts and sections along a path."),
+        ("create panel", "Create a parametric panel from a flat or corrugated 2D outline."),
+        ("create equipment", "Insert non-structural furniture, equipment, or appliances."),
+        ("create custom rebar", "Place reinforcing bars from a sketch onto a structure."),
+        ("create window", "Insert a window into a wall and create the corresponding opening."),
+        ("create door", "Insert a door into a wall and create the corresponding opening."),
+        ("create pipe", "Create a straight pipe or a pipe from a base outline."),
+        ("create connector", "Connect two or three pipes at an elbow or T-junction."),
+        ("create box", "Create a Part box by specifying its dimensions."),
+        ("convert to component", "Convert a Part object into an Arch component."),
+        ("insert external reference", "Link an object stored in another FreeCAD file."),
+        ("create facebinder", "Create a parametric surface from selected faces."),
+        ("insert library object", "Open the object library to insert furniture and equipment."),
+        ("create profile", "Create a parametric 2D profile for extrusion, such as C, H, R, U, L, or T."),
+        ("shape builder", "Build edges, wires, faces, shells, and solids from primitives."),
+        ("add beam reinforcement", "Reinforce a beam with stirrups and upper, lower, and shear bars."),
+        ("add column reinforcement", "Reinforce a column with stirrups and main and secondary bars."),
+        ("add footing reinforcement", "Reinforce a footing with a bar mesh and columns."),
+        ("add slab reinforcement", "Reinforce a slab with bar meshes in both directions."),
+        ("create bent-shape rebar", "Create bent reinforcing bars inside a structure."),
+        ("create helical rebar", "Create a helical reinforcing bar inside a structure."),
+        ("create L-shape rebar", "Create L-shaped reinforcing bars inside a structure."),
+        ("create straight rebar", "Create straight reinforcing bars inside a structure."),
+        ("create stirrup", "Create closed-loop reinforcing bars inside a structure."),
+        ("create U-shape rebar", "Create U-shaped reinforcing bars inside a structure."),
+    ],
+    "2D-Drafting": [
+        ("point", "Create a point on the working plane."),
+        ("line", "Create a straight line between two points."),
+        ("rectangle", "Create a rectangle from two opposite corners."),
+        ("polygon", "Create a regular polygon from a center point and radius."),
+        ("polyline", "Create a continuous sequence of straight segments through several points."),
+        ("circle", "Create a circle from its center and radius."),
+        ("arc", "Create an arc from its center, radius, and start and end angles."),
+        ("arc from 3 points", "Create an arc that passes through three points on its perimeter."),
+        ("ellipse", "Create an ellipse from its center and major and minor radii."),
+        ("fillet", "Create a fillet or chamfer between selected lines."),
+        ("B-spline curve", "Create a smooth B-spline curve through a series of points."),
+        ("Bezier curve", "Create a Bezier curve from its control points."),
+        ("text", "Create a single-line or multiline text annotation in the drawing."),
+        ("dimension", "Add a dimension to measure distances or angles between points."),
+        ("label", "Add a text label linked to an element."),
+    ],
+    "Annotation": [
+        ("aligned dimension", "Create a dimension between two points or along a sloped edge."),
+        ("horizontal dimension", "Create a horizontally constrained dimension between two points."),
+        ("vertical dimension", "Create a vertically constrained dimension between two points."),
+        ("2D drawing", "Create a 2D drawing by projecting model views and sections."),
+        ("axes", "Place a structural reference axis system in the document."),
+        ("axis system", "Combine multiple reference axes into one coordinated system."),
+        ("label", "Add a text label associated with a building element."),
+        ("working plane", "Set the position and orientation of the active working plane."),
+        ("section view", "Create a cutting plane to section and display the model."),
+        ("new page", "Create a sheet for technical drawings."),
+        ("new view", "Insert a projected model view into the active drawing sheet."),
+        ("layer", "Create a layer to organize elements and control their color and visibility."),
+        ("layer manager", "Open the panel for managing, hiding, or locking layers."),
+        ("clone", "Create a linked parametric clone of an object's geometry."),
+    ],
+    "Manage": [
+        ("setup BIM project", "Guided setup for the initial parameters of a BIM project."),
+        ("manage IFC properties", "Open the manager for IFC entities, types, and attributes."),
+        ("export IFC", "Export the architectural model to the open IFC standard."),
+        ("BIM manager", "Open the central panel for organizing and managing the BIM model."),
+        ("review classifications", "Check that every object has an assigned classification."),
+        ("review IFC", "Inspect and validate IFC properties and types."),
+        ("manage materials", "Open the catalog and manager for construction materials."),
+        ("create schedule", "Generate a schedule of material quantities and areas."),
+        ("update quantities", "Recalculate quantities after model changes."),
+        ("drawing views", "Insert technical views and details into project sheets."),
+        ("section plane", "Define an interactive cutting plane in the 3D model view."),
+        ("grid", "Generate a modular grid of guide lines for design."),
+        ("view manager", "Manage saved cameras, perspectives, and orientations."),
+    ],
+    "Modify": [
+        ("move", "Move selected objects from a source point to a destination."),
+        ("copy", "Duplicate selected objects at new coordinates."),
+        ("rotate", "Rotate selected objects around a center by a specified angle."),
+        ("clone", "Create a parametric linked copy of the original object."),
+        ("offset", "Move an object's geometry along a vector."),
+        ("mirror", "Create a mirrored copy across a plane or axis."),
+        ("scale", "Resize objects by applying a scale factor."),
+        ("trim or extend", "Trim edges or lines that intersect other elements."),
+        ("stretch", "Stretch selected edges or vertices to deform an object."),
+        ("align", "Align faces, edges, or centers across multiple objects."),
+        ("edit", "Edit the part's vertices and parameters."),
+        ("convert to sketch", "Convert 2D Draft elements into a Sketcher sketch."),
+        ("join elements", "Join contiguous lines and edges into a single wire."),
+        ("split element", "Cut or split a line or wire at a selected point."),
+        ("create offset", "Create a parallel offset curve or outline at a constant distance."),
+        ("create 2D offset", "Create a parallel 2D outline at a specified distance."),
+        ("create array", "Create an orthogonal array of copies along the X, Y, and Z axes."),
+        ("create polar array", "Arrange copies in a circle around a center."),
+        ("create path array", "Distribute copies along a path or curve."),
+        ("array by points", "Place copies at points on another piece of geometry."),
+        ("union objects", "Combine two or more solids into one using a boolean union."),
+        ("cut objects", "Subtract one solid from another using a boolean difference."),
+        ("intersect objects", "Keep only the volume shared by intersecting solids."),
+        ("extrude piece", "Extrude a planar shape to give it 3D volume."),
+        ("extrude face", "Extrude a selected planar face perpendicularly."),
+        ("cut with plane", "Cut a BIM object or solid using a reference plane."),
+        ("add component", "Add objects to a wall, structure, level, or host element."),
+        ("remove component", "Remove or detach a component from its host element."),
+    ],
+    "Preferences": [
+        ("general preferences", "Configure global interface, language, and performance options."),
+        ("2D preferences", "Configure 2D drawing colors, snapping, and precision."),
+        ("3D preferences", "Configure the 3D workspace, display, and rendering options."),
+        ("annotation preferences", "Set default dimension styles, fonts, and arrows."),
+        ("management preferences", "Configure IFC schemes, metadata, and BIM project options."),
+        ("modify preferences", "Set default tolerances and editing tool behavior."),
+        ("snapping preferences", "Configure cursor sensitivity, snap radius, and the working grid."),
+        ("view preferences", "Configure camera display modes and 3D navigation."),
+        ("tool preferences", "Customize toolbars, access, and keyboard shortcuts."),
+        ("import export preferences", "Configure import and export settings and filters for IFC, DXF, SVG, and STEP."),
+    ],
+    "Snapping": [
+        ("working plane", "Set the working plane using vertices, faces, or a quick view."),
+        ("top plane", "Set the working plane to the top XY plane."),
+        ("front plane", "Set the working plane to the front XZ plane."),
+        ("side plane", "Set the working plane to the side YZ plane."),
+        ("toggle snap", "Turn object snapping modes on or off globally."),
+        ("snap grid", "Toggle snapping to grid intersections."),
+        ("snap endpoint", "Snap the cursor to vertices and line or edge endpoints."),
+        ("snap midpoint", "Snap the cursor to the midpoint of edges and segments."),
+        ("snap center", "Snap the cursor to the center of circles, arcs, and polygons."),
+        ("snap ortho", "Constrain cursor movement to orthogonal angles."),
+        ("lock snap", "Lock the current snapping reference coordinate."),
+    ],
+    "StatusBar": [
+        ("lock IFC", "Toggle strict IFC mode to validate geometry against the standard."),
+        ("toggle BIM views", "Show or hide the dockable BIM views and levels panel."),
+        ("toggle 3D background", "Cycle the 3D view background between vertical gradient, radial gradient, and solid color."),
+    ],
+    "Utils": [
+        ("take measurements", "Measure distances, edges, faces, and angles interactively."),
+        ("check model", "Check selected object geometry for faults and open faces."),
+        ("close holes", "Repair and seal open holes in meshes and non-planar faces."),
+        ("create component", "Convert standard geometric shapes into BIM architectural components."),
+        ("review IFC", "Audit the model's IFC properties and types against the standard."),
+    ],
+    "Explorer": [
+        ("file", "Open file tools for creating, opening, saving, importing, and exporting."),
+        ("project", "Open project tools for voice-based file operations."),
+        ("edit", "Open editing tools such as undo, redo, cut, copy, and paste."),
+        ("print", "Configure printing or export directly to PDF."),
+        ("windows", "Manage document windows, close documents, or exit the application."),
+        ("expressions", "Copy, paste, and manage formulas and parametric expressions."),
+        ("tools", "Open utility tools for measurements, customization, and parameters."),
+        ("structure", "Create parts, groups, and links."),
+        ("examples", "Open the user manual and guided step-by-step examples."),
+        ("refresh", "Refresh the 3D view and object tree."),
+        ("screenshot", "Capture the active 3D view and save it to disk."),
+        ("text document", "Create a text document in the project."),
+        ("unlink", "Remove the link or dependency from the selected object."),
+        ("freeze", "Lock the selected object's geometry to prevent changes."),
+        ("all instances", "Select every instance associated with the object."),
+        ("variables", "Create a parametric design variable set."),
+    ],
+    "Views": [
+        ("perspective", "Enable the 3D perspective camera with realistic depth and a vanishing point."),
+        ("orthographic", "Enable a parallel camera without perspective distortion for technical drawings."),
+        ("isometric", "Set the view to the classic 3D isometric orientation."),
+        ("front", "Set the camera to the front elevation in the XZ plane."),
+        ("top", "Set the camera to the top or plan view in the XY plane."),
+        ("right", "Set the camera to the right-side view in the YZ plane."),
+        ("left", "Set the camera to the left-side view."),
+        ("rear", "Set the camera to the rear view."),
+        ("bottom", "Set the camera to the bottom view."),
+        ("fit all", "Frame the entire visible model in the viewport."),
+        ("fit selection", "Center and zoom in on the selected object."),
+        ("zoom in", "Zoom in on the model."),
+        ("zoom out", "Zoom out from the model."),
+        ("rotate left", "Rotate the camera 15 degrees to the left around the model."),
+        ("rotate right", "Rotate the camera 15 degrees to the right around the model."),
+        ("rotate up", "Tilt the camera 15 degrees upward."),
+        ("rotate down", "Tilt the camera 15 degrees downward."),
+        ("move camera", "Center the camera on coordinates specified by voice (X, Y, Z)."),
+    ],
+}
+
+# Keep the translated aliases aligned with the Spanish catalog aliases.
+HELP_BY_CATEGORY_EN["BIM3D"] = HELP_BY_CATEGORY_EN["3D-BIM"]
+HELP_BY_CATEGORY_EN["Drafting2D"] = HELP_BY_CATEGORY_EN["2D-Drafting"]
+HELP_BY_CATEGORY_EN["Vistas"] = HELP_BY_CATEGORY_EN["Views"]
+
 
 def get_help_for_category(
     category_name: str,
     context_path: str = "",
     current_entries: list[Any] | None = None,
+    language: str = "es",
 ) -> tuple[str, list[tuple[str, str]], str]:
     """Retorna el título, la lista de pares (comando, descripción) y el texto plano formateado.
 
@@ -252,25 +468,28 @@ def get_help_for_category(
         category_name: Nombre interno de la categoría (p. ej. "3D-BIM", "Modify", "Base").
         context_path: Ruta de navegación (p. ej. "Base > 3D-BIM").
         current_entries: Lista opcional de ContextEntry actuales para fallback dinámico.
+        language: Idioma de las etiquetas y explicaciones ("es" o "en").
 
     Returns:
         tuple (title, items, formatted_text)
     """
     clean_cat = (category_name or "Base").strip()
     path = context_path or clean_cat
-    title = format_section_title(path)
+    lang = "en" if str(language).lower().startswith("en") else "es"
+    help_by_category = HELP_BY_CATEGORY_EN if lang == "en" else HELP_BY_CATEGORY
+    title = format_section_title(path, lang)
 
     items: list[tuple[str, str]] = []
 
     # 1. Búsqueda exacta en el diccionario estructurado
-    if clean_cat in HELP_BY_CATEGORY:
-        items = list(HELP_BY_CATEGORY[clean_cat])
+    if clean_cat in help_by_category:
+        items = list(help_by_category[clean_cat])
     else:
         # Búsqueda por subsegmento de context_path si es un submenú (ej. Explorer > file)
         segments = [s.strip() for s in path.split(">") if s.strip()]
         last_seg = segments[-1] if segments else clean_cat
-        if last_seg in HELP_BY_CATEGORY:
-            items = list(HELP_BY_CATEGORY[last_seg])
+        if last_seg in help_by_category:
+            items = list(help_by_category[last_seg])
 
     # 2. Si no se encontró o se proporcionaron entradas del navegador, complementar
     if not items and current_entries:
@@ -281,7 +500,11 @@ def get_help_for_category(
                 continue
             seen.add(spoken)
             is_sub = getattr(entry, "IsSubContext", lambda: False)() if callable(getattr(entry, "IsSubContext", None)) else getattr(entry, "IsSubContext", False)
-            if is_sub:
+            if lang == "en" and is_sub:
+                desc = f"Open this submenu to browse the {spoken} tools."
+            elif lang == "en":
+                desc = f"Run the {spoken} tool."
+            elif is_sub:
                 desc = f"Submenú para ingresar y ver herramientas de {spoken}."
             else:
                 desc = f"Ejecuta la herramienta de {spoken}."
@@ -289,14 +512,22 @@ def get_help_for_category(
 
     # Fallback genérico si sigue vacío
     if not items:
-        items = [("ayuda", "Muestra esta ventana con las instrucciones de uso.")]
+        items = (
+            [("help", "Open this window to view usage instructions.")]
+            if lang == "en"
+            else [("ayuda", "Muestra esta ventana con las instrucciones de uso.")]
+        )
 
     # Generar texto plano amigable
     lines = [f"=== {title} ===", ""]
     for cmd, desc in items:
         lines.append(f"  {cmd.ljust(26)} - {desc}")
     lines.append("")
-    lines.append("Para cerrar esta ventana di: «cerrar ayuda» o «cerrar»")
+    lines.append(
+        "To close this window, say: «close help» or «close»"
+        if lang == "en"
+        else "Para cerrar esta ventana di: «cerrar ayuda» o «cerrar»"
+    )
     formatted_text = "\n".join(lines)
 
     return title, items, formatted_text

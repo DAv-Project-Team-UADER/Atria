@@ -121,8 +121,12 @@ class AtriaPanel(QWidget):
 
         self._theme = Theme
         self._palette = LIGHT if Theme == "light" else DARK
-        self._lang = Lang
-        self._texts = TEXTS.get(Lang, TEXTS["es"])
+        self._lang = "en" if str(Lang).lower().startswith("en") else "es"
+        self._texts = TEXTS[self._lang]
+        self._statusKey = "inactive"
+        self._statusDetail = ""
+        self._treeObjects: list[dict] = []
+        self._treeDocumentName: str | None = None
 
         self._BuildUi()
         self.RenderContext(self._context)
@@ -259,6 +263,8 @@ class AtriaPanel(QWidget):
             "inactive": self._texts["mic_inactive"],
             "error": self._texts["mic_error"],
         }
+        self._statusKey = Status
+        self._statusDetail = Detail
         self._statusLabel.setText(Detail or labels.get(Status, Status))
 
     def SetTree(self, Objects: list[dict], DocumentName: str | None = None) -> None:
@@ -275,13 +281,15 @@ class AtriaPanel(QWidget):
         if tree is None:
             return
 
+        self._treeObjects = [dict(obj) for obj in (Objects or [])]
+        self._treeDocumentName = DocumentName
         tree.clear()
         self._treeItems = {}
         if not Objects:
-            tree.addTopLevelItem(QTreeWidgetItem(["(sin documento abierto)"]))
+            tree.addTopLevelItem(QTreeWidgetItem([self._texts["no_document"]]))
             return
 
-        root = QTreeWidgetItem([DocumentName or "Documento"])
+        root = QTreeWidgetItem([DocumentName or self._texts["document_name"]])
         tree.addTopLevelItem(root)
 
         items: dict[str, QTreeWidgetItem] = {}
@@ -289,7 +297,7 @@ class AtriaPanel(QWidget):
         for obj in Objects:
             label = obj.get("label") or obj.get("name") or "?"
             if not obj.get("visible", True):
-                label = f"{label}  (oculto)"
+                label = f"{label}  {self._texts['hidden']}"
             items[obj.get("name", label)] = QTreeWidgetItem([label])
 
         for obj in Objects:
@@ -341,14 +349,18 @@ class AtriaPanel(QWidget):
 
     def SetLanguage(self, Lang: str) -> None:
         """Switch the interface language."""
-        self._lang = Lang
-        self._texts = TEXTS.get(Lang, TEXTS["es"])
+        self._lang = "en" if str(Lang).lower().startswith("en") else "es"
+        self._texts = TEXTS[self._lang]
         self._listenLabel.setText(self._texts["section_listen"])
         self._histLabel.setText(self._texts["section_history"])
         self._modelLabel.setText(self._texts["section_model"])
+        self.SetStatus(self._statusKey, self._statusDetail)
         if hasattr(self, "_emptyHint") and self._emptyHint is not None:
             self._emptyHint.setText(self._texts["empty_context"])
+        self._UpdateHeaderTooltips()
         self._UpdateSectionTitle()
+        self.RenderContext(self._context)
+        self.SetTree(self._treeObjects, self._treeDocumentName)
 
     def SetDockState(self, Floating: bool) -> None:
         """Reflect whether the panel is detached, on the dock/undock button.
@@ -365,8 +377,8 @@ class AtriaPanel(QWidget):
             return
         button.setText("⧈" if Floating else "⧉")
         button.setToolTip(
-            "Volver a unir a la ventana de FreeCAD" if Floating
-            else "Separar de la ventana de FreeCAD"
+            self._texts["dock_floating"] if Floating
+            else self._texts["dock_attached"]
         )
 
     def Flash(self) -> None:
@@ -389,7 +401,7 @@ class AtriaPanel(QWidget):
 
         layout.addLayout(self._BuildHeader())
 
-        self._statusLabel = QLabel(texts.get("status_idle", "Micrófono inactivo"))
+        self._statusLabel = QLabel(texts["status_idle"])
         self._statusLabel.setFont(QFont(FONT_SANS, 13, QFont.Bold))
         self._statusLabel.setAlignment(Qt.AlignCenter)
         self._statusLabel.setFixedHeight(44)
@@ -482,7 +494,6 @@ class AtriaPanel(QWidget):
         self._dockButton = QPushButton("⧉")
         self._dockButton.setFixedSize(38, 34)
         self._dockButton.setFont(QFont(FONT_SANS, 15, QFont.Bold))
-        self._dockButton.setToolTip("⧉ Desacoplar / Acoplar panel ATRIA\n(Permite flotar o fijar el panel en FreeCAD)")
         hand_cursor = getattr(Qt, "PointingHandCursor", None)
         if hand_cursor is not None:
             self._dockButton.setCursor(hand_cursor)
@@ -492,11 +503,6 @@ class AtriaPanel(QWidget):
         self._prefsButton = QPushButton("⚙")
         self._prefsButton.setFixedSize(38, 34)
         self._prefsButton.setFont(QFont(FONT_SANS, 15, QFont.Bold))
-        self._prefsButton.setToolTip(
-            "⚙ Preferencias y Configuración de Voz\n"
-            "🎤 Di: «preferencias»\n"
-            "🖱️ O haz clic para abrir opciones"
-        )
         if hand_cursor is not None:
             self._prefsButton.setCursor(hand_cursor)
         self._prefsButton.clicked.connect(self.PreferencesRequested.emit)
@@ -505,18 +511,18 @@ class AtriaPanel(QWidget):
         self._helpButton = QPushButton("?")
         self._helpButton.setFixedSize(38, 34)
         self._helpButton.setFont(QFont(FONT_SANS, 15, QFont.Bold))
-        self._helpButton.setToolTip(
-            "? Ayuda y Manual de la Sección\n"
-            "🎤 Di: «ayuda» o «manual»\n"
-            "🖱️ Abre una ventana emergente que explica cada botón de la sección\n"
-            "🎤 Para cerrar di: «cerrar ayuda» o «cerrar»"
-        )
         if hand_cursor is not None:
             self._helpButton.setCursor(hand_cursor)
         self._helpButton.clicked.connect(self.HelpRequested.emit)
         row.addWidget(self._helpButton)
 
+        self._UpdateHeaderTooltips()
         return row
+
+    def _UpdateHeaderTooltips(self) -> None:
+        self._dockButton.setToolTip(self._texts["dock_tooltip"])
+        self._prefsButton.setToolTip(self._texts["preferences_tooltip"])
+        self._helpButton.setToolTip(self._texts["help_tooltip"])
 
     def _BuildTreeColumn(self) -> QVBoxLayout:
         column = QVBoxLayout()
@@ -593,17 +599,15 @@ class AtriaPanel(QWidget):
         clean_name = spoken_text.replace("_", " ").strip().title()
 
         if is_sub:
-            tooltip = (
-                f"📂 Submenú: {clean_name}\n"
-                f"🎤 Di «{spoken_text}»\n"
-                f"🖱️ Clic para explorar herramientas"
+            tooltip = self._texts["submenu_tooltip"].format(
+                name=clean_name,
+                spoken=spoken_text,
             )
             button.setStyleSheet(self._SubmenuButtonQss())
         else:
-            tooltip = (
-                f"⚡ Herramienta: {clean_name}\n"
-                f"🎤 Di «{spoken_text}»\n"
-                f"🖱️ Clic para ejecutar"
+            tooltip = self._texts["tool_tooltip"].format(
+                name=clean_name,
+                spoken=spoken_text,
             )
             button.setStyleSheet(self._ButtonQss())
 
@@ -628,11 +632,7 @@ class AtriaPanel(QWidget):
         button = QToolButton()
         button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         button.setFixedSize(self.BUTTON_WIDTH, self.BUTTON_HEIGHT)
-        button.setToolTip(
-            "⬅ Volver al nivel anterior\n"
-            "🎤 Di: «volver» o «subir»\n"
-            "🖱️ O haz clic para regresar"
-        )
+        button.setToolTip(self._texts["back_tooltip"])
         button.setFont(QFont(FONT_SANS, 8, QFont.Bold))
         hand_cursor = getattr(Qt, "PointingHandCursor", None)
         if hand_cursor is not None:
@@ -644,8 +644,7 @@ class AtriaPanel(QWidget):
             button.setIcon(QIcon(icon))
             button.setIconSize(QSize(self.ICON_SIZE, self.ICON_SIZE))
 
-        back_text = self._BackPhrase().capitalize()
-        button.setText(f"⬅ {back_text}")
+        button.setText("Back" if self._lang == "en" else "Volver")
 
         button.clicked.connect(lambda _checked=False: self._OnEntryClicked(self._BackPhrase()))
         return button
@@ -655,12 +654,7 @@ class AtriaPanel(QWidget):
         button = QToolButton()
         button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         button.setFixedSize(self.BUTTON_WIDTH, self.BUTTON_HEIGHT)
-        button.setToolTip(
-            "❓ Ayuda y Manual de la Sección\n"
-            "🎤 Di: «ayuda» o «manual»\n"
-            "🖱️ Haz clic para abrir la ventana de ayuda de esta sección\n"
-            "🎤 Di: «cerrar ayuda» o «cerrar» para cerrarla"
-        )
+        button.setToolTip(self._texts["context_help_tooltip"])
         button.setFont(QFont(FONT_SANS, 8, QFont.Bold))
         hand_cursor = getattr(Qt, "PointingHandCursor", None)
         if hand_cursor is not None:
@@ -677,8 +671,12 @@ class AtriaPanel(QWidget):
             button.setIcon(QIcon(icon))
             button.setIconSize(QSize(self.ICON_SIZE, self.ICON_SIZE))
 
-        button.setText("❓ Ayuda")
-        button.clicked.connect(lambda _checked=False: self._OnEntryClicked("ayuda"))
+        button.setText(self._texts["help_btn"])
+        button.clicked.connect(
+            lambda _checked=False: self._OnEntryClicked(
+                "help" if self._lang == "en" else "ayuda"
+            )
+        )
         return button
 
     def _FormatButtonText(self, spoken: str) -> str:

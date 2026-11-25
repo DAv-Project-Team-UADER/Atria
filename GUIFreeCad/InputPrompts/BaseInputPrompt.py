@@ -203,13 +203,13 @@ class BaseInputPrompt(QDialog):
 
         self._OkButton.setToolTip(
             "Confirmar valor ingresado\n"
-            "🎤 Di «ok», «listo» o «enviar»\n"
-            "⌨️ Presiona Enter"
+            "Di «ok», «listo» o «enviar»\n"
+            "Presiona Enter"
         )
         self._CancelButton.setToolTip(
             "Cancelar y descartar entrada\n"
-            "🎤 Di «cancelar» o «anular»\n"
-            "⌨️ Presiona Esc"
+            "Di «cancelar» o «anular»\n"
+            "Presiona Esc"
         )
 
         hand_cursor = getattr(Qt, "PointingHandCursor", None)

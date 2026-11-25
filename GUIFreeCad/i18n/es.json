@@ -9,7 +9,7 @@
   "section_startup": "Arranque",
   "lang_en": "Inglés",
   "lang_es": "Español",
-  "model_prompt_voice": "🎤 Decí: «sí» o «no» (también podés usar los botones)",
+  "model_prompt_voice": "Decí: «sí» o «no» (también podés usar los botones)",
   "model_small": "Modelo pequeño",
   "model_large": "Modelo grande",
   "theme_light": "Claro (blanco grisáceo)",

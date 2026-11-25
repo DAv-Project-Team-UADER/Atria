@@ -9,7 +9,7 @@
   "section_startup": "Startup",
   "lang_en": "English",
   "lang_es": "Spanish",
-  "model_prompt_voice": "🎤 Say: «yes» or «no» (buttons work too)",
+  "model_prompt_voice": "Say: «yes» or «no» (buttons work too)",
   "model_small": "Small model",
   "model_large": "Large model",
   "theme_light": "Light (grayish white)",

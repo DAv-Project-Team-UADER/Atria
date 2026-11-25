@@ -485,26 +485,48 @@ class Browser:
             return BrowserResult(True, "show_context", self.DescribeContext())
         if action_key == "help":
             try:
+                from GUIFreeCad.ui.Textos import TEXTS
                 from GUIFreeCad.ui.HelpContent import get_help_for_category
                 from GUIFreeCad.ui.HelpDialog import AtriaHelpDialog
+                language = self._language.value
+                texts = TEXTS["en" if language == "en" else "es"]
                 title, items, _ = get_help_for_category(
                     self.CurrentContextName,
                     self.ContextPath,
                     self.Context,
+                    language=language,
                 )
-                AtriaHelpDialog.ShowHelp(title, items)
-                return BrowserResult(True, "help", f"Mostrando ayuda de {title}")
+                AtriaHelpDialog.ShowHelp(title, items, language=language)
+                return BrowserResult(
+                    True,
+                    "help",
+                    texts["help_shown"].format(title=title),
+                )
             except Exception as exc:
-                return BrowserResult(False, "help", f"No se pudo mostrar la ayuda: {exc}")
+                from GUIFreeCad.ui.Textos import TEXTS
+                texts = TEXTS["en" if self._language.value == "en" else "es"]
+                return BrowserResult(
+                    False,
+                    "help",
+                    texts["help_failed"].format(error=exc),
+                )
         if action_key == "close_help":
             try:
+                from GUIFreeCad.ui.Textos import TEXTS
+                texts = TEXTS["en" if self._language.value == "en" else "es"]
                 from GUIFreeCad.ui.HelpDialog import AtriaHelpDialog
                 if AtriaHelpDialog.IsHelpOpen():
                     AtriaHelpDialog.CloseHelp()
-                    return BrowserResult(True, "close_help", "Ventana de ayuda cerrada")
-                return BrowserResult(False, "close_help", "No hay ventana de ayuda abierta")
+                    return BrowserResult(True, "close_help", texts["help_closed"])
+                return BrowserResult(False, "close_help", texts["help_not_open"])
             except Exception as exc:
-                return BrowserResult(False, "close_help", f"Error al cerrar la ayuda: {exc}")
+                from GUIFreeCad.ui.Textos import TEXTS
+                texts = TEXTS["en" if self._language.value == "en" else "es"]
+                return BrowserResult(
+                    False,
+                    "close_help",
+                    texts["help_close_failed"].format(error=exc),
+                )
         return BrowserResult(False, "nav_unknown", f"Unknown nav action '{action_key}'")
 
     def GetHelpForCurrentContext(self) -> tuple[str, list[tuple[str, str]], str]:
@@ -514,6 +536,7 @@ class Browser:
             self.CurrentContextName,
             self.ContextPath,
             self.Context,
+            language=self._language.value,
         )
 
     def _FirstSpokenForNavAction(self, action_key: str) -> str | None:

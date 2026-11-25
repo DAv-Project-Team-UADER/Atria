@@ -25,6 +25,8 @@ from __future__ import annotations
 import sys
 from typing import Any
 
+from GUIFreeCad.ui.Textos import TEXTS
+
 # Intentar importar bindings de Qt
 QtWidgets = None
 QtCore = None
@@ -95,11 +97,21 @@ class AtriaHelpDialog:
         items: list[tuple[str, str]],
         parent=None,
         theme: str | None = None,
+        language: str | None = None,
     ) -> None:
         self.title = title
         self.items = items
         self._parent = parent
         self.theme = theme or detect_theme(parent)
+        lang = language or getattr(parent, "_lang", None)
+        if not lang:
+            try:
+                from GUIFreeCad.core.settings import settings
+                lang = settings.language
+            except Exception:
+                lang = "es"
+        self.language = "en" if str(lang).lower().startswith("en") else "es"
+        self._texts = TEXTS[self.language]
         self._qt_dialog = None
 
         if QtWidgets and hasattr(QtWidgets, "QDialog"):
@@ -127,7 +139,9 @@ class AtriaHelpDialog:
 
         dlg = QDialog(parent_widget)
         dlg.setObjectName("AtriaHelpDialog")
-        dlg.setWindowTitle(f"ATRIA - Manual y Ayuda: {self.title}")
+        dlg.setWindowTitle(
+            self._texts["help_window_title"].format(title=self.title)
+        )
         dlg.setModal(False)
         dlg.resize(620, 520)
         dlg.setMinimumSize(480, 380)
@@ -270,7 +284,7 @@ class AtriaHelpDialog:
         title_lbl.setStyleSheet(title_style)
         header_box.addWidget(title_lbl)
 
-        sub_lbl = QLabel("Pronuncia el comando por voz o haz clic sobre su botón en la pantalla:")
+        sub_lbl = QLabel(self._texts["help_intro"])
         if QFont:
             sub_lbl.setFont(QFont("Segoe UI", 9))
         sub_lbl.setStyleSheet(sub_style)
@@ -317,7 +331,7 @@ class AtriaHelpDialog:
         footer_layout = QHBoxLayout()
         footer_layout.setContentsMargins(0, 4, 0, 0)
 
-        voice_hint = QLabel("💡 Di: «cerrar ayuda» o «cerrar» para cerrar esta ventana")
+        voice_hint = QLabel(self._texts["help_close_hint"])
         if QFont:
             voice_hint.setFont(QFont("Segoe UI", 9))
         voice_hint.setStyleSheet(hint_style)
@@ -325,7 +339,7 @@ class AtriaHelpDialog:
 
         footer_layout.addStretch(1)
 
-        close_btn = QPushButton("Cerrar")
+        close_btn = QPushButton(self._texts["close"])
         close_btn.setObjectName("closeBtn")
         if Qt and hasattr(Qt, "PointingHandCursor"):
             close_btn.setCursor(Qt.PointingHandCursor)
@@ -382,6 +396,7 @@ class AtriaHelpDialog:
         content: str | list[tuple[str, str]],
         parent=None,
         theme: str | None = None,
+        language: str | None = None,
     ) -> AtriaHelpDialog:
         """Crea y muestra la ventana de ayuda emergente en el tema correspondiente."""
         # Cerrar ventana previa si está abierta
@@ -405,7 +420,13 @@ class AtriaHelpDialog:
                 else:
                     items.append((line, ""))
 
-        dialog = cls(title, items, parent=parent, theme=theme)
+        dialog = cls(
+            title,
+            items,
+            parent=parent,
+            theme=theme,
+            language=language,
+        )
         dialog.show()
         cls._active_instance = dialog
         return dialog

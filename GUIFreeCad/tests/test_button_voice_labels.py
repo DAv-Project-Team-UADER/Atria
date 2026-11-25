@@ -87,13 +87,11 @@ class TestButtonVoiceLabels(unittest.TestCase):
 
         # Back button (index 0)
         back_btn = panel._toolButtons[0]
-        self.assertIn("Subir", back_btn.text())
-        self.assertIn("⬅", back_btn.text())
+        self.assertEqual(back_btn.text(), "Volver")
 
         # Help button (index 1: al inicio, cerca del botón volver)
         help_btn = panel._toolButtons[1]
         self.assertIn("Ayuda", help_btn.text())
-        self.assertIn("❓", help_btn.text())
 
         # Submenu button
         sub_btn = panel._toolButtons[2]
@@ -108,6 +106,43 @@ class TestButtonVoiceLabels(unittest.TestCase):
 
         cmd_viga = panel._toolButtons[5]
         self.assertEqual(cmd_viga.text(), "Nueva\nViga")
+
+    def test_english_labels_tooltips_and_model_tree(self) -> None:
+        try:
+            from PySide6.QtWidgets import QApplication
+            from ui.AtriaPanel import AtriaPanel
+            from ui.ContextView import ContextEntryView, ContextView
+            app = QApplication.instance() or QApplication([])
+        except ImportError:
+            self.skipTest("PySide6 not available in test runner")
+
+        panel = AtriaPanel(Lang="en")
+        panel.RenderContext(
+            ContextView(
+                "Base > 3D-BIM",
+                [ContextEntryView("explorer", "explorer", IsSubContext=True)],
+                [ContextEntryView("create wall", "wall")],
+            )
+        )
+
+        self.assertIn("Up", panel._toolButtons[0].text())
+        self.assertIn("Help", panel._toolButtons[1].text())
+        self.assertEqual(panel._toolButtons[2].text(), "Explorer")
+        self.assertEqual(panel._toolButtons[3].text(), "Create\nWall")
+        self.assertIn("Submenu:", panel._toolButtons[2].toolTip())
+        self.assertIn("Click to browse tools", panel._toolButtons[2].toolTip())
+        self.assertNotIn("Di:", panel._toolButtons[2].toolTip())
+
+        panel.SetTree(
+            [{"name": "Wall", "label": "Wall", "visible": False}],
+            "Document",
+        )
+        tree = panel._treeWidget
+        self.assertIsNotNone(tree)
+        self.assertIn("(hidden)", tree.topLevelItem(0).child(0).text())
+
+        panel.SetTree([])
+        self.assertEqual(tree.topLevelItem(0).text(), "(no open document)")
 
 
 if __name__ == "__main__":

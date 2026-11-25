@@ -288,5 +288,96 @@ class TestViewCommandButtons(unittest.TestCase):
         self.assertFalse(self.module._is_view_command(None))
 
 
+class _FakeSignal:
+    def __init__(self) -> None:
+        self.slots = []
+
+    def connect(self, slot) -> None:
+        self.slots.append(slot)
+
+    def disconnect(self, slot) -> None:
+        self.slots.remove(slot)
+
+
+class _FakePanel:
+    def __init__(self) -> None:
+        self.CommandRequested = _FakeSignal()
+        self.PreferencesRequested = _FakeSignal()
+        self.HelpRequested = _FakeSignal()
+        self._lang = "es"
+        self.context = None
+
+    def SetLanguage(self, language: str) -> None:
+        self._lang = language
+
+    def RenderContext(self, context) -> None:
+        self.context = context
+
+
+class TestBrowserPanelSourceLanguageRefresh(unittest.TestCase):
+    def test_language_change_rebuilds_open_panel_context(self) -> None:
+        from types import SimpleNamespace
+        from integration.atria_dock_panel import BrowserPanelSource
+
+        class Preferences:
+            def __init__(self) -> None:
+                self.callbacks = []
+
+            def RegisterLanguageChange(self, callback) -> None:
+                self.callbacks.append(callback)
+
+            def UnregisterLanguageChange(self, callback) -> None:
+                self.callbacks.remove(callback)
+
+            def ChangeLanguage(self, new_language: str) -> None:
+                previous = self.language
+                self.language = new_language
+                for callback in list(self.callbacks):
+                    callback(previous, new_language)
+
+        class Entry:
+            def __init__(self, spoken: str) -> None:
+                self.Spoken = spoken
+                self.InternalKey = "open"
+                self.Target = object()
+
+            def IsSubContext(self) -> bool:
+                return False
+
+        class Browser:
+            def __init__(self) -> None:
+                self._prefs = Preferences()
+                self._prefs.language = "es"
+                self.SetLanguage = SimpleNamespace(value="es")
+                self.ContextPath = "Base"
+                self.Context = [Entry("Abrir")]
+                self._prefs.RegisterLanguageChange(self._reload_context)
+
+            def _reload_context(self, _previous, new_language: str) -> None:
+                self.SetLanguage = SimpleNamespace(value=new_language)
+                phrase = "Open" if new_language == "en" else "Abrir"
+                self.Context = [Entry(phrase)]
+
+            @staticmethod
+            def IsSameTarget(left, right) -> bool:
+                return left is right
+
+        browser = Browser()
+        panel = _FakePanel()
+        source = BrowserPanelSource(browser, object())
+        with mock.patch.object(source, "RefreshStatus"):
+            source.Attach(panel)
+
+        self.assertEqual(panel.context.Commands[0].Spoken, "Abrir")
+        browser._prefs.ChangeLanguage("en")
+
+        self.assertEqual(panel._lang, "en")
+        self.assertEqual(panel.context.Commands[0].Spoken, "Open")
+
+        source.Detach()
+        self.assertEqual(browser._prefs.callbacks, [browser._reload_context])
+        self.assertEqual(panel.CommandRequested.slots, [])
+
+
 if __name__ == "__main__":
     unittest.main()
