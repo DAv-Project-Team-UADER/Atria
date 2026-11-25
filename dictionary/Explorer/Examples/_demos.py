@@ -37,12 +37,10 @@ _EXAMPLES = (
 _CHOOSE_TITLE = {
     "es": "ATRIA - Ejemplos",
     "en": "ATRIA - Examples",
-    "pt": "ATRIA - Exemplos",
 }
 _CHOOSE_MESSAGE = {
     "es": "Elegí un ejemplo para aprender paso a paso",
     "en": "Pick an example to learn step by step",
-    "pt": "Escolha um exemplo para aprender passo a passo",
 }
 
 # el reproductor es no modal: se guarda la referencia para que Qt no lo recolecte

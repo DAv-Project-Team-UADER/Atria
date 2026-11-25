@@ -34,7 +34,6 @@ class CoordinateInputPrompt(BaseInputPrompt):
     Users can dictate:
     - In Spanish: "diez veinte ok", "cero cero enviar", "cien doscientos cincuenta listo"
     - In English: "ten twenty ok", "zero zero send"
-    - In Portuguese: "dez vinte ok", "zero zero enviar"
     Or dictate coordinates one by one and confirm with an acceptance word.
     """
 
@@ -53,11 +52,7 @@ class CoordinateInputPrompt(BaseInputPrompt):
             or (
                 "Dictá las coordenadas (X, Y) o punto, por ejemplo «diez veinte», y decí ok o enviar."
                 if language == "es"
-                else (
-                    "Say the (X, Y) coordinates, e.g. 'ten twenty', then say ok or send."
-                    if language == "en"
-                    else "Diga as coordenadas (X, Y), ex: «dez vinte», e depois diga ok ou enviar."
-                )
+                else "Say the (X, Y) coordinates, e.g. 'ten twenty', then say ok or send."
             ),
             Parent,
         )

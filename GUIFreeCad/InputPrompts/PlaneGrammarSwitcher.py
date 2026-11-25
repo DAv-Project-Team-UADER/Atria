@@ -50,12 +50,6 @@ _PLANE_PHRASES: dict[str, list[str]] = {
         "done", "yes", "yep",
         "cancel", "discard", "abort", "no", "never mind",
     ],
-    "pt": [
-        "cima", "abaixo",
-        "okey", "okay", "ok", "enviar", "aceitar", "confirmar", "entrar",
-        "pronto", "feito", "sim",
-        "cancelar", "cancelamento", "descartar", "anular", "abortar", "nao", "não",
-    ],
 }
 
 
@@ -64,12 +58,12 @@ class PlaneGrammarSwitcher:
 
     @staticmethod
     def PlanePhrases(Language: str = "es") -> list[str]:
-        """Return the plane-selection phrases for ``Language`` ("es"/"en"/"pt")."""
+        """Return the plane-selection phrases for ``Language`` ("es" or "en")."""
         return list(_PLANE_PHRASES.get(Language, _PLANE_PHRASES["es"]))
 
     @staticmethod
     def CurrentLanguage() -> str:
-        """Return the configured ATRIA language ("es"/"en"/"pt"), "es" if unknown."""
+        """Return the configured ATRIA language ("es" or "en"), "es" if unknown."""
         try:
             from GUIFreeCad.core.settings import settings
 

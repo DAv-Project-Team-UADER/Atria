@@ -26,12 +26,11 @@ from pathlib import Path
 _MANUALS = {
     "es": "Manual_Usuario.pdf",
     "en": "User_Manual.pdf",
-    "pt": "Manual_do_Usuario.pdf",
 }
 
 
 def _language() -> str:
-    """Return the ATRIA language ("es", "en" or "pt"), Spanish when unknown."""
+    """Return the ATRIA language ("es" or "en"), Spanish when unknown."""
     try:
         from InputPrompts.InputPromptI18n import ResolveLanguage
 
@@ -44,7 +43,7 @@ def manualPath(language: str | None = None) -> Path | None:
     """Find the manual PDF for ``language`` in the repository or installation.
 
     Args:
-        language: ``"es"``, ``"en"`` or ``"pt"``. Defaults to the ATRIA language.
+        language: ``"es"`` or ``"en"``. Defaults to the ATRIA language.
 
     Returns:
         The PDF path, or None when it is not there.
@@ -62,7 +61,6 @@ def openManual() -> None:
     """Open the user manual in the system PDF viewer.
 
     Spanish opens ``Manual_Usuario.pdf``, English ``User_Manual.pdf`` and
-    Portuguese ``Manual_do_Usuario.pdf``.
     """
     language = _language()
     path = manualPath(language)

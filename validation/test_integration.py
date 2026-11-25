@@ -116,15 +116,13 @@ class IntegrationTests(unittest.TestCase):
         self.assertTrue(ok)
         self.assertEqual(kwargs, {})
 
-    def test_get_requirements_geometry_three_languages(self) -> None:
+    def test_get_requirements_geometry_both_languages(self) -> None:
         fn = sample_create_line
         v = Validator()
         es = v.GetRequirements("es", fn)
         en = v.GetRequirements("en", fn)
-        pt = v.GetRequirements("pt", fn)
         self.assertIn("Dato1", es)
         self.assertIn("Data1", en)
-        self.assertIn("Dado1", pt)
         self.assertIn("decimal", es)
         self.assertIn("texto", es)
 

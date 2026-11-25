@@ -25,20 +25,18 @@ from InputPrompts.SpokenNumberParser import SpokenNumberParser
 
 _YES = {
     "si", "okey", "okay", "ok", "dale", "aceptar", "confirmar", "listo", "vale",
-    "yes", "yep", "accept", "confirm", "sim", "aceitar", "pronto",
+    "yes", "yep", "accept", "confirm",
 }
-_NO = {"no", "negativo", "nope", "negative", "nao"}
+_NO = {"no", "negativo", "nope", "negative"}
 _CANCEL = {
     "cancelar", "cancela", "abortar", "anular", "descartar",
-    "cancel", "abort", "discard", "cancelamento",
+    "cancel", "abort", "discard",
 }
 _PHRASES = {
     "es": ["si", "sí", "okey", "ok", "dale", "aceptar", "confirmar", "listo", "vale",
            "no", "negativo", "cancelar", "cancela", "abortar", "anular", "descartar"],
     "en": ["yes", "yep", "okey", "ok", "accept", "confirm", "no", "nope", "negative",
            "cancel", "abort", "discard"],
-    "pt": ["sim", "okey", "ok", "aceitar", "confirmar", "pronto", "não", "nao", "negativo",
-           "cancelar", "cancelamento", "abortar", "anular"],
 }
 
 

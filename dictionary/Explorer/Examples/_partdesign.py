@@ -36,7 +36,6 @@ from ._words import down, no, numbers, send
 TITLE = {
     "es": "PartDesign: un tornillo paso a paso",
     "en": "PartDesign: a screw, step by step",
-    "pt": "PartDesign: um parafuso passo a passo",
 }
 
 
@@ -172,12 +171,10 @@ def steps() -> list:
             Text={
                 "es": "Empezá por el vástago: un cilindro de radio 4 y 26 de alto, con el centro en (0, 0, 17).",
                 "en": "Start with the shank: a cylinder with radius 4 and height 26, centred at (0, 0, 17).",
-                "pt": "Comece pela haste: um cilindro de raio 4 e 26 de altura, com o centro em (0, 0, 17).",
             },
             Path={
                 "es": ("banco", "diseño", "sumar", "cilindro"),
                 "en": ("workbench", "design", "add", "cylinder"),
-                "pt": ("trabalho", "projeto", "aditivo", "cilindro"),
             },
             Values=lambda language: numbers(language, CORE_RADIUS, SHANK_HEIGHT, 0, 0, 17),
             Action=_shank,
@@ -186,9 +183,8 @@ def steps() -> list:
             Text={
                 "es": "Agregá la punta: un cono de radio 0,5 abajo y 4 arriba, 4 de alto, centro en (0, 0, 2). Como ya hay un cuerpo, se responde «no» a «¿cuerpo nuevo?» y se elige el existente.",
                 "en": "Add the tip: a cone with radius 0.5 at the bottom and 4 at the top, 4 high, centred at (0, 0, 2). There is a body already, so answer “no” to “new body?” and pick the existing one.",
-                "pt": "Adicione a ponta: um cone de raio 0,5 embaixo e 4 em cima, 4 de altura, centro em (0, 0, 2). Como já há um corpo, responda «não» a «corpo novo?» e escolha o existente.",
             },
-            Path={"es": ("cono",), "en": ("cone",), "pt": ("cone",)},
+            Path={"es": ("cono",), "en": ("cone",)},
             Values=more(0.5, 4, 4, 0, 0, 2),
             Action=_tip,
         ),
@@ -196,9 +192,8 @@ def steps() -> list:
             Text={
                 "es": "Ahora la cabeza: un prisma de 6 lados, radio 8 y 5 de alto, centro en (0, 0, 32,5).",
                 "en": "Now the head: a 6-sided prism, radius 8 and 5 high, centred at (0, 0, 32.5).",
-                "pt": "Agora a cabeça: um prisma de 6 lados, raio 8 e 5 de altura, centro em (0, 0, 32,5).",
             },
-            Path={"es": ("prisma",), "en": ("prism",), "pt": ("prisma",)},
+            Path={"es": ("prisma",), "en": ("prism",)},
             Values=more(6, 8, HEAD_HEIGHT, 0, 0, 32.5),
             Action=_head,
         ),
@@ -206,12 +201,10 @@ def steps() -> list:
             Text={
                 "es": "Achaflaná los bordes: 0,5 mm. El comando trabaja sobre la pieza seleccionada o, si no hay ninguna, sobre la última operación. Dictás «cero punto cinco» (o «cero coma cinco»).",
                 "en": "Chamfer the edges: 0.5 mm. The command works on the selected part or, if there is none, on the last operation. Say “zero point five”.",
-                "pt": "Chanfre as bordas: 0,5 mm. O comando trabalha sobre a peça selecionada ou, se não houver, sobre a última operação. Diga «zero ponto cinco».",
             },
             Path={
                 "es": ("subir", "editar", "chaflan por medida"),
                 "en": ("up", "edit", "chamfer by size"),
-                "pt": ("subir", "editar", "chanfro por medida"),
             },
             Values=lambda language: numbers(language, 0.5),
             Action=_chamfer,
@@ -220,12 +213,10 @@ def steps() -> list:
             Text={
                 "es": "Para la rosca hace falta el dibujo de un filete. Boceto nuevo sobre el plano XZ (es el segundo de la lista: «abajo» una vez y «enviar»).",
                 "en": "The thread needs a drawing of one thread ridge. New sketch on the XZ plane (second in the list: “down” once and “send”).",
-                "pt": "Para a rosca é preciso o desenho de um filete. Esboço novo no plano XZ (é o segundo da lista: «abaixo» uma vez e «enviar»).",
             },
             Path={
                 "es": ("base", "nuevo boceto"),
                 "en": ("base", "new sketch"),
-                "pt": ("base", "esboço novo"),
             },
             Values=lambda language: down(language, 1) + send(language),
             Action=_threadSketch,
@@ -234,12 +225,10 @@ def steps() -> list:
             Text={
                 "es": "Dibujá el filete: un triángulo por vértices, (3,5; 3), (3,5; 5,4) y (5,5; 4,2). La base se hunde en el vástago (radio 4) y la cresta llega a 5,5.",
                 "en": "Draw the thread ridge: a triangle by vertices, (3.5, 3), (3.5, 5.4) and (5.5, 4.2). The base sinks into the shank (radius 4) and the crest reaches 5.5.",
-                "pt": "Desenhe o filete: um triângulo por vértices, (3,5; 3), (3,5; 5,4) e (5,5; 4,2). A base afunda na haste (raio 4) e a crista chega a 5,5.",
             },
             Path={
                 "es": ("geometría", "triángulo", "triángulo por vértices"),
                 "en": ("geometry", "triangle", "triangle by vertices"),
-                "pt": ("geometria", "triângulo", "triângulo por vértices"),
             },
             Values=lambda language: numbers(language, *(value for corner in PROFILE for value in corner)),
             Action=_threadProfile,
@@ -248,12 +237,10 @@ def steps() -> list:
             Text={
                 "es": "Cerrá el croquis y enrollá el filete en una hélice: paso 3 y altura 21, o sea, 7 vueltas. Después elegís el dibujo de la lista (es el único: «enviar»).",
                 "en": "Close the sketch and wind the ridge into a helix: pitch 3 and height 21, that is, 7 turns. Then pick the drawing from the list (it is the only one: “send”).",
-                "pt": "Feche o esboço e enrole o filete numa hélice: passo 3 e altura 21, ou seja, 7 voltas. Depois escolha o desenho da lista (é o único: «enviar»).",
             },
             Path={
                 "es": ("cerrar croquis", "banco", "diseño", "sumar", "hélice"),
                 "en": ("close sketch", "workbench", "design", "add", "additive helix"),
-                "pt": ("fechar esboço", "trabalho", "projeto", "aditivo", "helice"),
             },
             Values=lambda language: numbers(language, PITCH, THREAD_HEIGHT) + send(language),
             Action=_thread,
@@ -262,9 +249,8 @@ def steps() -> list:
             Text={
                 "es": "Medí el ancho de la cabeza en 3D: de (-8, 0, 35) a (8, 0, 35). Con un sólido en el documento, «cota» pide 6 valores: X, Y y Z de cada punto.",
                 "en": "Measure the width of the head in 3D: from (-8, 0, 35) to (8, 0, 35). With a solid in the document, “measure” asks for 6 values: X, Y and Z of each point.",
-                "pt": "Meça a largura da cabeça em 3D: de (-8, 0, 35) a (8, 0, 35). Com um sólido no documento, «medir» pede 6 valores: X, Y e Z de cada ponto.",
             },
-            Path={"es": ("cota",), "en": ("measure",), "pt": ("medir",)},
+            Path={"es": ("cota",), "en": ("measure",)},
             Values=lambda language: numbers(language, -8, 0, HEAD_TOP, 8, 0, HEAD_TOP),
             Action=_dimension,
         ),
@@ -272,9 +258,8 @@ def steps() -> list:
             Text={
                 "es": "Mirá el tornillo terminado en la vista «tres de» (isométrica).",
                 "en": "See the finished screw in the isometric view.",
-                "pt": "Veja o parafuso pronto na vista isométrica.",
             },
-            Path={"es": ("tres de",), "en": ("isometric",), "pt": ("isométrica",)},
+            Path={"es": ("tres de",), "en": ("isometric",)},
             Action=_isometric,
         ),
     ]

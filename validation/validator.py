@@ -38,7 +38,6 @@ def _GetApp() -> Any:
 class LanguageCode(Enum):
     En = "en"
     Es = "es"
-    PT = "pt"
 
     @classmethod
     def FromInput(cls, value: str | "LanguageCode") -> "LanguageCode":
@@ -94,22 +93,6 @@ _I18N: dict[LanguageCode, dict[str, str]] = {
         "no_document": "No active document to resolve objects.",
         "not_callable": "Dictionary function is not callable.",
         "coerce_fail": "Could not convert '{name}' to {expected}.",
-    },
-    LanguageCode.PT: {
-        "dato": "Dado",
-        "expects": "espera-se",
-        "int": "um inteiro",
-        "float": "um número decimal",
-        "coord": "coordenadas (X, Y) ou ponto",
-        "str": "um texto",
-        "object": "um objeto do documento",
-        "none": "sem parâmetros",
-        "missing": "Falta o parâmetro obrigatório '{name}'.",
-        "wrong_type": "O parâmetro '{name}' deve ser {expected}, mas foi recebido {received}.",
-        "object_not_found": "O objeto '{name}' não existe no documento ativo.",
-        "no_document": "Não há documento ativo para resolver objetos.",
-        "not_callable": "A função do dicionário não é callable.",
-        "coerce_fail": "Não foi possível converter '{name}' para {expected}.",
     },
 }
 

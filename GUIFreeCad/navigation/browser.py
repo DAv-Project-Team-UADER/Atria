@@ -19,7 +19,7 @@
 Browser: voice navigation engine over dictionary folders.
 
 Implemented so far (Developer 1 + Developer 2):
-  - Preferences.SetLanguage → En / Es / PT
+  - Preferences.SetLanguage → En / Es
   - BaseContext: fixed top-level commands loaded from base.py via Keychain
   - Context:     current-level spoken commands (TraduceTo*)
   - Language-change callback: reloads from base.py automatically

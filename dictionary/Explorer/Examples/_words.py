@@ -31,35 +31,29 @@ _UNITS = {
         "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen",
         "eighteen", "nineteen",
     ),
-    "pt": (
-        "zero", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove",
-        "dez", "onze", "doze", "treze", "catorze", "quinze", "dezesseis", "dezessete",
-        "dezoito", "dezenove",
-    ),
 }
 # 20, 30, ... 90
 _TENS = {
     "es": ("veinte", "treinta", "cuarenta", "cincuenta", "sesenta", "setenta", "ochenta", "noventa"),
     "en": ("twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"),
-    "pt": ("vinte", "trinta", "quarenta", "cinquenta", "sessenta", "setenta", "oitenta", "noventa"),
 }
 # en español del 21 al 29 se dicen en una sola palabra
 _TWENTIES_ES = (
     "veintiuno", "veintidós", "veintitrés", "veinticuatro", "veinticinco", "veintiséis",
     "veintisiete", "veintiocho", "veintinueve",
 )
-# lo que une decena y unidad: «treinta y dos», «twenty two», «trinta e dois»
-_JOIN = {"es": ("y",), "en": (), "pt": ("e",)}
+# lo que une decena y unidad: «treinta y dos», «twenty two»
+_JOIN = {"es": ("y",), "en": ()}
 
-_MINUS = {"es": "menos", "en": "minus", "pt": "menos"}
-_SEND = {"es": "enviar", "en": "send", "pt": "enviar"}
-_DOWN = {"es": "abajo", "en": "down", "pt": "abaixo"}
-_NEXT = {"es": "avanzar", "en": "next", "pt": "próximo"}
-_NO = {"es": "no", "en": "no", "pt": "nao"}
-_YES = {"es": "si", "en": "yes", "pt": "sim"}
+_MINUS = {"es": "menos", "en": "minus"}
+_SEND = {"es": "enviar", "en": "send"}
+_DOWN = {"es": "abajo", "en": "down"}
+_NEXT = {"es": "avanzar", "en": "next"}
+_NO = {"es": "no", "en": "no"}
+_YES = {"es": "si", "en": "yes"}
 # la palabra del decimal es «punto» en los tres idiomas; en español también se acepta «coma»
 # (el reproductor de ejemplos lo sabe: ver WORD_SYNONYMS en InputPrompts/ExampleStep.py)
-_POINT = {"es": "punto", "en": "point", "pt": "ponto"}
+_POINT = {"es": "punto", "en": "point"}
 
 
 def _lang(language: str) -> str:
@@ -114,7 +108,7 @@ def numbers(language: str, *values: float) -> tuple[str, ...]:
     spelled digit by digit. A decimal is said with «punto» and its digits one by one.
 
     Args:
-        language: ``"es"``, ``"en"`` or ``"pt"``.
+        language: ``"es"`` or ``"en"``.
         *values: numbers to dictate, whole or decimal; a negative one is said with «menos».
 
     Returns:

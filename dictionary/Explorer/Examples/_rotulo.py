@@ -30,7 +30,6 @@ from ._words import numbers
 TITLE = {
     "es": "Draft: rótulo simple con texto",
     "en": "Draft: simple title block with text",
-    "pt": "Draft: carimbo simples com texto",
 }
 
 # el texto es «A1»: una letra y un dígito, para deletrear poco
@@ -38,9 +37,8 @@ LABEL = "A1"
 _SPELLING = {
     "es": ("a", "uno"),
     "en": ("a", "one"),
-    "pt": ("a", "um"),
 }
-_CONFIRM = {"es": "okey", "en": "okey", "pt": "okey"}
+_CONFIRM = {"es": "okey", "en": "okey"}
 
 
 def _rectangle(x1: float, y1: float, x2: float, y2: float):
@@ -86,12 +84,10 @@ def steps() -> list:
             Text={
                 "es": "Dibujá el marco del rótulo: un rectángulo de (0, 0) a (80, 30).",
                 "en": "Draw the outer frame of the title block: a rectangle from (0, 0) to (80, 30).",
-                "pt": "Desenhe a moldura do carimbo: um retângulo de (0, 0) a (80, 30).",
             },
             Path={
                 "es": ("banco", "borrador", "crear", "rectángulo"),
                 "en": ("workbench", "draft", "create", "rectangle"),
-                "pt": ("trabalho", "draft", "criar", "retângulo"),
             },
             Values=lambda language: numbers(language, 0, 0, 80, 30),
             Action=_rectangle(0, 0, 80, 30),
@@ -100,9 +96,8 @@ def steps() -> list:
             Text={
                 "es": "Agregá el recuadro interior: otro rectángulo de (4, 4) a (76, 26). Seguís en Crear: alcanza con «rectángulo».",
                 "en": "Add the inner box: another rectangle from (4, 4) to (76, 26). You are still in Create: “rectangle” is enough.",
-                "pt": "Adicione o quadro interno: outro retângulo de (4, 4) a (76, 26). Você continua em Criar: basta «retangulo».",
             },
-            Path={"es": ("rectángulo",), "en": ("rectangle",), "pt": ("retângulo",)},
+            Path={"es": ("rectángulo",), "en": ("rectangle",)},
             Values=lambda language: numbers(language, 4, 4, 76, 26),
             Action=_rectangle(4, 4, 76, 26),
         ),
@@ -110,12 +105,10 @@ def steps() -> list:
             Text={
                 "es": "Escribí el texto «A1» dentro del recuadro, en (10, 12). Primero «subir» a Borrador. Se deletrea: «a», «uno» y «okey» para terminar; después X e Y.",
                 "en": "Write the text “A1” inside the box, at (10, 12). First go “up” to Draft. It is spelled: “a”, “one” and “okey” to finish; then X and Y.",
-                "pt": "Escreva o texto «A1» dentro do quadro, em (10, 12). Primeiro «subir» ao Draft. Ele é soletrado: «a», «um» e «okey» para terminar; depois X e Y.",
             },
             Path={
                 "es": ("subir", "anotación", "texto"),
                 "en": ("up", "annotation", "text"),
-                "pt": ("subir", "anotação", "texto"),
             },
             Values=lambda language: _spellLabel(language) + numbers(language, 10, 12),
             Action=_text,

@@ -38,7 +38,6 @@ from ._words import numbers
 TITLE = {
     "es": "TechDraw: un círculo con su rótulo",
     "en": "TechDraw: a circle with its title block",
-    "pt": "TechDraw: um círculo com seu carimbo",
 }
 
 # plantilla A4 apaisada con rótulo (la que trae FreeCAD)
@@ -48,7 +47,6 @@ _TEMPLATE = os.path.join("Mod", "TechDraw", "Templates", "ISO", "A4_Landscape_TD
 _TITLE_BLOCK = {
     "es": ("Círculo", "Ejemplo de ATRIA", "Diseño Asistido por Voz"),
     "en": ("Circle", "ATRIA example", "Voice-Assisted Design"),
-    "pt": ("Círculo", "Exemplo do ATRIA", "Design Assistido por Voz"),
 }
 
 
@@ -113,12 +111,10 @@ def steps() -> list:
             Text={
                 "es": "Creá la pieza a dibujar: un círculo en el origen (0, 0, 0) de radio 20.",
                 "en": "Create the part to draw: a circle at the origin (0, 0, 0) with radius 20.",
-                "pt": "Crie a peça a desenhar: um círculo na origem (0, 0, 0) com raio 20.",
             },
             Path={
                 "es": ("banco", "pieza", "círculo"),
                 "en": ("workbench", "part", "circle"),
-                "pt": ("trabalho", "peça", "círculo"),
             },
             Values=lambda language: numbers(language, 0, 0, 0, 20),
             Action=_circle,
@@ -127,12 +123,10 @@ def steps() -> list:
             Text={
                 "es": "Creá una página técnica nueva.",
                 "en": "Create a new technical page.",
-                "pt": "Crie uma página técnica nova.",
             },
             Path={
                 "es": ("dibujo técnico", "página", "página"),
                 "en": ("drawing", "page", "new page"),
-                "pt": ("técnico", "página", "página"),
             },
             Action=_page,
         ),
@@ -140,12 +134,10 @@ def steps() -> list:
             Text={
                 "es": "Poné una vista del círculo en la página (con el círculo seleccionado).",
                 "en": "Place a view of the circle on the page (with the circle selected).",
-                "pt": "Coloque uma vista do círculo na página (com o círculo selecionado).",
             },
             Path={
                 "es": ("vistas", "vista"),
                 "en": ("views", "view"),
-                "pt": ("vistas", "vista"),
             },
             Action=_view,
         ),
@@ -153,12 +145,10 @@ def steps() -> list:
             Text={
                 "es": "Completá el rótulo: título, subtítulo, autor y número de plano.",
                 "en": "Fill in the title block: title, subtitle, author and drawing number.",
-                "pt": "Preencha o carimbo: título, subtítulo, autor e número do desenho.",
             },
             Path={
                 "es": ("elementos", "campos"),
                 "en": ("features", "fields"),
-                "pt": ("recursos", "campos"),
             },
             Action=_titleBlock,
         ),

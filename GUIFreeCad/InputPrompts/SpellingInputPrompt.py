@@ -53,29 +53,21 @@ class SpellingInputPrompt(BaseInputPrompt):
             "see": "C", "sea": "C", "tea": "T", "you": "U", "are": "R", "eye": "I",
             "oh": "O", "pea": "P", "queue": "Q", "zed": "Z", "pug": "U",
         },
-        "pt": {
-            "a": "A", "bê": "B", "cê": "C", "dê": "D", "e": "E", "gê": "G", "agá": "H",
-            "i": "I", "jota": "J", "cá": "K", "éle": "L", "ême": "M", "o": "O",
-            "pê": "P", "quê": "Q", "érre": "R", "ésse": "S", "tê": "T", "u": "U",
-            "vê": "V", "xis": "X", "ípsilon": "Y", "zê": "Z", "fê": "F", "efe": "F", "ene": "N",
-            "dáblio": "W", "dábliu": "W", "dâblio": "W", "capa": "K", "guê": "G",
-        },
     }
     # letras y simbolos de dos palabras: (primera, segunda) -> caracter
     PairNames: dict[tuple[str, str], str] = {
         ("doble", "uve"): "W", ("doble", "ve"): "W", ("doble", "u"): "W",
-        ("i", "griega"): "Y", ("i", "grego"): "Y",
-        ("double", "u"): "W", ("duplo", "ve"): "W",
+        ("i", "griega"): "Y",
+        ("double", "u"): "W",
         ("guion", "bajo"): "_",
     }
     PairWords: dict[str, tuple[str, ...]] = {
-        "es": ("doble", "uve", "griega", "bajo"), "en": ("double",), "pt": ("duplo", "grego"),
+        "es": ("doble", "uve", "griega", "bajo"), "en": ("double",),
     }
     # simbolos de una palabra, para nombres de archivo o de croquis ("Sketch_1")
     SymbolNames: dict[str, dict[str, str]] = {
         "es": {"guion": "-", "punto": "."},
         "en": {"dash": "-", "dot": ".", "underscore": "_"},
-        "pt": {"hífen": "-", "ponto": ".", "sublinhado": "_"},
     }
     # "<letra> de <palabra clave>" ("be de boca", "cu de queso"): la palabra clave
     # decide la letra aunque Vosk confunda el nombre ("u"/"cu", "de"/"ge"...).
@@ -101,8 +93,8 @@ class SpellingInputPrompt(BaseInputPrompt):
         "T": "te", "U": "u", "V": "uve", "W": "doble uve", "X": "equis", "Y": "i griega",
         "Z": "zeta",
     }
-    SpaceWords: dict[str, str] = {"es": "espacio", "en": "space", "pt": "espaço"}
-    DeleteWords: dict[str, str] = {"es": "borrar", "en": "delete", "pt": "apagar"}
+    SpaceWords: dict[str, str] = {"es": "espacio", "en": "space"}
+    DeleteWords: dict[str, str] = {"es": "borrar", "en": "delete"}
 
     SpaceTokens: set[str] = {_Prep(word) for word in SpaceWords.values()}
     DeleteTokens: set[str] = {_Prep(word) for word in DeleteWords.values()}

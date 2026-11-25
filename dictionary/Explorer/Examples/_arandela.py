@@ -46,7 +46,6 @@ from ._words import nextItem, numbers, send
 TITLE = {
     "es": "Arandela plana M6",
     "en": "M6 flat washer",
-    "pt": "Arruela lisa M6",
 }
 
 # arandela plana M6 (ISO 7089): agujero de 6,4 mm, exterior de 12 mm y 1,6 mm de espesor
@@ -55,7 +54,7 @@ OUTER_RADIUS = 6
 THICKNESS = 1.6
 
 # texto de la hoja por idioma
-_LABEL = {"es": "M6 arandela", "en": "M6 washer", "pt": "M6 arruela"}
+_LABEL = {"es": "M6 arandela", "en": "M6 washer"}
 
 # el círculo de 12 mm se ve de 48 mm en la hoja
 _VIEW_SCALE = 4
@@ -201,12 +200,10 @@ def steps() -> list:
             Text={
                 "es": "Empezá con un croquis nuevo en el plano base (XY es el primero de la lista: «enviar» lo elige).",
                 "en": "Start with a new sketch on the base plane (XY is first in the list: “send” picks it).",
-                "pt": "Comece com um croqui novo no plano base (XY é o primeiro da lista: «enviar» o escolhe).",
             },
             Path={
                 "es": ("banco", "croquis", "nuevo"),
                 "en": ("workbench", "sketcher", "new"),
-                "pt": ("trabalho", "croqui", "novo"),
             },
             Values=lambda language: send(language),
             Action=_newSketch,
@@ -215,12 +212,10 @@ def steps() -> list:
             Text={
                 "es": "Dibujá primero el agujero: un círculo de centro 0, 0 y radio 3,2 (diámetro 6,4). El radio se dicta «tres punto dos» (o «tres coma dos»).",
                 "en": "Draw the hole first: a circle centred at 0, 0 with radius 3.2 (diameter 6.4). Say the radius as “three point two”.",
-                "pt": "Desenhe primeiro o furo: um círculo de centro 0, 0 e raio 3,2 (diâmetro 6,4). O raio se diz «três ponto dois».",
             },
             Path={
                 "es": ("geometría", "círculo", "círculo"),
                 "en": ("geometry", "circle", "circle"),
-                "pt": ("geometria", "círculo", "círculo"),
             },
             Values=lambda language: numbers(language, 0, 0, INNER_RADIUS),
             Action=_circle(INNER_RADIUS),
@@ -229,12 +224,10 @@ def steps() -> list:
             Text={
                 "es": "Ahora el borde exterior: otro círculo con el mismo centro y radio 6 (diámetro 12).",
                 "en": "Now the outer edge: another circle with the same centre and radius 6 (diameter 12).",
-                "pt": "Agora a borda externa: outro círculo com o mesmo centro e raio 6 (diâmetro 12).",
             },
             Path={
                 "es": ("geometría", "círculo", "círculo"),
                 "en": ("geometry", "circle", "circle"),
-                "pt": ("geometria", "círculo", "círculo"),
             },
             Values=values(0, 0, OUTER_RADIUS),
             Action=_circle(OUTER_RADIUS),
@@ -243,12 +236,10 @@ def steps() -> list:
             Text={
                 "es": "Mostrá la medida interior con una restricción de diámetro: 6,4 mm. Actúa sobre el primer círculo, el del agujero.",
                 "en": "Show the inner size with a diameter constraint: 6.4 mm. It acts on the first circle, the hole.",
-                "pt": "Mostre a medida interna com uma restrição de diâmetro: 6,4 mm. Age sobre o primeiro círculo, o furo.",
             },
             Path={
                 "es": ("restricciones", "diámetro"),
                 "en": ("constraints", "diameter"),
-                "pt": ("restrições", "diâmetro"),
             },
             Values=lambda language: numbers(language, 2 * INNER_RADIUS),
             Action=_innerDiameter,
@@ -257,12 +248,10 @@ def steps() -> list:
             Text={
                 "es": "Y la medida exterior con una cota 2D: de (-6, 0) a (6, 0), o sea 12 mm. Primero «subir» a Croquis. «cota» pide 4 valores: X e Y de cada punto.",
                 "en": "And the outer size with a 2D dimension: from (-6, 0) to (6, 0), that is 12 mm. First go “up” to Sketcher. “measure” asks for 4 values: X and Y of each point.",
-                "pt": "E a medida externa com uma cota 2D: de (-6, 0) a (6, 0), ou seja 12 mm. Primeiro «subir» ao Croqui. «medir» pede 4 valores: X e Y de cada ponto.",
             },
             Path={
                 "es": ("subir", "cota"),
                 "en": ("up", "measure"),
-                "pt": ("subir", "medir"),
             },
             Values=values(-OUTER_RADIUS, 0, OUTER_RADIUS, 0),
             Action=_outerDimension,
@@ -271,12 +260,10 @@ def steps() -> list:
             Text={
                 "es": "Cerrá el croquis.",
                 "en": "Close the sketch.",
-                "pt": "Feche o croqui.",
             },
             Path={
                 "es": ("cerrar croquis",),
                 "en": ("close sketch",),
-                "pt": ("fechar croqui",),
             },
             Action=_close,
         ),
@@ -284,14 +271,12 @@ def steps() -> list:
             Text={
                 "es": "Dale volumen al croquis con PartDesign: 1,6 mm de espesor. «dar altura» es el mismo comando que «extruir por medida», con palabras que el dictado reconoce mejor. Después elegís el dibujo de la lista (es el único: «enviar»).",
                 "en": "Give the sketch its thickness with PartDesign: 1.6 mm. “give height” is the same command as “extrude by length”, in words the dictation recognises better. Then pick the drawing from the list (it is the only one: “send”).",
-                "pt": "Dê volume ao croqui com PartDesign: 1,6 mm de espessura. «dar altura» é o mesmo comando que «extrudar por medida», com palavras que o ditado reconhece melhor. Depois escolha o desenho da lista (é o único: «enviar»).",
             },
             # «extruir» / «extrude» no están en el vocabulario de los modelos de voz chicos:
             # se dicta el sinónimo, que apunta al mismo comando (additive["pad_by_length"]).
             Path={
                 "es": ("banco", "diseño", "sumar", "dar altura"),
                 "en": ("workbench", "design", "add", "give height"),
-                "pt": ("trabalho", "projeto", "aditivo", "dar altura"),
             },
             Values=lambda language: numbers(language, THICKNESS) + send(language),
             Action=_pad,
@@ -300,12 +285,10 @@ def steps() -> list:
             Text={
                 "es": "Ahora la hoja técnica: una página desde plantilla. En la lista elegí el tercer elemento («avanzar» dos veces) y «enviar»: es la plantilla con rótulo.",
                 "en": "Now the technical sheet: a page from a template. In the list pick the third item (“next” twice) and “send”: it is the template with a title block.",
-                "pt": "Agora a folha técnica: uma página a partir de um modelo. Na lista escolha o terceiro item («próximo» duas vezes) e «enviar»: é o modelo com carimbo.",
             },
             Path={
                 "es": ("banco", "dibujo técnico", "página", "plantilla"),
                 "en": ("workbench", "drawing", "page", "template page"),
-                "pt": ("trabalho", "técnico", "página", "modelo"),
             },
             Values=lambda language: nextItem(language, 2) + send(language),
             Action=_page,
@@ -314,12 +297,10 @@ def steps() -> list:
             Text={
                 "es": "Poné en la hoja la vista isométrica de la arandela (con la pieza seleccionada).",
                 "en": "Place the isometric view of the washer on the page (with the part selected).",
-                "pt": "Coloque na folha a vista isométrica da arruela (com a peça selecionada).",
             },
             Path={
                 "es": ("vistas", "vista"),
                 "en": ("views", "view"),
-                "pt": ("vistas", "vista"),
             },
             Action=_isometricView,
         ),
@@ -327,21 +308,18 @@ def steps() -> list:
             Text={
                 "es": "Agregá también la vista del boceto (con el croquis seleccionado): los dos círculos vistos desde arriba. Seguís en Vistas: alcanza con «vista».",
                 "en": "Also add the view of the sketch (with the sketch selected): the two circles seen from above. You are still in Views: “view” is enough.",
-                "pt": "Adicione também a vista do croqui (com o croqui selecionado): os dois círculos vistos de cima. Você continua em Vistas: basta «vista».",
             },
-            Path={"es": ("vista",), "en": ("view",), "pt": ("vista",)},
+            Path={"es": ("vista",), "en": ("view",)},
             Action=_sketchView,
         ),
         ExampleStep(
             Text={
                 "es": "Por último, un texto en la hoja que dice «M6 arandela».",
                 "en": "Finally, a text on the page that says “M6 washer”.",
-                "pt": "Por último, um texto na folha que diz «M6 arruela».",
             },
             Path={
                 "es": ("anotaciones", "texto"),
                 "en": ("annotations", "text"),
-                "pt": ("anotações", "texto"),
             },
             Action=_text,
         ),

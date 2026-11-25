@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Download small Vosk models (en, es, pt) into models/."""
+"""Download small Vosk models (en, es) into models/."""
 
 import os
 import sys

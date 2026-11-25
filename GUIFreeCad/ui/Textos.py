@@ -94,45 +94,6 @@ TEXTS = {
         "go_to":       "ir a",
         "not_found":   "not found in model",
     },
-    "pt": {
-        "title":           "ASSISTENTE DE VOZ PARA TECNICOS",
-        "mic_active":      "Microfone ativo - Escutando...",
-        "mic_error":       "Erro de microfone",
-        "section_listen":  "Voz reconhecida:",
-        "detected":        "Detectado:",
-        "section_model":   "Modelo 3D:",
-        "section_history": "Histórico:",
-        "mic_inactive":    "Microfone inativo",
-        "empty_context":   "Sem comandos neste contexto",
-        "section_cmds":    "Comandos sugeridos",
-        "help_btn":        "Ajuda",
-        "help_title":      "AJUDA PARA ASSISTENTE DE VOZ",
-        "help_text": (
-            "COMANDOS DE VOZ DISPONIVEIS:\n\n"
-            "CONTROLE DO APP:\n"
-            "   'ayuda'           - abre esta janela\n"
-            "   'cerrar ayuda'    - fecha esta janela\n"
-            "   'minimizar'       - minimiza o programa\n"
-            "   'maximizar'       - maximiza o programa\n"
-            "   'cerrar programa' - fecha o aplicativo\n\n"
-            "COMANDOS TECNICOS:\n"
-            "   'dibujar linea'\n"
-            "   'dibujar circulo'\n"
-            "   'acercar'\n"
-            "   'guardar archivo'\n"
-            "   'limpiar pantalla'\n\n"
-            "NAVEGACAO NO HISTORICO:\n"
-            "   'subir' - sobe 5 entradas no historico\n"
-            "   'bajar' - desce 5 entradas no historico\n\n"
-            "NAVEGACAO NO MODELO:\n"
-            "   'ir a [nome]'  - destaca a parte do modelo\n\n"
-            "DICA: Fale CLARAMENTE. Voce tambem pode CLICAR."
-        ),
-        "help_close":  "FECHAR AJUDA",
-        "unknown":     "Nao entendido",
-        "go_to":       "ir a",
-        "not_found":   "nao encontrado no modelo",
-    },
 }
 
 MODEL_PARTS = ["Documento 1"]
@@ -190,37 +151,14 @@ SECTION_NAMES = {
         "structure": "Structure",
         "examples": "Examples & Tutorials",
     },
-    "pt": {
-        "Base": "Categorias Principais",
-        "3D-BIM": "3D - Modelagem BIM",
-        "BIM3D": "3D - Modelagem BIM",
-        "2D-Drafting": "2D - Desenho e Esboço",
-        "Drafting2D": "2D - Desenho e Esboço",
-        "Annotation": "Anotação e Cotas",
-        "Manage": "Administração e Gestão BIM",
-        "Modify": "Modificar e Transformar",
-        "Preferences": "Preferências e Configurações",
-        "Snapping": "Encaixe (Snapping)",
-        "StatusBar": "Barra de Estado e Vistas",
-        "Utils": "Utilidades e Ferramentas",
-        "Explorer": "Explorador de Arquivos",
-        "file": "Arquivo",
-        "edit": "Edição",
-        "print": "Imprimir / Exportar PDF",
-        "windows": "Janelas",
-        "expressions": "Expressões",
-        "tools": "Ferramentas",
-        "structure": "Estrutura",
-        "examples": "Exemplos e Tutoriais",
-    },
 }
 
 
 def format_section_title(context_path: str, lang: str = "es") -> str:
     """Genera el título legible y descriptivo para la sección activa de comandos."""
-    lang_key = "en" if str(lang).lower().startswith("en") else ("pt" if str(lang).lower().startswith("pt") else "es")
+    lang_key = "en" if str(lang).lower().startswith("en") else "es"
     names = SECTION_NAMES.get(lang_key, SECTION_NAMES["es"])
-    prefix = "Section:" if lang_key == "en" else ("Seção:" if lang_key == "pt" else "Sección:")
+    prefix = "Section:" if lang_key == "en" else "Sección:"
 
     path = (context_path or "Base").strip()
     if not path or path == "Base":

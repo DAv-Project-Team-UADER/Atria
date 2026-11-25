@@ -19,16 +19,13 @@ from typing import Any
 
 _ES = "es"
 _EN = "en"
-_PT = "pt"
 
 
 def _Normalize(value: Any) -> str:
-    """Map any stored language value to es/en/pt, defaulting to es."""
+    """Map any stored language value to es/en, defaulting to es."""
     text = str(value or _ES).strip().lower()
     if "en" in text:
         return _EN
-    if "pt" in text:
-        return _PT
     return _ES
 
 
@@ -41,7 +38,7 @@ def ResolveLanguage() -> str:
     ``core/preferences.py``; the final fallback is Spanish.
 
     Returns:
-        One of ``"es"``, ``"en"``, ``"pt"``.
+        One of ``"es"`` or ``"en"``.
     """
     try:
         from core.preferences import preferences
@@ -137,38 +134,6 @@ _LABELS: dict[str, dict[str, str]] = {
         "kind_int": "número entero",
         "kind_str": "texto",
         "kind_object": "objeto del documento",
-    },
-    _PT: {
-        "listening": "Ouvindo...",
-        "accepted": "Aceito",
-        "cancelled": "Cancelado",
-        "ok": "OK",
-        "cancel": "Cancelar",
-        "value_not_empty": "O valor não pode estar vazio.",
-        "numeric_no_value": "Não há número para confirmar. Diga um número primeiro.",
-        "numeric_prompt": "Diga um número e depois diga ok ou enviar.",
-        "string_waiting": "Aguardando enviar ou aceitar...",
-        "string_not_empty": "O texto não pode estar vazio.",
-        "object_unavailable": "A seleção de objetos não está disponível: {error}",
-        "object_no_doc": "Não há documento ativo no FreeCAD.",
-        "object_no_objects": "O documento ativo do FreeCAD não tem objetos.",
-        "object_browse_confirm": "Diga próximo para percorrer objetos e depois diga enviar para confirmar.",
-        "object_browse": "Diga próximo para percorrer, ou diga enviar para confirmar.",
-        "object_select_error": "Não foi possível selecionar o objeto: {error}",
-        "object_selected": "Selecionado {name} ({current}/{total}).",
-        "object_none": "Nenhum objeto está selecionado.",
-        "object_search_title": "Buscar por soletração",
-        "object_search_message": "Soletre o nome do objeto, letra por letra",
-        "object_search_none": "Nada se parece com \"{text}\". Diga buscar por soletração para tentar de novo.",
-        "object_search_found": "O mais parecido com \"{text}\": {name} ({current}/{total}).{others} Diga enviar para escolhê-lo.",
-        "object_search_others": " Também: {names}.",
-        "param_title": "ATRIA Parâmetro {index}",
-        "param_message": "Diga o {kind} para '{name}' e depois diga enviar.",
-        "kind_float": "número decimal",
-        "kind_coord": "coordenadas (X, Y)",
-        "kind_int": "número inteiro",
-        "kind_str": "texto",
-        "kind_object": "objeto do documento",
     },
 }
 
@@ -282,52 +247,6 @@ _FRIENDLY_NAMES: dict[str, dict[str, str]] = {
         "vector": "Displacement vector",
         "delta": "Delta displacement",
     },
-    _PT: {
-        "x1": "Coordenada X inicial",
-        "y1": "Coordenada Y inicial",
-        "z1": "Coordenada Z inicial",
-        "x2": "Coordenada X final",
-        "y2": "Coordenada Y final",
-        "z2": "Coordenada Z final",
-        "x3": "Coordenada X ponto 3",
-        "y3": "Coordenada Y ponto 3",
-        "x": "Coordenada X",
-        "y": "Coordenada Y",
-        "z": "Coordenada Z",
-        "center_x": "Centro X",
-        "center_y": "Centro Y",
-        "center_z": "Centro Z",
-        "radius": "Raio",
-        "major_radius": "Raio maior",
-        "minor_radius": "Raio menor",
-        "start_angle": "Ângulo inicial",
-        "end_angle": "Ângulo final",
-        "length": "Comprimento",
-        "width": "Largura",
-        "height": "Altura",
-        "thickness": "Espessura",
-        "diameter": "Diâmetro",
-        "dx": "Deslocamento em X",
-        "dy": "Deslocamento em Y",
-        "dz": "Deslocamento em Z",
-        "angle": "Ângulo de rotação",
-        "factor": "Fator de escala",
-        "scale": "Escala",
-        "rotation": "Rotação",
-        "nfaces": "Número de lados",
-        "sides": "Número de lados",
-        "steps": "Quantidade de degraus",
-        "rows": "Quantidade de linhas",
-        "columns": "Quantidade de colunas",
-        "size": "Tamanho",
-        "text": "Texto",
-        "label": "Rótulo",
-        "point": "Ponto / Coordenadas",
-        "p1": "Primeiro ponto",
-        "p2": "Segundo ponto",
-        "vector": "Vetor de deslocamento",
-        "delta": "Deslocamento delta",
-    },
 }
 
 
@@ -344,6 +263,6 @@ def ParamFriendlyMessage(language: str, name: str, kind: str) -> str | None:
         return None
     if norm_lang == _ES:
         return f"Dictá el valor para {label} y decí ok o enviar para confirmar."
-    elif norm_lang == _EN:
+    if norm_lang == _EN:
         return f"Say the value for {label}, then say ok or send to confirm."
-    return f"Diga o valor para {label} e diga ok ou enviar para confirmar."
+    return f"Dictá el valor para {label} y decí ok o enviar para confirmar."

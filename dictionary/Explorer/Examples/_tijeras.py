@@ -36,7 +36,6 @@ from ._words import down, nextItem, no, numbers, send, yes
 TITLE = {
     "es": "Tijera de 5 piezas",
     "en": "Five-part scissors",
-    "pt": "Tesoura de 5 peças",
 }
 
 # La tijera yace en el plano XY y el eje del perno es Z. Medidas en mm.
@@ -225,35 +224,31 @@ def steps() -> list:
     def frame(text, path, action, values=None):
         return ExampleStep(Text=text, Path=path, Values=values, Action=action)
 
-    def say(es, en, pt):
-        return {"es": es, "en": en, "pt": pt}
+    def say(es, en):
+        return {"es": es, "en": en}
 
-    def route(es, en, pt):
-        return {"es": es, "en": en, "pt": pt}
+    def route(es, en):
+        return {"es": es, "en": en}
 
     sketchPath = route(
         ("banco", "croquis", "geometría", "triángulo", "triángulo por vértices"),
         ("workbench", "sketch", "geometry", "triangle", "triangle by vertices"),
-        ("trabalho", "croqui", "geometria", "triângulo", "triângulo por vértices"),
     )
     padPath = route(
         ("subir", "subir", "subir", "diseño", "sumar", "extruir por medida"),
         ("up", "up", "up", "design", "add", "extrude by length"),
-        ("subir", "subir", "subir", "projeto", "aditivo", "extrudar por medida"),
     )
-    addPath = route(("cilindro por medidas",), ("cylinder by size",), ("cilindro por medidas",))
+    addPath = route(("cilindro por medidas",), ("cylinder by size",))
     cutPath = route(
         ("subir", "cortar", "cortar cilindro por medidas"),
         ("up", "cut", "cut cylinder by size"),
-        ("subir", "cortar", "cortar cilindro por medidas"),
     )
     cutAgainPath = route(
-        ("cortar cilindro por medidas",), ("cut cylinder by size",), ("cortar cilindro por medidas",)
+        ("cortar cilindro por medidas",), ("cut cylinder by size",)
     )
     toAddPath = route(
         ("subir", "sumar", "cilindro por medidas"),
         ("up", "add", "cylinder by size"),
-        ("subir", "aditivo", "cilindro por medidas"),
     )
 
     def cyl(kind, body, new, radius, height, x, y, z, newBody):
@@ -285,12 +280,10 @@ def steps() -> list:
                 say(
                     f"Hoja {name}: un triángulo por vértices, {vertices[0]}, {vertices[1]} y {vertices[2]}. Es la hoja con su cola.",
                     f"Blade {name}: a triangle by vertices, {vertices[0]}, {vertices[1]} and {vertices[2]}. It is the blade with its tail.",
-                    f"Lâmina {name}: um triângulo por vértices, {vertices[0]}, {vertices[1]} e {vertices[2]}. É a lâmina com a cauda.",
                 ),
                 sketchPath if index == 0 else route(
                     ("subir", "subir", "croquis", "geometría", "triángulo", "triángulo por vértices"),
                     ("up", "up", "sketch", "geometry", "triangle", "triangle by vertices"),
-                    ("subir", "subir", "croqui", "geometria", "triângulo", "triângulo por vértices"),
                 ),
                 _triangle(vertices),
                 lambda language, flat=flat: numbers(language, *flat),
@@ -299,7 +292,6 @@ def steps() -> list:
                 say(
                     f"Extruí el triángulo 2 mm: nace el cuerpo de la hoja {name}. En la lista de dibujos elegí el último, el que acabás de hacer.",
                     f"Extrude the triangle 2 mm: the body of blade {name} is born. In the list of drawings pick the last one, the one you just made.",
-                    f"Extrude o triângulo 2 mm: nasce o corpo da lâmina {name}. Na lista de desenhos escolha o último, o que acabou de fazer.",
                 ),
                 padPath,
                 _pad,
@@ -309,9 +301,8 @@ def steps() -> list:
                 say(
                     f"La lengüeta donde se agarra el mango: un cilindro de radio {TANG_RADIUS} y {THICK} de alto, centro en ({HANDLE_X}, {sign * HANDLE_Y}, 1). Decí «no» a «¿cuerpo nuevo?» y elegí la hoja en la lista.",
                     f"The tang that holds the handle: a cylinder with radius {TANG_RADIUS} and height {THICK}, centred at ({HANDLE_X}, {sign * HANDLE_Y}, 1). Say “no” to “new body?” and pick the blade in the list.",
-                    f"A lingueta que segura o cabo: um cilindro de raio {TANG_RADIUS} e {THICK} de altura, centro em ({HANDLE_X}, {sign * HANDLE_Y}, 1). Diga «nao» a «corpo novo?» e escolha a lâmina na lista.",
                 ),
-                route(("subir", "subir", "diseño", "sumar", "cilindro por medidas"), ("up", "up", "design", "add", "cylinder by size"), ("subir", "subir", "projeto", "aditivo", "cilindro por medidas")),
+                route(("subir", "subir", "diseño", "sumar", "cilindro por medidas"), ("up", "up", "design", "add", "cylinder by size")),
                 _cylinder("Additive", index, False, TANG_RADIUS, THICK, HANDLE_X, sign * HANDLE_Y, THICK / 2),
                 cyl("Additive", index, False, TANG_RADIUS, THICK, HANDLE_X, sign * HANDLE_Y, THICK / 2, False),
             ),
@@ -319,7 +310,6 @@ def steps() -> list:
                 say(
                     f"El agujero del perno: un cilindro sustractivo de radio {pivot}, centro en (0, 0, 1). Primero «subir», porque estás en Sumar. Elegí la hoja en la lista.",
                     f"The pin hole: a subtractive cylinder with radius {pivot}, centred at (0, 0, 1). First go “up”, since you are in Add. Pick the blade in the list.",
-                    f"O furo do pino: um cilindro subtrativo de raio {pivot}, centro em (0, 0, 1). Primeiro «subir», porque você está em Aditivo. Escolha a lâmina na lista.",
                 ),
                 cutPath,
                 _cylinder("Subtractive", index, False, pivot, CUT_HEIGHT, 0, 0, THICK / 2),
@@ -329,7 +319,6 @@ def steps() -> list:
                 say(
                     f"El hueco de la lengüeta: un cilindro sustractivo de radio {HOLE_RADIUS}, mismo centro que la lengüeta. Sobre este hueco irá la junta fija del mango.",
                     f"The hollow of the tang: a subtractive cylinder with radius {HOLE_RADIUS}, same centre as the tang. The handle's fixed joint will go on this hollow.",
-                    f"O vazio da lingueta: um cilindro subtrativo de raio {HOLE_RADIUS}, mesmo centro da lingueta. A junta fixa do cabo irá neste vazio.",
                 ),
                 cutAgainPath,
                 _cylinder("Subtractive", index, False, HOLE_RADIUS, CUT_HEIGHT, HANDLE_X, sign * HANDLE_Y, THICK / 2),
@@ -344,9 +333,8 @@ def steps() -> list:
                 say(
                     f"Mango {name}: un anillo, o sea un cilindro de radio {RING_RADIUS} y {RING_HEIGHT} de alto, centro en ({HANDLE_X}, {sign * HANDLE_Y}, 1). Es otra pieza: decí «sí» a «¿cuerpo nuevo?».",
                     f"Handle {name}: a ring, that is a cylinder with radius {RING_RADIUS} and height {RING_HEIGHT}, centred at ({HANDLE_X}, {sign * HANDLE_Y}, 1). It is another part: say “yes” to “new body?”.",
-                    f"Cabo {name}: um anel, ou seja, um cilindro de raio {RING_RADIUS} e {RING_HEIGHT} de altura, centro em ({HANDLE_X}, {sign * HANDLE_Y}, 1). É outra peça: diga «sim» a «corpo novo?».",
                 ),
-                route(("subir", "sumar", "cilindro por medidas"), ("up", "add", "cylinder by size"), ("subir", "aditivo", "cilindro por medidas")),
+                route(("subir", "sumar", "cilindro por medidas"), ("up", "add", "cylinder by size")),
                 _cylinder("Additive", index, True, RING_RADIUS, RING_HEIGHT, HANDLE_X, sign * HANDLE_Y, THICK / 2),
                 cyl("Additive", index, True, RING_RADIUS, RING_HEIGHT, HANDLE_X, sign * HANDLE_Y, THICK / 2, True),
             ),
@@ -354,7 +342,6 @@ def steps() -> list:
                 say(
                     f"El hueco del mango {name}: cilindro sustractivo de radio {HOLE_RADIUS}, mismo centro. Elegí el mango en la lista de cuerpos.",
                     f"The hollow of handle {name}: a subtractive cylinder with radius {HOLE_RADIUS}, same centre. Pick the handle in the list of bodies.",
-                    f"O vazio do cabo {name}: cilindro subtrativo de raio {HOLE_RADIUS}, mesmo centro. Escolha o cabo na lista de corpos.",
                 ),
                 cutPath,
                 _cylinder("Subtractive", index, False, HOLE_RADIUS, CUT_HEIGHT, HANDLE_X, sign * HANDLE_Y, THICK / 2),
@@ -368,7 +355,6 @@ def steps() -> list:
             say(
                 "El perno es escalonado. Primero la cabeza: cilindro de radio 5 y 2 de alto, centro en (0, 0, -1). Pieza nueva: «sí».",
                 "The pin is stepped. First the head: a cylinder with radius 5 and height 2, centred at (0, 0, -1). New part: “yes”.",
-                "O pino é escalonado. Primeiro a cabeça: cilindro de raio 5 e 2 de altura, centro em (0, 0, -1). Peça nova: «sim».",
             ),
             toAddPath,
             _cylinder("Additive", 4, True, 5, THICK, 0, 0, -1),
@@ -378,7 +364,6 @@ def steps() -> list:
             say(
                 f"El eje que pasa por la hoja A: radio {PIN_A}, {THICK} de alto, centro en (0, 0, 1). «No» a cuerpo nuevo y elegí el perno en la lista.",
                 f"The shaft through blade A: radius {PIN_A}, height {THICK}, centred at (0, 0, 1). “No” to new body and pick the pin in the list.",
-                f"O eixo que passa pela lâmina A: raio {PIN_A}, altura {THICK}, centro em (0, 0, 1). «Nao» a corpo novo e escolha o pino na lista.",
             ),
             addPath,
             _cylinder("Additive", 4, False, PIN_A, THICK, 0, 0, THICK / 2),
@@ -388,7 +373,6 @@ def steps() -> list:
             say(
                 f"El eje de la hoja B, un poco más fino: radio {PIN_B}, {THICK} de alto, centro en (0, 0, 3). Así el ensamblaje apila la hoja B 2 mm sobre la A.",
                 f"The shaft of blade B, a little thinner: radius {PIN_B}, height {THICK}, centred at (0, 0, 3). That way the assembly stacks blade B 2 mm above A.",
-                f"O eixo da lâmina B, um pouco mais fino: raio {PIN_B}, altura {THICK}, centro em (0, 0, 3). Assim o conjunto empilha a lâmina B 2 mm sobre a A.",
             ),
             addPath,
             _cylinder("Additive", 4, False, PIN_B, THICK, 0, 0, 3 * THICK / 2),
@@ -402,22 +386,20 @@ def steps() -> list:
             say(
                 "Ahora el ensamblaje: creá uno nuevo.",
                 "Now the assembly: create a new one.",
-                "Agora o conjunto: crie um novo.",
             ),
-            route(("subir", "subir", "ensamblaje", "crear ensamblaje"), ("up", "up", "assembly", "create assembly"), ("subir", "subir", "montagem", "criar conjunto")),
+            route(("subir", "subir", "ensamblaje", "crear ensamblaje"), ("up", "up", "assembly", "create assembly")),
             _createAssembly,
         )
     )
-    parts = (("la hoja A", "blade A", "a lâmina A"), ("la hoja B", "blade B", "a lâmina B"), ("el mango A", "handle A", "o cabo A"), ("el mango B", "handle B", "o cabo B"), ("el perno", "the pin", "o pino"))
-    for position, (es, en, pt) in enumerate(parts):
+    parts = (("la hoja A", "blade A"), ("la hoja B", "blade B"), ("el mango A", "handle A"), ("el mango B", "handle B"), ("el perno", "the pin"))
+    for position, (es, en) in enumerate(parts):
         frames.append(
             frame(
                 say(
                     f"Insertá {es}: en la lista de cuerpos elegí el número {position + 1}.",
                     f"Insert {en}: in the list of bodies pick number {position + 1}.",
-                    f"Insira {pt}: na lista de corpos escolha o número {position + 1}.",
                 ),
-                route(("insertar vínculo",), ("insert link",), ("inserir link",)),
+                route(("insertar vínculo",), ("insert link",)),
                 _insertLink(position),
                 lambda language, position=position: _pickBody(language, position),
             )
@@ -427,9 +409,8 @@ def steps() -> list:
             say(
                 "Anclá el perno: el solver lo deja quieto y mueve lo demás. En la lista, «avanzar» hasta el vínculo del perno (después de los cinco cuerpos) y «enviar».",
                 "Ground the pin: the solver keeps it still and moves the rest. In the list say “next” up to the pin's link (after the five bodies) and “send”.",
-                "Ancore o pino: o solver o deixa parado e move o resto. Na lista, «próximo» até o link do pino (depois dos cinco corpos) e «enviar».",
             ),
-            route(("anclar pieza",), ("ground part",), ("ancorar peca",)),
+            route(("anclar pieza",), ("ground part",)),
             _ground,
             lambda language: _pick(language, _links()[4]),
         ),
@@ -437,9 +418,8 @@ def steps() -> list:
             say(
                 "Articulá el perno con la hoja A con una bisagra: elegí los dos vínculos y, en cada uno, el cilindro de radio 2 (el del eje y el del agujero).",
                 "Hinge the pin to blade A: pick both links and, in each, the cylinder of radius 2 (the shaft and the hole).",
-                "Articule o pino com a lâmina A com uma dobradiça: escolha os dois links e, em cada um, o cilindro de raio 2 (o do eixo e o do furo).",
             ),
-            route(("bisagra",), ("hinge",), ("dobradiça",)),
+            route(("bisagra",), ("hinge",)),
             _joint("Revolute", 4, 0, PIN_A, PIN_A),
             lambda language: _jointWords(language, 4, 0, PIN_A, PIN_A),
         ),
@@ -447,9 +427,8 @@ def steps() -> list:
             say(
                 "Lo mismo con la hoja B, por los cilindros de radio 1,8. La hoja B salta 2 mm hacia arriba.",
                 "The same with blade B, through the cylinders of radius 1.8. Blade B jumps 2 mm up.",
-                "O mesmo com a lâmina B, pelos cilindros de raio 1,8. A lâmina B sobe 2 mm.",
             ),
-            route(("bisagra",), ("hinge",), ("dobradiça",)),
+            route(("bisagra",), ("hinge",)),
             _joint("Revolute", 4, 1, PIN_B, PIN_B),
             lambda language: _jointWords(language, 4, 1, PIN_B, PIN_B),
         ),
@@ -457,9 +436,8 @@ def steps() -> list:
             say(
                 "Unite la hoja A con su mango con un ensamble fijo, por los huecos de radio 8.",
                 "Join blade A to its handle with a fixed joint, through the hollows of radius 8.",
-                "Una a lâmina A ao seu cabo com uma junta fixa, pelos vazios de raio 8.",
             ),
-            route(("ensamble fijo",), ("fixed joint",), ("junta fixa",)),
+            route(("ensamble fijo",), ("fixed joint",)),
             _joint("Fixed", 0, 2, HOLE_RADIUS, HOLE_RADIUS),
             lambda language: _jointWords(language, 0, 2, HOLE_RADIUS, HOLE_RADIUS),
         ),
@@ -467,9 +445,8 @@ def steps() -> list:
             say(
                 "Y la hoja B con su mango, igual.",
                 "And blade B with its handle, the same way.",
-                "E a lâmina B com o seu cabo, igual.",
             ),
-            route(("ensamble fijo",), ("fixed joint",), ("junta fixa",)),
+            route(("ensamble fijo",), ("fixed joint",)),
             _joint("Fixed", 1, 3, HOLE_RADIUS, HOLE_RADIUS),
             lambda language: _jointWords(language, 1, 3, HOLE_RADIUS, HOLE_RADIUS),
         ),
@@ -477,18 +454,16 @@ def steps() -> list:
             say(
                 "Resolvé el ensamblaje para comprobar que todo encaja: la hoja B queda apilada sobre la A.",
                 "Solve the assembly to check that everything fits: blade B is stacked on A.",
-                "Resolva o conjunto para conferir que tudo encaixa: a lâmina B fica empilhada sobre a A.",
             ),
-            route(("resolver",), ("solve",), ("resolver",)),
+            route(("resolver",), ("solve",)),
             _solve,
         ),
         frame(
             say(
                 "Mirá la tijera terminada: decí «tres de» (vista isométrica). La versión abierta al 50 % y el plano ANSI están en la guía guia-tijeras-voz.md. Después decí «enviar» para cerrar el ejemplo.",
                 "See the finished scissors: say “isometric”. The version open at 50 % and the ANSI drawing are in the guide guia-tijeras-voz.md. Then say “send” to close the example.",
-                "Veja a tesoura pronta: diga «isometrica». A versão aberta a 50 % e o desenho ANSI estão no guia guia-tijeras-voz.md. Depois diga «enviar» para fechar o exemplo.",
             ),
-            {"es": ("tres de",), "en": ("isometric",), "pt": ("isométrica",)},
+            {"es": ("tres de",), "en": ("isometric",)},
             _isometric,
         ),
     ]

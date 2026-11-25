@@ -31,11 +31,10 @@ except ImportError:
 
 
 class LanguageCode(Enum):
-    """En, Es, PT — matches GUIFreeCad Preferences.SetLanguage."""
+    """En and Es — matches GUIFreeCad Preferences.SetLanguage."""
 
     En = "en"
     Es = "es"
-    PT = "pt"
 
     @classmethod
     def FromStorage(cls, value: Any) -> "LanguageCode":
@@ -44,8 +43,6 @@ class LanguageCode(Enum):
         val_str = str(value or "es").strip().lower()
         if "en" in val_str:
             return cls.En
-        if "pt" in val_str:
-            return cls.PT
         return cls.Es
 
 
@@ -63,12 +60,6 @@ _LABELS: dict[LanguageCode, dict[str, str]] = {
         "line": "Linea",
         "surface": "Superficie",
         "edge": "Arista",
-    },
-    LanguageCode.PT: {
-        "point": "Ponto",
-        "line": "Linha",
-        "surface": "Superficie",
-        "edge": "Aresta",
     },
 }
 
@@ -144,8 +135,6 @@ class Tagger:
         lang_str = getattr(self._language, "value", str(self._language)).lower()
         if "en" in lang_str:
             return _LABELS[LanguageCode.En]
-        if "pt" in lang_str:
-            return _LABELS[LanguageCode.PT]
         return _LABELS[LanguageCode.Es]
 
     def NextName(self, kind: str) -> str:

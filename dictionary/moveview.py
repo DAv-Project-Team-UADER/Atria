@@ -132,9 +132,4 @@ MOVE_VIEW_PHRASES = {
         "center on", "center view", "go to point",
         "shift", "go to", "navigate to", "reposition view",
     ),
-    "pt": (
-        "mover", "mover vista", "mover camera", "mover câmera", "deslocar vista",
-        "arrastar vista", "centralizar em", "centrar vista", "ir ao ponto",
-        "centralizar", "ir para", "levar a", "posicionar vista",
-    ),
 }

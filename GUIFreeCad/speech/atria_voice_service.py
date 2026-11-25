@@ -405,7 +405,7 @@ class AtriaVoiceService:
                             # entero (ver crash.log, Recognizer::SetGrm).
                             # Reset() lo devuelve a estado inicial y ahi si
                             # acepta la gramatica nueva. Verificado contra el
-                            # modelo pt, que era el que crasheaba.
+                            # modelo que causaba el fallo.
                             log.info(
                                 "aplicando gramatica: %d frases",
                                 g_json.count(",") + 1,

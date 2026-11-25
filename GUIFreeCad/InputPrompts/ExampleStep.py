@@ -37,12 +37,6 @@ NAVIGATION_WORDS: dict[str, dict[str, tuple[str, ...]]] = {
         "select": ("send",),
         "skip": ("skip",),
     },
-    "pt": {
-        "previous": ("voltar",),
-        "next": ("próximo",),
-        "select": ("enviar",),
-        "skip": ("pular",),
-    },
 }
 
 # Sinónimos que el reproductor da por buenos: palabra oída (sin tildes) -> palabra esperada.

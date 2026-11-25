@@ -65,7 +65,7 @@ def _FindSketchName(preferred: str | None) -> str | None:
 
 
 def RunFullDemo(sketch_name: str | None = None):
-    """CreateObjects (es/en/pt) + ObjectSelection demo. Returns selector."""
+    """CreateObjects (es/en) + ObjectSelection demo. Returns selector."""
     _EnsurePath()
     import FreeCAD as App
 
@@ -81,7 +81,7 @@ def RunFullDemo(sketch_name: str | None = None):
 
     print("\n========== ATRIA selection — prueba automática ==========\n")
 
-    for language in ("es", "en", "pt"):
+    for language in ("es", "en"):
         print(f"--- CreateObjects idioma={language} ---")
         RunCreateObjects(target, Is3D=False, Language=language)
         PrintObjectTree()

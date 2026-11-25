@@ -23,7 +23,6 @@ from ._words import down, nextItem, no, numbers, send, yes
 TITLE = {
     "es": "Bulón-tuerca",
     "en": "Bolt-nut",
-    "pt": "Parafuso-porca",
 }
 
 # Bulón M6 simplificado de la DIN 931: vástago liso de 20 mm y cabeza hexagonal de 4 mm.
@@ -177,7 +176,7 @@ def _pick(language: str, *links) -> tuple:
     """Words that pick each of ``links`` from the parts list: «avanzar» up to it and «enviar».
 
     Args:
-        language: ``"es"``, ``"en"`` or ``"pt"``.
+        language: ``"es"`` or ``"en"``.
         *links: the parts to pick, in the order the dialogs ask for them; one already
             chosen no longer shows up in the next dialog.
     """
@@ -243,12 +242,10 @@ def steps() -> list:
             Text={
                 "es": "El bulón, simplificado de la DIN 931: primero el vástago, un cilindro de radio 3 y 20 de alto, con el centro en (0, 0, 10).",
                 "en": "The bolt, simplified from DIN 931: first the shank, a cylinder with radius 3 and height 20, centred at (0, 0, 10).",
-                "pt": "O parafuso, simplificado da DIN 931: primeiro a haste, um cilindro de raio 3 e 20 de altura, com o centro em (0, 0, 10).",
             },
             Path={
                 "es": ("banco", "diseño", "sumar", "cilindro"),
                 "en": ("workbench", "design", "add", "cylinder"),
-                "pt": ("trabalho", "projeto", "aditivo", "cilindro"),
             },
             Values=values(SHANK_RADIUS, SHANK_LENGTH, 0, 0, SHANK_LENGTH // 2),
             Action=_shank,
@@ -257,9 +254,8 @@ def steps() -> list:
             Text={
                 "es": "La cabeza hexagonal: un prisma de 6 lados, radio 6 y 4 de alto, centro en (0, 0, 22). Como ya hay un cuerpo, después de los valores decí «no» a «¿cuerpo nuevo?» y, en la lista de cuerpos, «enviar» para elegir el existente.",
                 "en": "The hex head: a 6-sided prism, radius 6 and 4 high, centred at (0, 0, 22). There is a body already, so after the values say “no” to “new body?” and, in the list of bodies, “send” to pick the existing one.",
-                "pt": "A cabeça sextavada: um prisma de 6 lados, raio 6 e 4 de altura, centro em (0, 0, 22). Como já há um corpo, depois dos valores diga «nao» a «corpo novo?» e, na lista de corpos, «enviar» para escolher o existente.",
             },
-            Path={"es": ("prisma",), "en": ("prism",), "pt": ("prisma",)},
+            Path={"es": ("prisma",), "en": ("prism",)},
             Values=lambda language: numbers(language, 6, HEX_RADIUS, HEAD_HEIGHT, 0, 0, SHANK_LENGTH + HEAD_HEIGHT // 2)
             + no(language)
             + send(language),
@@ -269,9 +265,8 @@ def steps() -> list:
             Text={
                 "es": "La tuerca es otra pieza: un prisma de 6 lados, radio 6 y 5 de alto, centro en (15, 0, 4), o sea, aparte del bulón. Esta vez se responde «sí» a «¿cuerpo nuevo?».",
                 "en": "The nut is another part: a 6-sided prism, radius 6 and 5 high, centred at (15, 0, 4), that is, away from the bolt. This time answer “yes” to “new body?”.",
-                "pt": "A porca é outra peça: um prisma de 6 lados, raio 6 e 5 de altura, centro em (15, 0, 4), ou seja, longe do parafuso. Desta vez responda «sim» a «corpo novo?».",
             },
-            Path={"es": ("prisma",), "en": ("prism",), "pt": ("prisma",)},
+            Path={"es": ("prisma",), "en": ("prism",)},
             Values=lambda language: numbers(language, 6, HEX_RADIUS, NUT_HEIGHT, NUT_X, 0, NUT_CENTER_Z) + yes(language),
             Action=_nut,
         ),
@@ -279,12 +274,10 @@ def steps() -> list:
             Text={
                 "es": "Agujereá la tuerca: un cilindro sustractivo de radio 3 y 10 de alto, centro en (15, 0, 4). Primero «subir» un nivel, porque estás en Sumar. En la lista de cuerpos, «avanzar» una vez para elegir la tuerca.",
                 "en": "Drill the nut: a subtractive cylinder with radius 3 and height 10, centred at (15, 0, 4). First go “up” one level, since you are in Add. In the list of bodies, say “next” once to pick the nut.",
-                "pt": "Fure a porca: um cilindro subtrativo de raio 3 e 10 de altura, centro em (15, 0, 4). Primeiro «subir» um nível, porque você está em Aditivo. Na lista de corpos, «próximo» uma vez para escolher a porca.",
             },
             Path={
                 "es": ("subir", "cortar", "cilindro"),
                 "en": ("up", "cut", "cylinder"),
-                "pt": ("subir", "cortar", "cilindro"),
             },
             Values=lambda language: numbers(language, SHANK_RADIUS, HOLE_HEIGHT, NUT_X, 0, NUT_CENTER_Z)
             + nextItem(language, 1)
@@ -295,12 +288,10 @@ def steps() -> list:
             Text={
                 "es": "Ahora el ensamblaje: creá uno nuevo.",
                 "en": "Now the assembly: create a new one.",
-                "pt": "Agora o conjunto: crie um novo.",
             },
             Path={
                 "es": ("banco", "ensamblaje", "crear ensamblaje"),
                 "en": ("workbench", "assembly", "create assembly"),
-                "pt": ("trabalho", "montagem", "criar conjunto"),
             },
             Action=_createAssembly,
         ),
@@ -308,12 +299,10 @@ def steps() -> list:
             Text={
                 "es": "Insertá el bulón en el ensamblaje: en la lista de piezas elegí el primer cuerpo (es el bulón) con «enviar».",
                 "en": "Insert the bolt into the assembly: in the list of parts pick the first body (the bolt) with “send”.",
-                "pt": "Insira o parafuso no conjunto: na lista de peças escolha o primeiro corpo (o parafuso) com «enviar».",
             },
             Path={
                 "es": ("insertar vínculo",),
                 "en": ("insert link",),
-                "pt": ("inserir link",),
             },
             Values=lambda language: _pickBody(language, 0),
             Action=_insertLink(0),
@@ -322,12 +311,10 @@ def steps() -> list:
             Text={
                 "es": "Insertá la tuerca del mismo modo: «avanzar» una vez para elegir el segundo cuerpo. Se pone a la derecha del bulón, sin pisarlo.",
                 "en": "Insert the nut the same way: say “next” once to pick the second body. It is placed to the right of the bolt, without overlapping it.",
-                "pt": "Insira a porca do mesmo modo: «próximo» uma vez para escolher o segundo corpo. Ela fica à direita do parafuso, sem sobrepor.",
             },
             Path={
                 "es": ("insertar vínculo",),
                 "en": ("insert link",),
-                "pt": ("inserir link",),
             },
             Values=lambda language: _pickBody(language, 1),
             Action=_insertLink(1),
@@ -336,12 +323,10 @@ def steps() -> list:
             Text={
                 "es": "Anclá el bulón: el solver lo deja quieto y mueve la tuerca. La lista muestra primero los cuerpos y después los vínculos: «avanzar» hasta el vínculo del bulón y «enviar».",
                 "en": "Ground the bolt: the solver keeps it still and moves the nut. The list shows the bodies first and then the links: say “next” up to the bolt's link and “send”.",
-                "pt": "Ancore o parafuso: o solver o deixa parado e move a porca. A lista mostra primeiro os corpos e depois os links: «próximo» até o link do parafuso e «enviar».",
             },
             Path={
                 "es": ("anclar pieza",),
                 "en": ("ground part",),
-                "pt": ("ancorar peca",),
             },
             Values=lambda language: _pick(language, _link(0)),
             Action=_ground,
@@ -350,12 +335,10 @@ def steps() -> list:
             Text={
                 "es": "Unilos con una junta cilíndrica: la tuerca gira y desliza sobre el eje del bulón. Elegí el vínculo del bulón y el de la tuerca; después, por dónde se une cada uno: en la lista de caras el cilindro es la primera (el vástago, el agujero), así que alcanza con «enviar». Al crear la junta, la tuerca salta al eje del bulón.",
                 "en": "Join them with a cylindrical joint: the nut turns and slides on the bolt's axis. Pick the bolt's link and the nut's; then where each one joins: the cylinder is first in the list of faces (the shank, the hole), so “send” is enough. When the joint is made, the nut jumps onto the bolt's axis.",
-                "pt": "Una-os com uma junta cilíndrica: a porca gira e desliza sobre o eixo do parafuso. Escolha o link do parafuso e o da porca; depois, por onde cada um se une: o cilindro é o primeiro da lista de faces (a haste, o furo), então basta «enviar». Ao criar a junta, a porca salta para o eixo do parafuso.",
             },
             Path={
                 "es": ("junta de cilindro",),
                 "en": ("cylinder joint",),
-                "pt": ("junta de cilindro",),
             },
             Values=lambda language: _pick(language, _link(0), _link(1))
             + _pickConnector(language, _link(0))
@@ -366,12 +349,10 @@ def steps() -> list:
             Text={
                 "es": "Resolvé el ensamblaje para comprobar que todo encaja: la tuerca queda sobre el bulón.",
                 "en": "Solve the assembly to check that everything fits: the nut stays on the bolt.",
-                "pt": "Resolva o conjunto para conferir que tudo encaixa: a porca fica sobre o parafuso.",
             },
             Path={
                 "es": ("resolver",),
                 "en": ("solve",),
-                "pt": ("resolver",),
             },
             Action=_solve,
         ),
@@ -379,9 +360,8 @@ def steps() -> list:
             Text={
                 "es": "Mirá el conjunto terminado: decí «tres de» (vista isométrica). Después decí «enviar» para cerrar el ejemplo.",
                 "en": "See the finished set: say “isometric”. Then say “send” to close the example.",
-                "pt": "Veja o conjunto pronto: diga «isometrica». Depois diga «enviar» para fechar o exemplo.",
             },
-            Path={"es": ("tres de",), "en": ("isometric",), "pt": ("isométrica",)},
+            Path={"es": ("tres de",), "en": ("isometric",)},
             Action=_isometric,
         ),
     ]

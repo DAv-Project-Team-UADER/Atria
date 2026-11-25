@@ -37,7 +37,6 @@ from InputPrompts.SpokenNumberParser import SpokenNumberParser
 _LABELS = {
     "es": {"skip": "Saltar cuadro", "close": "Cerrar", "done": "Ejemplo terminado. Decí enviar para cerrar."},
     "en": {"skip": "Skip frame", "close": "Close", "done": "Example finished. Say send to close."},
-    "pt": {"skip": "Pular quadro", "close": "Fechar", "done": "Exemplo concluído. Diga enviar para fechar."},
 }
 
 
@@ -157,7 +156,7 @@ class GuidedExampleInputPrompt(BaseInputPrompt):
             if self._Matched >= len(words):
                 break
             token = _Canonical(token)
-            # el conector de «vinte e dois» es una palabra de una letra: el reconocimiento suele
+            # el conector de «veinte y dos» es una palabra de una letra: el reconocimiento suele
             # comérsela, así que si falta se da por dicho al oír la palabra que le sigue
             if (
                 token != words[self._Matched]

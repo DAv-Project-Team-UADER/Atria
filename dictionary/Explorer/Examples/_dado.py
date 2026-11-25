@@ -32,7 +32,6 @@ from ._words import down, nextItem, numbers, send
 TITLE = {
     "es": "Dado",
     "en": "Die",
-    "pt": "Dado",
 }
 
 SIDE = 20  # el dado ocupa de (0, 0, 0) a (20, 20, 20)
@@ -195,12 +194,10 @@ def steps() -> list:
             Text={
                 "es": "El cuerpo del dado: una caja de 20 x 20 x 20 con el centro en (10, 10, 10). Sin cuerpos previos, se crea uno solo.",
                 "en": "The body of the die: a 20 x 20 x 20 box centred at (10, 10, 10). With no bodies yet, one is created for you.",
-                "pt": "O corpo do dado: uma caixa de 20 x 20 x 20 com o centro em (10, 10, 10). Sem corpos prévios, um é criado sozinho.",
             },
             Path={
                 "es": ("banco", "diseño", "sumar", "caja"),
                 "en": ("workbench", "design", "add", "box"),
-                "pt": ("trabalho", "projeto", "aditivo", "caixa"),
             },
             Values=values(SIDE, SIDE, SIDE, 10, 10, 10),
             Action=_cube,
@@ -209,12 +206,10 @@ def steps() -> list:
             Text={
                 "es": "La cara del 1 (arriba): un solo hueco, con un cilindro sustractivo de radio 2 y 4 de alto, centro en (10, 10, 20). Primero «subir» un nivel, porque estás en Sumar. Después se elige el cuerpo.",
                 "en": "The face with 1 (top): a single hole, with a subtractive cylinder of radius 2 and height 4, centred at (10, 10, 20). First go “up” one level, since you are in Add. Then pick the body.",
-                "pt": "A face do 1 (em cima): um único furo, com um cilindro subtrativo de raio 2 e 4 de altura, centro em (10, 10, 20). Primeiro «subir» um nível, porque você está em Aditivo. Depois escolha o corpo.",
             },
             Path={
                 "es": ("subir", "cortar", "cilindro"),
                 "en": ("up", "cut", "cylinder"),
-                "pt": ("subir", "cortar", "cilindro"),
             },
             Values=lambda language: numbers(language, PIP_RADIUS, 2 * PIP_DEPTH, 10, 10, SIDE) + send(language),
             Action=_cylinderForOne,
@@ -227,12 +222,10 @@ def steps() -> list:
                 Text={
                     "es": f"Cara del {number}: un boceto nuevo sobre la cara {name}. Elegila con «abajo» en la lista (tres planos y después las caras) y «enviar».",
                     "en": f"Face with {number}: a new sketch on that face ({name}). Pick it with “down” in the list (three planes, then the faces) and “send”.",
-                    "pt": f"Face do {number}: um esboço novo sobre essa face ({name}). Escolha-a com «abaixo» na lista (três planos e depois as faces) e «enviar».",
                 },
                 Path={
                     "es": ("base", "nuevo boceto"),
                     "en": ("base", "new sketch"),
-                    "pt": ("base", "esboço novo"),
                 },
                 Values=_downToFace(name),
                 Action=_sketchOnFace(name),
@@ -241,12 +234,10 @@ def steps() -> list:
                 Text={
                     "es": f"Dibujá el primer hueco del {number}: círculo de centro (5, 5) y radio 2, medido desde el centro de la cara. Los demás huecos del {number} se dibujan solos.",
                     "en": f"Draw the first pip of the {number}: a circle centred at (5, 5) with radius 2, measured from the centre of the face. The other pips are drawn for you.",
-                    "pt": f"Desenhe o primeiro furo do {number}: círculo de centro (5, 5) e raio 2, medido do centro da face. Os outros furos são desenhados sozinhos.",
                 },
                 Path={
                     "es": ("geometría", "círculo", "círculo"),
                     "en": ("geometry", "circle", "circle"),
-                    "pt": ("geometria", "círculo", "círculo"),
                 },
                 Values=values(5, 5, PIP_RADIUS),
                 Action=_pips(number),
@@ -255,12 +246,10 @@ def steps() -> list:
                 Text={
                     "es": f"Cerrá el croquis y vaciá {PIP_DEPTH} mm: los huecos del {number} se restan del dado. Al cerrar volvés a «banco» y «diseño», porque el cierre te deja en Croquis. La lista de dibujos se recorre con «avanzar» hasta el último.",
                     "en": f"Close the sketch and hollow {PIP_DEPTH} mm: the pips of the {number} are subtracted from the die. Move through the drawings with “next” up to the last one.",
-                    "pt": f"Feche o esboço e esvazie {PIP_DEPTH} mm: os furos do {number} são subtraídos do dado. A lista de desenhos se percorre com «próximo» até o último.",
                 },
                 Path={
                     "es": ("cerrar croquis", "banco", "diseño", "cortar", "vaciar"),
                     "en": ("close sketch", "workbench", "design", "cut", "hollow"),
-                    "pt": ("fechar esboço", "trabalho", "projeto", "cortar", "esvaziar"),
                 },
                 Values=_pocketValues,
                 Action=_pocket,
@@ -272,9 +261,8 @@ def steps() -> list:
             Text={
                 "es": "Medí el borde del dado en 3D: de (0, 0, 0) a (20, 0, 0). «cota» pide 6 valores: X, Y y Z de cada punto.",
                 "en": "Measure the edge of the die in 3D: from (0, 0, 0) to (20, 0, 0). “measure” asks for 6 values: X, Y and Z of each point.",
-                "pt": "Meça a aresta do dado em 3D: de (0, 0, 0) a (20, 0, 0). «medir» pede 6 valores: X, Y e Z de cada ponto.",
             },
-            Path={"es": ("cota",), "en": ("measure",), "pt": ("medir",)},
+            Path={"es": ("cota",), "en": ("measure",)},
             Values=values(0, 0, 0, SIDE, 0, 0),
             Action=_dimension,
         )
@@ -282,12 +270,12 @@ def steps() -> list:
 
     # ensayo de vistas: cada cara del dado con su vista estándar, y al final el «tres de»
     viewWords = {
-        "front": {"es": "frontal", "en": "front", "pt": "frontal"},
-        "rear": {"es": "trasera", "en": "rear", "pt": "traseira"},
-        "left": {"es": "izquierda", "en": "left", "pt": "esquerda"},
-        "right": {"es": "derecha", "en": "right", "pt": "direita"},
-        "top": {"es": "arriba", "en": "top", "pt": "superior"},
-        "bottom": {"es": "abajo", "en": "bottom", "pt": "inferior"},
+        "front": {"es": "frontal", "en": "front"},
+        "rear": {"es": "trasera", "en": "rear"},
+        "left": {"es": "izquierda", "en": "left"},
+        "right": {"es": "derecha", "en": "right"},
+        "top": {"es": "arriba", "en": "top"},
+        "bottom": {"es": "abajo", "en": "bottom"},
     }
     tour = (("front", 2), ("rear", 5), ("left", 4), ("right", 3), ("top", 1), ("bottom", 6))
     for view, number in tour:
@@ -296,7 +284,6 @@ def steps() -> list:
                 Text={
                     "es": f"Ensayo de vistas: mirá la cara del {number}.",
                     "en": f"View test: look at the face with {number}.",
-                    "pt": f"Ensaio de vistas: veja a face do {number}.",
                 },
                 Path={lang: (word,) for lang, word in viewWords[view].items()},
                 Action=_showView(view),
@@ -307,9 +294,8 @@ def steps() -> list:
             Text={
                 "es": "Y para cerrar, el dado completo en la vista «tres de» (isométrica).",
                 "en": "And to finish, the whole die in the isometric view.",
-                "pt": "E para terminar, o dado completo na vista isométrica.",
             },
-            Path={"es": ("tres de",), "en": ("isometric",), "pt": ("isométrica",)},
+            Path={"es": ("tres de",), "en": ("isometric",)},
             Action=_showView("isometric"),
         )
     )
