@@ -21,7 +21,7 @@
 ## Archivos de Descarga
 | Archivo | Tamaño | SHA-256 |
 | :--- | :--- | :--- |
-| **`Instalador_ATRIA.exe`** | ~79.8 MB | `156cf6ab8da0b00d724e99594bfa1b4637f8abadbc56d524b9087cdcabe917b4` |
+| **`Instalador_ATRIA.exe`** | ~80.1 MB | `4d4be946ae7b425d9d07139f37a4c9bbe4eb0f3e76de68fe6b1aeda8ece815aa` |
 
 ### Instrucciones de Instalación:
 1. Descarga el archivo `Instalador_ATRIA.exe`.

@@ -55,7 +55,7 @@ def create_payload_zip(repo_root, zip_dest):
     log(f"Comprimidos {count} archivos en {elapsed:.2f}s (Tamaño ZIP: {size_mb:.2f} MB)")
     return count, size_mb
 
-def compile_installer(csc_exe, cs_file, zip_file, ico_file, output_exe):
+def compile_installer(csc_exe, cs_file, zip_file, ico_file, logo_file, output_exe):
     log(f"Compilando ejecutable de instalación: {output_exe}")
     start = time.time()
 
@@ -73,9 +73,12 @@ def compile_installer(csc_exe, cs_file, zip_file, ico_file, output_exe):
         "/r:System.IO.Compression.FileSystem.dll",
         f"/resource:{zip_file},Payload",
         f"/resource:{ico_file},Icon",
-        f"/out:{output_exe}",
-        cs_file,
     ]
+    if logo_file and os.path.exists(logo_file):
+        cmd.append(f"/resource:{logo_file},Logo")
+
+    cmd.append(f"/out:{output_exe}")
+    cmd.append(cs_file)
 
     res = subprocess.run(cmd, capture_output=True)
     if res.returncode != 0:
@@ -153,11 +156,13 @@ def main():
     log(f"Compilador C# encontrado: {csc_exe}")
 
     ico_file = os.path.join(installer_dir, "atria.ico")
-    if not os.path.exists(ico_file):
-        log("Generando icono atria.ico...")
-        ico_script = os.path.join(installer_dir, "create_icon.py")
-        if os.path.exists(ico_script):
-            subprocess.run(["python", ico_script], cwd=installer_dir)
+    badge_file = os.path.join(installer_dir, "atria_badge.png")
+
+    # Asegurar generación de iconos con create_icon.py
+    ico_script = os.path.join(installer_dir, "create_icon.py")
+    if os.path.exists(ico_script):
+        log("Actualizando recursos de icono y logo...")
+        subprocess.run([sys.executable, ico_script], cwd=installer_dir)
 
     cs_file = os.path.join(installer_dir, "InstallerSource.cs")
     if not os.path.exists(cs_file):
@@ -186,7 +191,7 @@ def main():
 
     exe_name = "Instalador_ATRIA.exe"
     output_exe = os.path.join(dist_dir, exe_name)
-    compile_installer(csc_exe, cs_file, zip_file, ico_file, output_exe)
+    compile_installer(csc_exe, cs_file, zip_file, ico_file, badge_file, output_exe)
 
     sha256_hash = generate_sha256(output_exe)
     size_mb = os.path.getsize(output_exe) / (1024 * 1024)

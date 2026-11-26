@@ -95,6 +95,21 @@ namespace AtriaInstaller
             pnlHeader.Controls.Add(lblHeaderTitle);
             pnlHeader.Controls.Add(lblHeaderSub);
 
+            // Logo institucional en cabecera
+            try {
+                using (Stream logoStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Logo")) {
+                    if (logoStream != null) {
+                        PictureBox picLogo = new PictureBox();
+                        picLogo.Image = Image.FromStream(logoStream);
+                        picLogo.SizeMode = PictureBoxSizeMode.Zoom;
+                        picLogo.Size = new Size(56, 56);
+                        picLogo.Location = new Point(560, 8);
+                        picLogo.BackColor = Color.Transparent;
+                        pnlHeader.Controls.Add(picLogo);
+                    }
+                }
+            } catch {}
+
             // Group FreeCAD Detection
             grpFreeCAD = new GroupBox();
             grpFreeCAD.Text = " 1. Estado de FreeCAD ";
