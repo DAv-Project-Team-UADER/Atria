@@ -1,4 +1,4 @@
-﻿# ATRIA - FreeCAD Launcher (PowerShell)
+# ATRIA - FreeCAD Launcher (PowerShell)
 $ErrorActionPreference = "Stop"
 
 Write-Host "===================================================" -ForegroundColor Cyan
