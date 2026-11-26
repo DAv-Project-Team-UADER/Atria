@@ -37,6 +37,15 @@ for p in (ROOT, GUI_PATH, VAL_PATH, DIC_PATH):
         sys.path.insert(0, text)
 
 # Install mocks for FreeCAD headless testing
+def setUpModule() -> None:
+    try:
+        from PySide6.QtWidgets import QApplication
+        global _qt_app
+        _qt_app = QApplication.instance() or QApplication(sys.argv)
+    except Exception:
+        pass
+
+
 class FakeVector:
     def __init__(self, x=0.0, y=0.0, z=0.0):
         if isinstance(x, (tuple, list)):

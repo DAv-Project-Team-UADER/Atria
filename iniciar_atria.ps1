@@ -1,4 +1,4 @@
-# ATRIA - FreeCAD Launcher (PowerShell)
+﻿# ATRIA - FreeCAD Launcher (PowerShell)
 $ErrorActionPreference = "Stop"
 
 Write-Host "===================================================" -ForegroundColor Cyan
@@ -69,6 +69,8 @@ if (Test-Path $interfazIcons) {
 }
 $env:ATRIA_DICTIONARY_ROOT = Join-Path $repoRoot "dictionary"
 $env:ATRIA_MODELS_DIR = Join-Path $repoRoot "models"
+$env:ATRIA_SELECTION_ROOT = Join-Path $repoRoot "selection"
+$env:ATRIA_VALIDATION_ROOT = Join-Path $repoRoot "validation"
 $env:ATRIA_AUTOLOAD_WORKBENCH = "1"
 $env:ATRIA_AUTO_START_VOICE = "1"
 $env:ATRIA_AUTO_PANEL = "1"

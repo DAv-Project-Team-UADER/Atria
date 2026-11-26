@@ -44,6 +44,15 @@ from GUIFreeCad.InputPrompts.PromptVoiceRouter import PromptVoiceRouter
 from Numbers.Numbers import get_numeric_grammar_phrases
 
 
+def setUpModule() -> None:
+    try:
+        from PySide6.QtWidgets import QApplication
+        global _qt_app
+        _qt_app = QApplication.instance() or QApplication(sys.argv)
+    except Exception:
+        pass
+
+
 class TestNumericGrammar(unittest.TestCase):
     def test_numeric_phrases_generation(self) -> None:
         phrases = NumericGrammarSwitcher.GetNumericPhrases("es")

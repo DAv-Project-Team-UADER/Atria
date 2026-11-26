@@ -122,6 +122,18 @@ def _bring_to_front(dock) -> None:
                     pass
 
     # Mostrar, traer al frente y activar
+    if hasattr(dock, "toggleViewAction") and callable(getattr(dock, "toggleViewAction")):
+        try:
+            act = dock.toggleViewAction()
+            if act is not None and not act.isChecked():
+                act.setChecked(True)
+        except Exception:
+            pass
+    if hasattr(dock, "setVisible") and callable(getattr(dock, "setVisible")):
+        try:
+            dock.setVisible(True)
+        except Exception:
+            pass
     if hasattr(dock, "show") and callable(getattr(dock, "show")):
         dock.show()
     if hasattr(dock, "raise_") and callable(getattr(dock, "raise_")):

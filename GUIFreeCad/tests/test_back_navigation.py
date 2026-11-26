@@ -215,7 +215,6 @@ class TestAtriaPanelBackButtonPlacement(unittest.TestCase):
         self.assertIn("⬅", first_button_en.text())
         self.assertIn("up", first_button_en.text().lower())
         emitted_commands.clear()
-        panel.CommandRequested.connect(emitted_commands.append)
         first_button_en.click()
         self.assertEqual(emitted_commands, ["up"])
 

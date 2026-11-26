@@ -29,6 +29,15 @@ from GUIFreeCad.ui.HelpContent import HELP_BY_CATEGORY, get_help_for_category
 from GUIFreeCad.ui.HelpDialog import AtriaHelpDialog
 
 
+def setUpModule() -> None:
+    try:
+        from PySide6.QtWidgets import QApplication
+        global _qt_app
+        _qt_app = QApplication.instance() or QApplication(sys.argv)
+    except Exception:
+        pass
+
+
 class TestHelpContent(unittest.TestCase):
     """Verifica que todas las categorías tengan contenido de ayuda y explicaciones de botones."""
 

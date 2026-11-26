@@ -54,6 +54,8 @@ class Launcher {
             psi.EnvironmentVariables["ATRIA_ICONS_ROOT"] = iconsPath;
             psi.EnvironmentVariables["ATRIA_DICTIONARY_ROOT"] = Path.Combine(myDir, "dictionary");
             psi.EnvironmentVariables["ATRIA_MODELS_DIR"] = Path.Combine(myDir, "models");
+            psi.EnvironmentVariables["ATRIA_SELECTION_ROOT"] = Path.Combine(myDir, "selection");
+            psi.EnvironmentVariables["ATRIA_VALIDATION_ROOT"] = Path.Combine(myDir, "validation");
             psi.EnvironmentVariables["ATRIA_AUTOLOAD_WORKBENCH"] = "1";
             psi.EnvironmentVariables["ATRIA_AUTO_START_VOICE"] = "1";
             psi.EnvironmentVariables["ATRIA_AUTO_PANEL"] = "1";
