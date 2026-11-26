@@ -9,6 +9,7 @@ sys.modules.setdefault("integration.browser_voice_adapter", sys.modules[__name__
 sys.modules.setdefault("GUIFreeCad.integration.browser_voice_adapter", sys.modules[__name__])
 
 import io
+import os
 import sys
 import unicodedata
 from typing import Any
@@ -80,6 +81,9 @@ class BrowserVoiceAdapter:
     def __init__(self, browser: Browser) -> None:
         global _ActiveAdapter
         self._browser = browser
+        from demo_house import install
+        self._demo = install(browser, self._update_grammar,
+                             enabled=os.environ.get("ATRIA_DEMO_CASA") == "1")
         self._stop_requested = False
         _ActiveAdapter = self
         self._browser._on_context_change = self._update_grammar
@@ -121,17 +125,22 @@ class BrowserVoiceAdapter:
         # todo lo que llegue a la GUI va dentro de run_on_main_thread mas abajo.
 
         token = self._extract_token(normalized)
-        if token is None:
-            return
-        if token is False:
-            print("[ATRIA Browser] Cancelled.")
-            return
 
         # Acciones que cambian de nivel: tras ellas mostramos el contexto.
         _NAV_ACTIONS = {"descend", "back", "base_jump"}
 
         def _run() -> None:
             # Ya en el hilo principal: recien aca se puede tocar la GUI.
+            command = token
+            if self._demo.enabled and self._demo.uses_raw_phrase(normalized):
+                command = normalized
+            elif token is False:
+                if not self._demo.enabled or not self._demo.pending:
+                    print("[ATRIA Browser] Cancelled.")
+                    return
+                command = "cancelar"
+            if command is None:
+                return
             self._publish_line(f"[ATRIA] Voz: {raw_phrase}", recognized=raw_phrase)
 
             # Los comandos del diccionario (los ayuda.py sobre todo) escriben
@@ -140,7 +149,7 @@ class BrowserVoiceAdapter:
             # el comando y se vuelca al panel. Sin esto la ayuda aparecia solo
             # en el Report View de FreeCAD.
             with _CapturedOutput() as captured:
-                result = self._browser.ProcessPhrase(token)
+                result = self._browser.ProcessPhrase(command)
 
             for line in captured.Lines():
                 print(line)
