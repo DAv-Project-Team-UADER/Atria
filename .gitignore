@@ -41,4 +41,12 @@ models/vosk-model*
 # Runtime logs, libs locales y status
 *.log
 **/voice_status.json
+
+# Artefactos de empaquetado e instalador
+scratch/
+dist/*.exe
+dist/*.zip
+Iniciar_ATRIA.exe
+desinstalar_atria.bat
+atria.ico
 .libs/

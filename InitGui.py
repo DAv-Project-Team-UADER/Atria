@@ -52,6 +52,7 @@ except Exception as e:
 class AtriaWorkbench(Gui.Workbench):
     MenuText = "Atria"
     ToolTip = "Atria (UADER)"
+    Icon = "atria_logo.svg"
 
     def Initialize(self):
         import atriaGui.freecad_wb
