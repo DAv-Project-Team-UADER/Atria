@@ -41,3 +41,8 @@ models/vosk-model*
 # Runtime logs y status
 *.log
 **/voice_status.json
+
+# Artefactos de empaquetado e instalador
+scratch/
+dist/*.exe
+dist/*.zip
