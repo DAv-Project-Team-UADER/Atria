@@ -1,4 +1,4 @@
-﻿"""Single shared microphone + Vosk engine for ATRIA (CAD navigation and preferences)."""
+"""Single shared microphone + Vosk engine for ATRIA (CAD navigation and preferences)."""
 
 from __future__ import annotations
 
@@ -286,13 +286,58 @@ class AtriaVoiceService:
         if prefs and prefs.on_status:
             self._safe_call(prefs.on_status, message)
 
+    @staticmethod
+    def _ensure_portaudio_on_linux() -> None:
+        if sys.platform != "linux":
+            return
+        import ctypes.util
+        import os
+        from pathlib import Path
+
+        if ctypes.util.find_library("portaudio") is not None:
+            return
+
+        repo_root = Path(__file__).resolve().parents[2]
+        candidates: list[Path] = []
+        env_pa = os.environ.get("ATRIA_PORTAUDIO_LIB", "").strip()
+        if env_pa:
+            candidates.append(Path(env_pa))
+        mod_root = os.environ.get("ATRIA_MOD_ROOT", "").strip()
+        if mod_root:
+            candidates.append(Path(mod_root) / ".libs" / "libportaudio.so.2")
+        candidates.extend(
+            [
+                repo_root / ".libs" / "libportaudio.so.2",
+                Path("/usr/lib/x86_64-linux-gnu/libportaudio.so.2"),
+                Path("/usr/lib64/libportaudio.so.2"),
+                Path("/usr/lib/libportaudio.so.2"),
+                Path("/run/host/usr/lib/x86_64-linux-gnu/libportaudio.so.2"),
+                Path("/run/host/usr/lib64/libportaudio.so.2"),
+                Path("/run/host/usr/lib/libportaudio.so.2"),
+            ]
+        )
+        found_pa = next((str(p) for p in candidates if p.is_file()), None)
+        if not found_pa:
+            return
+
+        orig_find_library = ctypes.util.find_library
+
+        def _patched_find_library(name: str):
+            res = orig_find_library(name)
+            if res is None and name == "portaudio":
+                return found_pa
+            return res
+
+        ctypes.util.find_library = _patched_find_library
+
     def _listen_loop(self, model_path: str) -> None:
         log.info("hilo de voz arrancando: modelo=%s", model_path)
         try:
+            self._ensure_portaudio_on_linux()
             import sounddevice as sd
             from vosk import KaldiRecognizer, Model
-        except ImportError as exc:
-            log.exception("faltan dependencias de voz (sounddevice/vosk)")
+        except Exception as exc:
+            log.exception("faltan dependencias de voz (sounddevice/vosk/PortAudio)")
             self._emit_prefs_status(f"error:import:{exc}")
             self._running = False
             return
