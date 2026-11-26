@@ -238,12 +238,12 @@ namespace AtriaInstaller
         {
             // 1. Detectar FreeCAD exe
             string[] candidates = new string[] {
-                @"C:\Program Files\FreeCAD 1.1inreecad.exe",
-                @"C:\Program Files\FreeCAD 1.0inreecad.exe",
-                @"C:\Program Files\FreeCAD 0.21inreecad.exe",
-                @"C:\Program Files\FreeCADinreecad.exe",
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Programs\FreeCAD 1.1inreecad.exe"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Programs\FreeCAD 1.0inreecad.exe")
+                @"C:\Program Files\FreeCAD 1.1\bin\freecad.exe",
+                @"C:\Program Files\FreeCAD 1.0\bin\freecad.exe",
+                @"C:\Program Files\FreeCAD 0.21\bin\freecad.exe",
+                @"C:\Program Files\FreeCAD\bin\freecad.exe",
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Programs\FreeCAD 1.1\bin\freecad.exe"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Programs\FreeCAD 1.0\bin\freecad.exe")
             };
 
             foreach (string path in candidates)
@@ -275,8 +275,8 @@ namespace AtriaInstaller
 
             // 2. Detectar Carpeta Mod
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string modernV11 = Path.Combine(appData, @"FreeCAD1-1\Mod");
-            string modernV10 = Path.Combine(appData, @"FreeCAD1-0\Mod");
+            string modernV11 = Path.Combine(appData, @"FreeCAD\v1-1\Mod");
+            string modernV10 = Path.Combine(appData, @"FreeCAD\v1-0\Mod");
             string classic = Path.Combine(appData, @"FreeCAD\Mod");
 
             if (detectedFreeCadExe != null && detectedFreeCadExe.Contains("1.1"))
@@ -453,8 +453,8 @@ namespace AtriaInstaller
                 string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 string[] otherModDirs = new string[] {
                     Path.Combine(appData, @"FreeCAD\Mod"),
-                    Path.Combine(appData, @"FreeCAD1-1\Mod"),
-                    Path.Combine(appData, @"FreeCAD1-0\Mod")
+                    Path.Combine(appData, @"FreeCAD\v1-1\Mod"),
+                    Path.Combine(appData, @"FreeCAD\v1-0\Mod")
                 };
 
                 foreach (string mdir in otherModDirs)
@@ -621,6 +621,17 @@ namespace AtriaInstaller
         [STAThread]
         static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.UnhandledException += (s, ev) => {
+                Exception ex = ev.ExceptionObject as Exception;
+                string msg = ex != null ? ex.ToString() : "Error desconocido";
+                MessageBox.Show("Error al ejecutar el instalador:\n\n" + msg, "Error de Instalador ATRIA", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            };
+
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+            Application.ThreadException += (s, ev) => {
+                MessageBox.Show("Error en la interfaz del instalador:\n\n" + ev.Exception.ToString(), "Error de Instalador ATRIA", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            };
+
             // Soporte modo silencioso: /S o /silent
             bool silent = false;
             string customTarget = null;
