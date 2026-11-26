@@ -38,7 +38,7 @@ desktop.ini
 models/vosk-model*
 *.zip
 
-# Runtime logs y status
+# Runtime logs, libs locales y status
 *.log
 **/voice_status.json
 
@@ -49,3 +49,4 @@ dist/*.zip
 Iniciar_ATRIA.exe
 desinstalar_atria.bat
 atria.ico
+.libs/
