@@ -355,8 +355,16 @@ namespace AtriaInstaller
         private void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
             InstallParams ip = (InstallParams)e.Argument;
-            string targetDir = ip.TargetDir;
+            PerformInstallation(ip, (pct, status) => worker.ReportProgress(pct, status));
+        }
 
+        private static void PerformInstallation(InstallParams ip, Action<int, string> reportProgress)
+        {
+            Action<int, string> report = (pct, msg) => {
+                if (reportProgress != null) reportProgress(pct, msg);
+            };
+
+            string targetDir = ip.TargetDir;
             Directory.CreateDirectory(targetDir);
 
             // Obtener recurso embebido
@@ -390,12 +398,12 @@ namespace AtriaInstaller
 
                         count++;
                         int pct = (int)((count * 85.0) / total);
-                        worker.ReportProgress(pct, "Extrayendo: " + entry.Name);
+                        report(pct, "Extrayendo: " + entry.Name);
                     }
                 }
             }
 
-            worker.ReportProgress(88, "Configurando scripts y lanzadores de ATRIA...");
+            report(88, "Configurando scripts y lanzadores de ATRIA...");
 
             // Guardar icono institucional atria.ico en destino
             string icoPath = Path.Combine(targetDir, "atria.ico");
@@ -413,14 +421,6 @@ namespace AtriaInstaller
                 }
             }
             catch {}
-
-            // Crear lanzador silencioso VBS
-            string vbsPath = Path.Combine(targetDir, "iniciar_atria_silencioso.vbs");
-            string vbsContent = "Set WshShell = CreateObject(\"WScript.Shell\")\r\n" +
-                                "Dim scriptDir\r\n" +
-                                "scriptDir = CreateObject(\"Scripting.FileSystemObject\").GetParentFolderName(WScript.ScriptFullName)\r\n" +
-                                "WshShell.Run Chr(34) & scriptDir & \"\\iniciar_atria.bat\" & Chr(34), 0, False\r\n";
-            File.WriteAllText(vbsPath, vbsContent, Encoding.Default);
 
             // Crear desinstalador .bat
             string uninstallerBat = Path.Combine(targetDir, "desinstalar_atria.bat");
@@ -445,7 +445,7 @@ namespace AtriaInstaller
                                         "pause\r\n";
             File.WriteAllText(uninstallerBat, uninstallerContent, Encoding.Default);
 
-            worker.ReportProgress(92, "Creando enlaces en directorios de FreeCAD...");
+            report(92, "Creando enlaces en directorios de FreeCAD...");
 
             // Enlazar a otras versiones de FreeCAD si se solicitó
             if (ip.LinkAllVersions)
@@ -480,17 +480,19 @@ namespace AtriaInstaller
                 }
             }
 
-            worker.ReportProgress(95, "Creando accesos directos...");
+            report(95, "Creando accesos directos...");
 
             // Crear accesos directos
-            string batPath = Path.Combine(targetDir, "iniciar_atria.bat");
-            string iconTarget = File.Exists(icoPath) ? icoPath : "";
+            string launcherExe = Path.Combine(targetDir, "Iniciar_ATRIA.exe");
+            string fallbackBat = Path.Combine(targetDir, "iniciar_atria.bat");
+            string targetApp = File.Exists(launcherExe) ? launcherExe : fallbackBat;
+            string iconTarget = File.Exists(launcherExe) ? launcherExe : (File.Exists(icoPath) ? icoPath : "");
 
             if (ip.CreateDesktopShortcut)
             {
                 string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                 string lnk = Path.Combine(desktop, "Iniciar ATRIA con FreeCAD.lnk");
-                CreateShortcut(lnk, "wscript.exe", string.Format("\"{0}\"", vbsPath), targetDir, iconTarget, "Iniciar FreeCAD con el Asistente de Voz ATRIA");
+                CreateShortcut(lnk, targetApp, "", targetDir, iconTarget, "Iniciar FreeCAD con el Asistente de Voz ATRIA");
             }
 
             if (ip.CreateStartMenuShortcut)
@@ -500,7 +502,7 @@ namespace AtriaInstaller
                 Directory.CreateDirectory(atriaFolder);
 
                 string lnkMain = Path.Combine(atriaFolder, "Iniciar ATRIA (FreeCAD).lnk");
-                CreateShortcut(lnkMain, "wscript.exe", string.Format("\"{0}\"", vbsPath), targetDir, iconTarget, "Iniciar FreeCAD con ATRIA");
+                CreateShortcut(lnkMain, targetApp, "", targetDir, iconTarget, "Iniciar FreeCAD con ATRIA");
 
                 string lnkUninst = Path.Combine(atriaFolder, "Desinstalar ATRIA.lnk");
                 CreateShortcut(lnkUninst, "cmd.exe", string.Format("/c \"{0}\"", uninstallerBat), targetDir, "", "Desinstalar ATRIA");
@@ -524,7 +526,7 @@ namespace AtriaInstaller
             }
             catch {}
 
-            worker.ReportProgress(100, "¡Instalación completada!");
+            report(100, "¡Instalación completada!");
         }
 
         private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -576,10 +578,10 @@ namespace AtriaInstaller
         {
             try
             {
-                string vbs = Path.Combine(txtDestination.Text, "iniciar_atria_silencioso.vbs");
-                if (File.Exists(vbs))
+                string launcherExe = Path.Combine(txtDestination.Text, "Iniciar_ATRIA.exe");
+                if (File.Exists(launcherExe))
                 {
-                    ProcessStartInfo psi = new ProcessStartInfo("wscript.exe", string.Format("\"{0}\"", vbs));
+                    ProcessStartInfo psi = new ProcessStartInfo(launcherExe);
                     psi.WorkingDirectory = txtDestination.Text;
                     Process.Start(psi);
                     return;
@@ -603,13 +605,18 @@ namespace AtriaInstaller
         {
             try
             {
+                if (File.Exists(shortcutPath))
+                {
+                    try { File.Delete(shortcutPath); } catch {}
+                }
+
                 Type shellType = Type.GetTypeFromProgID("WScript.Shell");
                 if (shellType == null) return;
                 object shell = Activator.CreateInstance(shellType);
                 object shortcut = shellType.InvokeMember("CreateShortcut", BindingFlags.InvokeMethod, null, shell, new object[] { shortcutPath });
                 Type scType = shortcut.GetType();
                 scType.InvokeMember("TargetPath", BindingFlags.SetProperty, null, shortcut, new object[] { targetPath });
-                if (!string.IsNullOrEmpty(arguments)) scType.InvokeMember("Arguments", BindingFlags.SetProperty, null, shortcut, new object[] { arguments });
+                scType.InvokeMember("Arguments", BindingFlags.SetProperty, null, shortcut, new object[] { arguments ?? "" });
                 if (!string.IsNullOrEmpty(workingDirectory)) scType.InvokeMember("WorkingDirectory", BindingFlags.SetProperty, null, shortcut, new object[] { workingDirectory });
                 if (!string.IsNullOrEmpty(iconLocation) && File.Exists(iconLocation)) scType.InvokeMember("IconLocation", BindingFlags.SetProperty, null, shortcut, new object[] { iconLocation + ",0" });
                 if (!string.IsNullOrEmpty(description)) scType.InvokeMember("Description", BindingFlags.SetProperty, null, shortcut, new object[] { description });
@@ -655,20 +662,23 @@ namespace AtriaInstaller
                     if (string.IsNullOrEmpty(target))
                     {
                         string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                        target = Path.Combine(appData, @"FreeCAD\Mod\Atria");
+                        string v11 = Path.Combine(appData, @"FreeCAD\v1-1\Mod\Atria");
+                        string v10 = Path.Combine(appData, @"FreeCAD\v1-0\Mod\Atria");
+                        if (Directory.Exists(Path.GetDirectoryName(v11)) || Directory.Exists(@"C:\Program Files\FreeCAD 1.1"))
+                            target = v11;
+                        else if (Directory.Exists(Path.GetDirectoryName(v10)) || Directory.Exists(@"C:\Program Files\FreeCAD 1.0"))
+                            target = v10;
+                        else
+                            target = Path.Combine(appData, @"FreeCAD\Mod\Atria");
                     }
-                    Directory.CreateDirectory(target);
-                    Assembly asm = Assembly.GetExecutingAssembly();
-                    using (Stream stream = asm.GetManifestResourceStream("Payload"))
-                    using (ZipArchive archive = new ZipArchive(stream, ZipArchiveMode.Read))
-                    {
-                        foreach (ZipArchiveEntry entry in archive.Entries)
-                        {
-                            string outPath = Path.Combine(target, entry.FullName.Replace('/', Path.DirectorySeparatorChar));
-                            if (string.IsNullOrEmpty(entry.Name)) Directory.CreateDirectory(outPath);
-                            else { Directory.CreateDirectory(Path.GetDirectoryName(outPath)); entry.ExtractToFile(outPath, true); }
-                        }
-                    }
+
+                    InstallParams ip = new InstallParams();
+                    ip.TargetDir = target;
+                    ip.CreateDesktopShortcut = true;
+                    ip.CreateStartMenuShortcut = true;
+                    ip.LinkAllVersions = true;
+
+                    PerformInstallation(ip, null);
                     Environment.Exit(0);
                 }
                 catch

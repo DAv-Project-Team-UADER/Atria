@@ -77,11 +77,11 @@ def compile_installer(csc_exe, cs_file, zip_file, ico_file, output_exe):
         cs_file,
     ]
 
-    res = subprocess.run(cmd, capture_output=True, text=True)
+    res = subprocess.run(cmd, capture_output=True)
     if res.returncode != 0:
         log("ERROR al compilar con csc:")
-        print(res.stdout)
-        print(res.stderr)
+        print(res.stdout.decode("latin1", errors="replace"))
+        print(res.stderr.decode("latin1", errors="replace"))
         sys.exit(1)
 
     elapsed = time.time() - start
@@ -163,6 +163,23 @@ def main():
     if not os.path.exists(cs_file):
         log(f"ERROR: No se encontró {cs_file}")
         sys.exit(1)
+
+    # 1. Compilar Iniciar_ATRIA.exe primero para que quede dentro del payload ZIP
+    launcher_cs = os.path.join(installer_dir, "LauncherSource.cs")
+    launcher_exe = os.path.join(repo_root, "Iniciar_ATRIA.exe")
+    if os.path.exists(launcher_cs):
+        log("Compilando lanzador nativo Iniciar_ATRIA.exe...")
+        subprocess.run([
+            csc_exe,
+            "/nologo",
+            "/target:winexe",
+            "/platform:anycpu",
+            "/optimize+",
+            f"/win32icon:{ico_file}",
+            f"/out:{launcher_exe}",
+            launcher_cs
+        ], check=True)
+        log(f"Lanzador nativo listo: {launcher_exe} ({os.path.getsize(launcher_exe)} bytes)")
 
     zip_file = os.path.join(scratch_dir, "atria_payload.zip")
     create_payload_zip(repo_root, zip_file)
