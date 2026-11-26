@@ -46,7 +46,10 @@ models/vosk-model*
 scratch/
 dist/*.exe
 dist/*.zip
+dist/*.sh
+dist/*.tar.gz
 Iniciar_ATRIA.exe
 desinstalar_atria.bat
 atria.ico
+installer/atria_logo_clean.png
 .libs/

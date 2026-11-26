@@ -35,7 +35,7 @@ except ImportError:
 
 try:
     import DraftTools  # noqa: F401
-except ImportError:
+except Exception:
     pass
 
 

@@ -213,7 +213,6 @@ class TestAtriaPanelBackButtonPlacement(unittest.TestCase):
         first_button_en = panel._MakeBackButton()
         self.assertEqual(first_button_en.text(), "Back")
         emitted_commands.clear()
-        panel.CommandRequested.connect(emitted_commands.append)
         first_button_en.click()
         self.assertEqual(emitted_commands, ["up"])
 

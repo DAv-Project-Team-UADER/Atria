@@ -34,12 +34,12 @@ except ImportError:
 # Sin este import, FreeCADGui.runCommand falla con "No such command".
 try:
     import bimcommands  # noqa: F401
-except ImportError:
+except Exception:
     pass
 # Registrar comandos Draft necesarios (Draft_AnnotationStyleEditor, etc.)
 try:
     import DraftTools  # noqa: F401
-except ImportError:
+except Exception:
     pass
 
 

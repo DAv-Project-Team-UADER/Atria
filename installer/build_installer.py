@@ -10,6 +10,9 @@ import hashlib
 import shutil
 import time
 
+sys.path.insert(0, os.path.dirname(__file__))
+from build_linux_installer import build_linux_installer
+
 def log(msg):
     print(f"[ATRIA-BUILD] {msg}")
 
@@ -103,16 +106,16 @@ def generate_sha256(file_path):
     log(f"SHA-256 ({os.path.basename(file_path)}): {digest}")
     return digest
 
-def generate_release_notes(dist_dir, exe_name, size_mb, sha256_hash):
+def generate_release_notes(dist_dir, win_exe, win_size, win_hash, linux_sh, linux_sh_size, linux_sh_hash, linux_tar, linux_tar_size, linux_tar_hash):
     notes_path = os.path.join(dist_dir, "RELEASE_NOTES.md")
     content = f"""# ATRIA — Asistente de Voz para FreeCAD
 **Universidad Autónoma de Entre Ríos (UADER FCYT)**
 
 ## Novedades del Release
-- **Instalador ejecutable de un clic (`{exe_name}`)**:
-  - Detección automática de instalaciones de FreeCAD (1.1, 1.0, 0.21).
-  - Descompresión automática e instalación en el directorio de Workbenchs (`Mod\\Atria`).
-  - Creación de accesos directos en el Escritorio y Menú Inicio.
+- **Instalador ejecutable multiplataforma (Windows y Linux)**:
+  - Detección automática de instalaciones de FreeCAD (1.1, 1.0, 0.21, Flatpak, Snap, AppImage).
+  - Descompresión automática e instalación en el directorio de Workbenchs (`Mod/Atria`).
+  - Creación de accesos directos en el Escritorio y Menú de Aplicaciones / Menú Inicio con el logo oficial.
   - Modelos de reconocimiento de voz sin conexión incluidos (Español e Inglés).
 - **Modelado 3D paramétrico por voz con coordenadas (X, Y, Z)**:
   - Creación y posicionamiento preciso de paredes, vigas, columnas, losas, cajas, techos, puertas, ventanas, caños/tubos y escaleras.
@@ -126,15 +129,38 @@ def generate_release_notes(dist_dir, exe_name, size_mb, sha256_hash):
   - Español e Inglés completo tanto en voz como en interfaz gráfica.
 
 ## Archivos de Descarga
-| Archivo | Tamaño | SHA-256 |
-| :--- | :--- | :--- |
-| **`{exe_name}`** | ~{size_mb:.1f} MB | `{sha256_hash}` |
+| Plataforma | Tipo de Paquete | Archivo | Tamaño | SHA-256 |
+| :--- | :--- | :--- | :--- | :--- |
+| **Windows** | Instalador ejecutable (.exe) | **`{win_exe}`** | ~{win_size:.1f} MB | `{win_hash}` |
+| **Linux** | Instalador autoextraíble (.sh) | **`{linux_sh}`** | ~{linux_sh_size:.1f} MB | `{linux_sh_hash}` |
+| **Linux** | Tarball comprimido (.tar.gz) | **`{linux_tar}`** | ~{linux_tar_size:.1f} MB | `{linux_tar_hash}` |
 
-### Instrucciones de Instalación:
-1. Descarga el archivo `{exe_name}`.
-2. Ejecuta el archivo haciendo doble clic.
+---
+
+### Instrucciones de Instalación en Windows:
+1. Descarga **`{win_exe}`**.
+2. Haz doble clic sobre el archivo descargado.
 3. Presiona **Instalar ATRIA**.
-4. ¡Listo! Puedes abrir FreeCAD desde el acceso directo del Escritorio o seleccionando el Workbench ATRIA en FreeCAD.
+4. ¡Listo! Abre FreeCAD desde el acceso directo del Escritorio o seleccionando el Workbench ATRIA.
+
+---
+
+### Instrucciones de Instalación en Linux:
+
+#### Opción 1: Instalador autoextraíble descargable (Recomendado)
+1. Descarga el archivo **`{linux_sh}`**.
+2. Dale permisos de ejecución y ejecútalo en una terminal:
+   ```bash
+   chmod +x {linux_sh}
+   ./{linux_sh}
+   ```
+3. ¡Listo! Se creará el acceso directo `ATRIA (FreeCAD)` en tu Escritorio y en tu Menú de Aplicaciones.
+
+#### Opción 2: Instalación directa por comando (un solo paso)
+Abre tu terminal y ejecuta:
+```bash
+curl -fsSL https://raw.githubusercontent.com/DAv-Project-Team-UADER/Atria/Codigo/install.sh | bash
+```
 """
     with open(notes_path, "w", encoding="utf-8") as f:
         f.write(content)
@@ -193,15 +219,36 @@ def main():
     output_exe = os.path.join(dist_dir, exe_name)
     compile_installer(csc_exe, cs_file, zip_file, ico_file, badge_file, output_exe)
 
-    sha256_hash = generate_sha256(output_exe)
-    size_mb = os.path.getsize(output_exe) / (1024 * 1024)
-    generate_release_notes(dist_dir, exe_name, size_mb, sha256_hash)
+    win_hash = generate_sha256(output_exe)
+    win_size = os.path.getsize(output_exe) / (1024 * 1024)
+
+    # 3. Compilar instalador y paquete de Linux
+    log("Construyendo instalador autoextraíble y paquete para Linux...")
+    sh_installer, dist_tar = build_linux_installer(repo_root, dist_dir, scratch_dir)
+    linux_sh_hash = generate_sha256(sh_installer)
+    linux_sh_size = os.path.getsize(sh_installer) / (1024 * 1024)
+    linux_tar_hash = generate_sha256(dist_tar)
+    linux_tar_size = os.path.getsize(dist_tar) / (1024 * 1024)
+
+    generate_release_notes(
+        dist_dir,
+        exe_name,
+        win_size,
+        win_hash,
+        os.path.basename(sh_installer),
+        linux_sh_size,
+        linux_sh_hash,
+        os.path.basename(dist_tar),
+        linux_tar_size,
+        linux_tar_hash
+    )
 
     log("=" * 60)
     log(f"¡PROCESO COMPLETADO EXITOSAMENTE!")
-    log(f"Instalador listo para publicar como Release en GitHub:")
-    log(f"  -> {output_exe}")
-    log(f"  -> Tamaño: {size_mb:.2f} MB")
+    log(f"Paquetes listos para publicar como Release en GitHub:")
+    log(f"  [Windows] -> {output_exe} ({win_size:.2f} MB)")
+    log(f"  [Linux]   -> {sh_installer} ({linux_sh_size:.2f} MB)")
+    log(f"  [Linux]   -> {dist_tar} ({linux_tar_size:.2f} MB)")
     log("=" * 60)
 
 if __name__ == "__main__":
