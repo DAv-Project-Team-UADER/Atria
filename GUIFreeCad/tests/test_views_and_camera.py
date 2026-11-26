@@ -24,6 +24,8 @@ if str(GUI_ROOT) not in sys.path:
 if str(ATRIA_DIR) not in sys.path:
     sys.path.insert(0, str(ATRIA_DIR))
 
+from GUIFreeCad.core.language_code import LanguageCode
+from GUIFreeCad.core.preferences import Preferences
 from GUIFreeCad.navigation.browser import Browser
 from GUIFreeCad.ui.HelpContent import get_help_for_category
 from GUIFreeCad.ui.IconLocator import IconLocator
@@ -149,7 +151,9 @@ class TestGlobalCameraVoiceCommands(unittest.TestCase):
 
     def test_camera_commands_accessible_from_real_base(self) -> None:
         dic_root = ATRIA_DIR / "dictionary"
-        browser = Browser(dictionary_root=dic_root)
+        prefs = Preferences()
+        prefs.SetLanguage = LanguageCode.Es
+        browser = Browser(dictionary_root=dic_root, prefs=prefs)
         # En Base, decir 'vistas' debe entrar a Views
         res_vistas = browser.ProcessPhrase("vistas")
         self.assertTrue(res_vistas.Success)
@@ -173,7 +177,9 @@ class TestGlobalCameraVoiceCommands(unittest.TestCase):
     def test_camera_and_views_from_inside_bim_context(self) -> None:
         """Verifica que desde dentro de 3D-BIM las vistas estándar e isométrica se detecten y ejecuten por búsqueda ascendente."""
         dic_root = ATRIA_DIR / "dictionary"
-        browser = Browser(dictionary_root=dic_root)
+        prefs = Preferences()
+        prefs.SetLanguage = LanguageCode.Es
+        browser = Browser(dictionary_root=dic_root, prefs=prefs)
         # Entrar a 3D-BIM
         res_bim = browser.ProcessPhrase("bim")
         self.assertTrue(res_bim.Success)

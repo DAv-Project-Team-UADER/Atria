@@ -38,6 +38,7 @@ HELP_BY_CATEGORY: dict[str, list[tuple[str, str]]] = {
         ("barra de estado", "Alternar modo IFC, visibilidad de vistas BIM y estilo de fondo de vista 3D."),
         ("utilidades", "Herramientas auxiliares de medición, verificación del modelo y utilidades geométricas."),
         ("vistas", "Control de vistas estándar, rotación, encuadre y cambio de perspectiva o cámara ortogonal."),
+        ("seleccionar", "Navega y selecciona objetos 3D del modelo con avanzar, retroceder, marcar y deseleccionar."),
     ],
     "3D-BIM": [
         ("crear sitio", "Crea el emplazamiento o terreno del proyecto y agrupa los edificios."),
@@ -232,12 +233,24 @@ HELP_BY_CATEGORY: dict[str, list[tuple[str, str]]] = {
         ("girar abajo", "Inclina la cámara 15° hacia abajo."),
         ("mover camara", "Centra la cámara en unas coordenadas específicas dictadas por voz (X, Y, Z)."),
     ],
+    "Select": [
+        ("avanzar", "Navega al siguiente objeto del modelo 3D y lo enfoca en la vista y en el árbol."),
+        ("retroceder", "Navega al objeto anterior del modelo 3D y lo enfoca en la vista y en el árbol."),
+        ("seleccionar", "Selecciona y marca el objeto actual para editarlo o modificarlo."),
+        ("deseleccionar", "Quita la selección del objeto actual sin afectar los demás."),
+        ("seleccionar todos", "Selecciona todos los objetos del documento activo de FreeCAD."),
+        ("deseleccionar todos", "Limpia y anula la selección de todos los objetos en el documento."),
+        ("editar", "Pone el objeto seleccionado en modo de edición interactiva."),
+        ("borrar", "Elimina del documento el objeto actualmente seleccionado."),
+    ],
 }
 
 # Alias de carpetas espejo
 HELP_BY_CATEGORY["BIM3D"] = HELP_BY_CATEGORY["3D-BIM"]
 HELP_BY_CATEGORY["Drafting2D"] = HELP_BY_CATEGORY["2D-Drafting"]
 HELP_BY_CATEGORY["Vistas"] = HELP_BY_CATEGORY["Views"]
+HELP_BY_CATEGORY["Seleccionar"] = HELP_BY_CATEGORY["Select"]
+HELP_BY_CATEGORY["Selection"] = HELP_BY_CATEGORY["Select"]
 
 HELP_BY_CATEGORY_EN: dict[str, list[tuple[str, str]]] = {
     "Base": [
