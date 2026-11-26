@@ -44,13 +44,6 @@ TraduceToEn = {
     'structure toolbar':     explorer['structure'],
     'structure bar':         explorer['structure'],
 
-    'examples':              explorer['examples'],
-    'example':               explorer['examples'],
-    'learn':                 explorer['examples'],
-    'i want to learn':       explorer['examples'],
-    'want to learn':         explorer['examples'],
-    'tutorials':             explorer['examples'],
-
     # Callables directos
     'refresh':               explorer['refresh'],
     'reload':                explorer['refresh'],

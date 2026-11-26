@@ -28,6 +28,40 @@ def _normalize(text: str) -> str:
 # Browser.GetNavWords, para poder sumar sinonimos sin tocar codigo.
 _SEND_WORDS = {"enviar", "send"}
 _CANCEL_WORDS = {"cancelar", "cancel"}
+_MENU_SCROLL_COMMANDS = {
+    "menu izquierda": "left",
+    "menu derecha": "right",
+    "menu left": "left",
+    "menu right": "right",
+    "menu a la izquierda": "left",
+    "menu a la derecha": "right",
+    "desplazar menu a la izquierda": "left",
+    "desplazar menu a la derecha": "right",
+    "mover menu a la izquierda": "left",
+    "mover menu a la derecha": "right",
+    "scroll menu left": "left",
+    "scroll menu right": "right",
+    "scroll menu to the left": "left",
+    "scroll menu to the right": "right",
+    "move menu left": "left",
+    "move menu right": "right",
+}
+_MENU_SCROLL_MESSAGES = {
+    "es": {
+        "left": "Menú desplazado a la izquierda.",
+        "right": "Menú desplazado a la derecha.",
+        "left_edge": "No hay más botones a la izquierda.",
+        "right_edge": "No hay más botones a la derecha.",
+        "unavailable": "El panel ATRIA no está disponible.",
+    },
+    "en": {
+        "left": "Menu scrolled left.",
+        "right": "Menu scrolled right.",
+        "left_edge": "There are no more buttons to the left.",
+        "right_edge": "There are no more buttons to the right.",
+        "unavailable": "The ATRIA panel is not available.",
+    },
+}
 
 
 class _CapturedOutput:
@@ -97,8 +131,12 @@ class BrowserVoiceAdapter:
     def _update_grammar(self) -> None:
         try:
             from GUIFreeCad.speech.atria_voice_service import AtriaVoiceService
-            phrases = self._browser.GetSpokenPhrases()
-            AtriaVoiceService.get().set_grammar(phrases)
+            phrases = set(self._browser.GetSpokenPhrases())
+            send_words = self._SendWords()
+            for phrase in _MENU_SCROLL_COMMANDS:
+                phrases.add(phrase)
+                phrases.update(f"{phrase} {word}" for word in send_words)
+            AtriaVoiceService.get().set_grammar(sorted(phrases))
         except Exception as e:
             print(f"[BrowserVoiceAdapter] Error updating voice service grammar: {e}")
 
@@ -127,12 +165,18 @@ class BrowserVoiceAdapter:
             print("[ATRIA Browser] Cancelled.")
             return
 
+        scroll_direction = _MENU_SCROLL_COMMANDS.get(token)
+
         # Acciones que cambian de nivel: tras ellas mostramos el contexto.
         _NAV_ACTIONS = {"descend", "back", "base_jump"}
 
         def _run() -> None:
             # Ya en el hilo principal: recien aca se puede tocar la GUI.
             self._publish_line(f"[ATRIA] Voz: {raw_phrase}", recognized=raw_phrase)
+
+            if scroll_direction is not None:
+                self._scroll_menu(scroll_direction)
+                return
 
             # Los comandos del diccionario (los ayuda.py sobre todo) escriben
             # su salida con print: son 988 llamadas en 123 archivos, asi que en
@@ -167,6 +211,26 @@ class BrowserVoiceAdapter:
             run_on_main_thread(_run)
         except ImportError:
             _run()
+
+    def _scroll_menu(self, direction: str) -> None:
+        from GUIFreeCad.integration.atria_dock_panel import get_source
+
+        source = get_source()
+        language = "en" if self._browser.SetLanguage.value == "en" else "es"
+        messages = _MENU_SCROLL_MESSAGES[language]
+        if source is None:
+            message = messages["unavailable"]
+            unknown = True
+        else:
+            moved = source.ScrollMenu(direction)
+            message = messages[direction if moved else f"{direction}_edge"]
+            unknown = not moved
+
+        line = f"[ATRIA] {message}"
+        print(line)
+        append_voice_history(line)
+        if source is not None:
+            source.PublishHistory(line, Unknown=unknown)
 
     def _export_state(self) -> None:
         """Refresca el panel con el contexto activo.

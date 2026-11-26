@@ -65,13 +65,6 @@ class TestSectionTitles(unittest.TestCase):
             format_section_title("Base > Explorer > file", "en"),
             "Section: File Explorer > File"
         )
-
-        # Portuguese
-        self.assertEqual(
-            format_section_title("Base > 3D-BIM", "pt"),
-            "Seção: 3D - Modelagem BIM"
-        )
-
     def test_panel_section_title_updates_on_render_context(self) -> None:
         """AtriaPanel._sectionTitleLabel must reflect the active section."""
         try:

@@ -42,13 +42,6 @@ _WORDS: dict[str, dict[str, tuple[str, ...]]] = {
         "enter": ("open", "inside"),
         "choose": ("choose", "select"),
     },
-    "pt": {
-        "next": ("seguinte", "próximo", "abaixo"),
-        "previous": ("anterior", "voltar", "cima"),
-        "parent": ("subir", "pai"),
-        "enter": ("abrir", "dentro"),
-        "choose": ("escolher", "selecionar"),
-    },
 }
 
 

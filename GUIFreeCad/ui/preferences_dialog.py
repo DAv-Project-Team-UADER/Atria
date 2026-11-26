@@ -20,17 +20,17 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from core.i18n import clear_cache, tr
-from core.model_manager import (
+from GUIFreeCad.core.i18n import clear_cache, tr
+from GUIFreeCad.core.model_manager import (
     download_large_model,
     has_large_model,
     has_small_model,
     verify_small_models,
 )
-from core.network_utils import has_internet
-from core.language_code import LanguageCode
-from core.preferences import preferences
-from core.settings import settings
+from GUIFreeCad.core.network_utils import has_internet
+from GUIFreeCad.core.language_code import LanguageCode
+from GUIFreeCad.core.preferences import preferences
+from GUIFreeCad.core.settings import settings
 from speech.voice_commands import VoiceCommandListener
 from integration.windows_startup import sync_windows_startup
 from ui.download_dialog import DownloadDialog
@@ -442,18 +442,18 @@ class PreferencesDialog(QDialog):
             self._voice_heard.setText(tr("voice_unknown", self._lang, text=heard))
             return
         if status == "error:no_model":
-            self._voice_status_badge.setText("⚠️ " + tr("voice_error_model", self._lang))
+            self._voice_status_badge.setText(tr("voice_error_model", self._lang))
             self._voice_label.setText(
                 tr("small_model_missing", self._lang, lang=self._current_language())
             )
             return
         if status.startswith("error:mic"):
-            self._voice_status_badge.setText("⚠️ " + tr("voice_error_mic", self._lang))
+            self._voice_status_badge.setText(tr("voice_error_mic", self._lang))
             self._voice_label.setText(status.replace("error:mic:", ""))
             return
         if status.startswith("error:import:"):
             detail = status.split("error:import:", 1)[1]
-            self._voice_status_badge.setText("⚠️ " + tr("voice_error", self._lang))
+            self._voice_status_badge.setText(tr("voice_error", self._lang))
             self._voice_label.setText(
                 detail
                 + "\n\npip en Python de FreeCAD:\n"
@@ -461,7 +461,7 @@ class PreferencesDialog(QDialog):
             )
             return
         if status.startswith("error:"):
-            self._voice_status_badge.setText("⚠️ " + tr("voice_error", self._lang))
+            self._voice_status_badge.setText(tr("voice_error", self._lang))
             self._voice_label.setText(status.split(":", 2)[-1] if ":" in status else status)
 
     def _on_text_heard(self, text: str, is_final: bool) -> None:

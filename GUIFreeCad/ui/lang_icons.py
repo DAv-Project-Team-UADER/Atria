@@ -1,4 +1,4 @@
-"""Flag icons for language selectors (Windows/Qt often cannot render flag emojis)."""
+"""Flag icons for language selectors (some Qt environments cannot render flag emojis)."""
 
 from __future__ import annotations
 

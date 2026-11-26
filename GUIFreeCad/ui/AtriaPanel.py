@@ -31,6 +31,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QPushButton,
     QScrollArea,
+    QScrollBar,
     QSizePolicy,
     QSplitter,
     QTextEdit,
@@ -121,8 +122,12 @@ class AtriaPanel(QWidget):
 
         self._theme = Theme
         self._palette = LIGHT if Theme == "light" else DARK
-        self._lang = Lang
-        self._texts = TEXTS.get(Lang, TEXTS["es"])
+        self._lang = "en" if str(Lang).lower().startswith("en") else "es"
+        self._texts = TEXTS[self._lang]
+        self._statusKey = "inactive"
+        self._statusDetail = ""
+        self._treeObjects: list[dict] = []
+        self._treeDocumentName: str | None = None
 
         self._BuildUi()
         self.RenderContext(self._context)
@@ -219,6 +224,18 @@ class AtriaPanel(QWidget):
         available = max(self._toolScroll.viewport().width() - 24, cell)
         return max(1, available // cell)
 
+    def ScrollMenu(self, Direction: str) -> bool:
+        """Move the context-button area one page horizontally."""
+        if Direction not in ("left", "right"):
+            raise ValueError(f"Unsupported menu scroll direction: {Direction}")
+
+        scrollbar = self._toolScroll.horizontalScrollBar()
+        previous = scrollbar.value()
+        step = max(scrollbar.pageStep(), self.BUTTON_WIDTH)
+        delta = step if Direction == "right" else -step
+        scrollbar.setValue(previous + delta)
+        return scrollbar.value() != previous
+
     def AddToHistory(self, Text: str, FromVoice: bool = True, Unknown: bool = False) -> None:
         """Append a line to the history panel, colour-coded by origin.
 
@@ -259,6 +276,8 @@ class AtriaPanel(QWidget):
             "inactive": self._texts["mic_inactive"],
             "error": self._texts["mic_error"],
         }
+        self._statusKey = Status
+        self._statusDetail = Detail
         self._statusLabel.setText(Detail or labels.get(Status, Status))
 
     def SetTree(self, Objects: list[dict], DocumentName: str | None = None) -> None:
@@ -275,13 +294,15 @@ class AtriaPanel(QWidget):
         if tree is None:
             return
 
+        self._treeObjects = [dict(obj) for obj in (Objects or [])]
+        self._treeDocumentName = DocumentName
         tree.clear()
         self._treeItems = {}
         if not Objects:
-            tree.addTopLevelItem(QTreeWidgetItem(["(sin documento abierto)"]))
+            tree.addTopLevelItem(QTreeWidgetItem([self._texts["no_document"]]))
             return
 
-        root = QTreeWidgetItem([DocumentName or "Documento"])
+        root = QTreeWidgetItem([DocumentName or self._texts["document_name"]])
         tree.addTopLevelItem(root)
 
         items: dict[str, QTreeWidgetItem] = {}
@@ -289,7 +310,7 @@ class AtriaPanel(QWidget):
         for obj in Objects:
             label = obj.get("label") or obj.get("name") or "?"
             if not obj.get("visible", True):
-                label = f"{label}  (oculto)"
+                label = f"{label}  {self._texts['hidden']}"
             items[obj.get("name", label)] = QTreeWidgetItem([label])
 
         for obj in Objects:
@@ -341,14 +362,21 @@ class AtriaPanel(QWidget):
 
     def SetLanguage(self, Lang: str) -> None:
         """Switch the interface language."""
-        self._lang = Lang
-        self._texts = TEXTS.get(Lang, TEXTS["es"])
+        self._lang = "en" if str(Lang).lower().startswith("en") else "es"
+        self._texts = TEXTS[self._lang]
         self._listenLabel.setText(self._texts["section_listen"])
         self._histLabel.setText(self._texts["section_history"])
         self._modelLabel.setText(self._texts["section_model"])
+        self.SetStatus(self._statusKey, self._statusDetail)
         if hasattr(self, "_emptyHint") and self._emptyHint is not None:
             self._emptyHint.setText(self._texts["empty_context"])
+        self._UpdateHeaderTooltips()
         self._UpdateSectionTitle()
+        self._menuScrollHint.setText(self._texts["menu_scroll_hint"])
+        self._menuScrollHint.setToolTip(self._texts["menu_scroll_tooltip"])
+        self._toolScroll.setToolTip(self._texts["menu_scroll_tooltip"])
+        self.RenderContext(self._context)
+        self.SetTree(self._treeObjects, self._treeDocumentName)
 
     def SetDockState(self, Floating: bool) -> None:
         """Reflect whether the panel is detached, on the dock/undock button.
@@ -365,8 +393,8 @@ class AtriaPanel(QWidget):
             return
         button.setText("⧈" if Floating else "⧉")
         button.setToolTip(
-            "Volver a unir a la ventana de FreeCAD" if Floating
-            else "Separar de la ventana de FreeCAD"
+            self._texts["dock_floating"] if Floating
+            else self._texts["dock_attached"]
         )
 
     def Flash(self) -> None:
@@ -389,7 +417,7 @@ class AtriaPanel(QWidget):
 
         layout.addLayout(self._BuildHeader())
 
-        self._statusLabel = QLabel(texts.get("status_idle", "Micrófono inactivo"))
+        self._statusLabel = QLabel(texts["status_idle"])
         self._statusLabel.setFont(QFont(FONT_SANS, 13, QFont.Bold))
         self._statusLabel.setAlignment(Qt.AlignCenter)
         self._statusLabel.setFixedHeight(44)
@@ -417,6 +445,7 @@ class AtriaPanel(QWidget):
         self._centerSplitter.setStretchFactor(0, 1)
         self._centerSplitter.setStretchFactor(1, 2)
         self._centerSplitter.setChildrenCollapsible(False)
+        self._centerSplitter.setHandleWidth(6)
         layout.addWidget(self._centerSplitter, stretch=1)
 
         self._sectionTitleLabel = QLabel()
@@ -449,15 +478,38 @@ class AtriaPanel(QWidget):
         self._toolScroll.setAutoFillBackground(False)
         if self._toolScroll.viewport() is not None:
             self._toolScroll.viewport().setAutoFillBackground(False)
-        # Scroll horizontal: los botones se mantienen en filas de altura fija
-        # y, si no entran a lo ancho, se corren en vez de empujar el borde de
-        # la ventana. Asi el panel conserva el alto en cualquier contexto.
-        self._toolScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self._toolScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self._toolScroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self._toolScroll.setToolTip(texts["menu_scroll_tooltip"])
         self._toolScroll.setFixedHeight(
             self.TOOL_AREA_MAX_ROWS * (self.BUTTON_HEIGHT + 8) + 24
         )
-        layout.addWidget(self._toolScroll)
+
+        self._menuScrollHint = QLabel(texts["menu_scroll_hint"])
+        self._menuScrollHint.setAlignment(Qt.AlignCenter)
+        self._menuScrollHint.setFont(QFont(FONT_SANS, 9))
+        self._menuScrollHint.setToolTip(texts["menu_scroll_tooltip"])
+        self._menuScrollHint.hide()
+
+        self._menuScrollBar = QScrollBar(Qt.Horizontal)
+        self._menuScrollBar.setObjectName("toolScrollBar")
+        self._menuScrollBar.setToolTip(texts["menu_scroll_tooltip"])
+        self._menuScrollBar.hide()
+
+        menu_area = QWidget()
+        menu_layout = QVBoxLayout(menu_area)
+        menu_layout.setContentsMargins(0, 0, 0, 0)
+        menu_layout.setSpacing(2)
+        menu_layout.addWidget(self._toolScroll)
+        menu_layout.addWidget(self._menuScrollHint)
+        menu_layout.addWidget(self._menuScrollBar)
+        layout.addWidget(menu_area)
+
+        tool_scrollbar = self._toolScroll.horizontalScrollBar()
+        tool_scrollbar.rangeChanged.connect(self._UpdateMenuScrollControls)
+        tool_scrollbar.valueChanged.connect(self._menuScrollBar.setValue)
+        self._menuScrollBar.valueChanged.connect(tool_scrollbar.setValue)
+        self._UpdateMenuScrollControls()
 
         self._flash = FlashOverlay(self)
         self._flash.setGeometry(self.rect())
@@ -468,21 +520,30 @@ class AtriaPanel(QWidget):
         row = QHBoxLayout()
         row.setSpacing(8)
 
-        logo = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Logos", "color.svg")
-        if os.path.exists(logo):
-            widget = QSvgWidget(logo)
-            widget.setFixedSize(40, 36)
-            widget.setStyleSheet("background-color: transparent;")
-            row.addWidget(widget)
+        logo_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "..",
+            "Logos",
+            "Atria.svg",
+        )
+        logo_widget = QSvgWidget()
+        logo_widget.setObjectName("atriaLogo")
+        logo_widget.setFixedSize(40, 44)
+        logo_widget.setStyleSheet("background-color: transparent;")
+        if os.path.isfile(logo_path):
+            with open(logo_path, "rb") as logo_file:
+                if logo_file.read().strip():
+                    logo_widget.load(logo_path)
+        row.addWidget(logo_widget)
 
-        self._titleLabel = QLabel("ATRIA")
+        self._titleLabel = QLabel("Atria")
         self._titleLabel.setFont(QFont(FONT_SANS, 22, QFont.Bold))
-        row.addWidget(self._titleLabel, stretch=1)
+        row.addWidget(self._titleLabel)
+        row.addStretch(1)
 
         self._dockButton = QPushButton("⧉")
-        self._dockButton.setFixedSize(38, 34)
-        self._dockButton.setFont(QFont(FONT_SANS, 15, QFont.Bold))
-        self._dockButton.setToolTip("⧉ Desacoplar / Acoplar panel ATRIA\n(Permite flotar o fijar el panel en FreeCAD)")
+        self._dockButton.setFixedSize(42, 40)
+        self._dockButton.setFont(QFont(FONT_SANS, 16, QFont.Bold))
         hand_cursor = getattr(Qt, "PointingHandCursor", None)
         if hand_cursor is not None:
             self._dockButton.setCursor(hand_cursor)
@@ -490,33 +551,28 @@ class AtriaPanel(QWidget):
         row.addWidget(self._dockButton)
 
         self._prefsButton = QPushButton("⚙")
-        self._prefsButton.setFixedSize(38, 34)
-        self._prefsButton.setFont(QFont(FONT_SANS, 15, QFont.Bold))
-        self._prefsButton.setToolTip(
-            "⚙ Preferencias y Configuración de Voz\n"
-            "🎤 Di: «preferencias»\n"
-            "🖱️ O haz clic para abrir opciones"
-        )
+        self._prefsButton.setFixedSize(42, 40)
+        self._prefsButton.setFont(QFont(FONT_SANS, 16, QFont.Bold))
         if hand_cursor is not None:
             self._prefsButton.setCursor(hand_cursor)
         self._prefsButton.clicked.connect(self.PreferencesRequested.emit)
         row.addWidget(self._prefsButton)
 
         self._helpButton = QPushButton("?")
-        self._helpButton.setFixedSize(38, 34)
-        self._helpButton.setFont(QFont(FONT_SANS, 15, QFont.Bold))
-        self._helpButton.setToolTip(
-            "? Ayuda y Manual de la Sección\n"
-            "🎤 Di: «ayuda» o «manual»\n"
-            "🖱️ Abre una ventana emergente que explica cada botón de la sección\n"
-            "🎤 Para cerrar di: «cerrar ayuda» o «cerrar»"
-        )
+        self._helpButton.setFixedSize(42, 40)
+        self._helpButton.setFont(QFont(FONT_SANS, 16, QFont.Bold))
         if hand_cursor is not None:
             self._helpButton.setCursor(hand_cursor)
         self._helpButton.clicked.connect(self.HelpRequested.emit)
         row.addWidget(self._helpButton)
 
+        self._UpdateHeaderTooltips()
         return row
+
+    def _UpdateHeaderTooltips(self) -> None:
+        self._dockButton.setToolTip(self._texts["dock_tooltip"])
+        self._prefsButton.setToolTip(self._texts["preferences_tooltip"])
+        self._helpButton.setToolTip(self._texts["help_tooltip"])
 
     def _BuildTreeColumn(self) -> QVBoxLayout:
         column = QVBoxLayout()
@@ -551,6 +607,20 @@ class AtriaPanel(QWidget):
         column.addWidget(self._historyList, stretch=1)
 
         return column
+
+    def _UpdateMenuScrollControls(self, *_args) -> None:
+        tool_scrollbar = self._toolScroll.horizontalScrollBar()
+        self._menuScrollBar.setRange(
+            tool_scrollbar.minimum(),
+            tool_scrollbar.maximum(),
+        )
+        self._menuScrollBar.setPageStep(tool_scrollbar.pageStep())
+        self._menuScrollBar.setSingleStep(tool_scrollbar.singleStep())
+        self._menuScrollBar.setValue(tool_scrollbar.value())
+
+        can_scroll = tool_scrollbar.maximum() > tool_scrollbar.minimum()
+        self._menuScrollHint.setVisible(can_scroll)
+        self._menuScrollBar.setVisible(can_scroll)
 
     # ================================================================
     # Botones del contexto
@@ -593,17 +663,15 @@ class AtriaPanel(QWidget):
         clean_name = spoken_text.replace("_", " ").strip().title()
 
         if is_sub:
-            tooltip = (
-                f"📂 Submenú: {clean_name}\n"
-                f"🎤 Di «{spoken_text}»\n"
-                f"🖱️ Clic para explorar herramientas"
+            tooltip = self._texts["submenu_tooltip"].format(
+                name=clean_name,
+                spoken=spoken_text,
             )
             button.setStyleSheet(self._SubmenuButtonQss())
         else:
-            tooltip = (
-                f"⚡ Herramienta: {clean_name}\n"
-                f"🎤 Di «{spoken_text}»\n"
-                f"🖱️ Clic para ejecutar"
+            tooltip = self._texts["tool_tooltip"].format(
+                name=clean_name,
+                spoken=spoken_text,
             )
             button.setStyleSheet(self._ButtonQss())
 
@@ -628,11 +696,7 @@ class AtriaPanel(QWidget):
         button = QToolButton()
         button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         button.setFixedSize(self.BUTTON_WIDTH, self.BUTTON_HEIGHT)
-        button.setToolTip(
-            "⬅ Volver al nivel anterior\n"
-            "🎤 Di: «volver» o «subir»\n"
-            "🖱️ O haz clic para regresar"
-        )
+        button.setToolTip(self._texts["back_tooltip"])
         button.setFont(QFont(FONT_SANS, 8, QFont.Bold))
         hand_cursor = getattr(Qt, "PointingHandCursor", None)
         if hand_cursor is not None:
@@ -644,8 +708,7 @@ class AtriaPanel(QWidget):
             button.setIcon(QIcon(icon))
             button.setIconSize(QSize(self.ICON_SIZE, self.ICON_SIZE))
 
-        back_text = self._BackPhrase().capitalize()
-        button.setText(f"⬅ {back_text}")
+        button.setText("Back" if self._lang == "en" else "Volver")
 
         button.clicked.connect(lambda _checked=False: self._OnEntryClicked(self._BackPhrase()))
         return button
@@ -655,12 +718,7 @@ class AtriaPanel(QWidget):
         button = QToolButton()
         button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         button.setFixedSize(self.BUTTON_WIDTH, self.BUTTON_HEIGHT)
-        button.setToolTip(
-            "❓ Ayuda y Manual de la Sección\n"
-            "🎤 Di: «ayuda» o «manual»\n"
-            "🖱️ Haz clic para abrir la ventana de ayuda de esta sección\n"
-            "🎤 Di: «cerrar ayuda» o «cerrar» para cerrarla"
-        )
+        button.setToolTip(self._texts["context_help_tooltip"])
         button.setFont(QFont(FONT_SANS, 8, QFont.Bold))
         hand_cursor = getattr(Qt, "PointingHandCursor", None)
         if hand_cursor is not None:
@@ -677,8 +735,12 @@ class AtriaPanel(QWidget):
             button.setIcon(QIcon(icon))
             button.setIconSize(QSize(self.ICON_SIZE, self.ICON_SIZE))
 
-        button.setText("❓ Ayuda")
-        button.clicked.connect(lambda _checked=False: self._OnEntryClicked("ayuda"))
+        button.setText(self._texts["help_btn"])
+        button.clicked.connect(
+            lambda _checked=False: self._OnEntryClicked(
+                "help" if self._lang == "en" else "ayuda"
+            )
+        )
         return button
 
     def _FormatButtonText(self, spoken: str) -> str:
@@ -824,8 +886,8 @@ class AtriaPanel(QWidget):
 
         if hasattr(self, "_centerSplitter") and self._centerSplitter is not None:
             self._centerSplitter.setStyleSheet(
-                f"QSplitter::handle {{ background-color: {palette['panel_border']}; width: 2px; }}"
-                f"QSplitter::handle:hover {{ background-color: #3b82f6; }}"
+                "QSplitter::handle { background-color: transparent; "
+                "border: none; width: 6px; }"
             )
 
         section_label = getattr(self, "_sectionTitleLabel", None)
@@ -981,7 +1043,7 @@ class AtriaPanel(QWidget):
             f" stop:0 {palette['btn_top']}, stop:1 {palette['btn_bot']}) !important;"
             f" border: 1.5px solid {palette['btn_border']}; border-radius: 6px;"
             f" color: {palette['black']}; font-family: {FONT_SANS};"
-            f" font-size: 14px; font-weight: bold; }}"
+            f" font-size: 18px; font-weight: bold; padding: 0px; }}"
             f"QPushButton:hover {{ background: {palette['btn_hover']} !important; border-color: #3b82f6; }}"
             f"QPushButton:pressed {{ background: {palette['highlight']} !important; }}"
         )

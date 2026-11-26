@@ -25,7 +25,11 @@ if str(ATRIA_DIR) not in sys.path:
     sys.path.insert(0, str(ATRIA_DIR))
 
 from GUIFreeCad.navigation.browser import Browser, BrowserResult
-from GUIFreeCad.ui.HelpContent import HELP_BY_CATEGORY, get_help_for_category
+from GUIFreeCad.ui.HelpContent import (
+    HELP_BY_CATEGORY,
+    HELP_BY_CATEGORY_EN,
+    get_help_for_category,
+)
 from GUIFreeCad.ui.HelpDialog import AtriaHelpDialog
 
 
@@ -63,6 +67,29 @@ class TestHelpContent(unittest.TestCase):
         title_draft, items_draft, _ = get_help_for_category("Drafting2D")
         self.assertTrue(len(items_draft) >= 10)
 
+    def test_english_help_content_is_localized(self) -> None:
+        for category, items in HELP_BY_CATEGORY.items():
+            if category in ("BIM3D", "Drafting2D", "Vistas"):
+                continue
+            with self.subTest(category=category):
+                self.assertEqual(
+                    len(HELP_BY_CATEGORY_EN[category]),
+                    len(items),
+                    f"English help is incomplete for {category}",
+                )
+
+        title, items, text = get_help_for_category(
+            "3D-BIM",
+            "Base > 3D-BIM",
+            language="en",
+        )
+
+        self.assertEqual(title, "Section: 3D - BIM Modeling")
+        self.assertIn("create wall", [command for command, _ in items])
+        self.assertIn("Create an architectural wall", text)
+        self.assertIn("close help", text)
+        self.assertNotIn("crear", text.lower())
+
 
 class TestAtriaHelpDialogLifecycle(unittest.TestCase):
     """Verifica el ciclo de vida de la ventana de ayuda (abrir, cerrar, consultar estado)."""
@@ -87,6 +114,16 @@ class TestAtriaHelpDialogLifecycle(unittest.TestCase):
         self.assertTrue(closed)
         self.assertFalse(AtriaHelpDialog.IsHelpOpen())
         self.assertIsNone(AtriaHelpDialog.GetActiveDialog())
+
+    def test_help_dialog_uses_requested_language(self) -> None:
+        dlg = AtriaHelpDialog.ShowHelp(
+            "Section: Views & Camera",
+            [("fit all", "Frame the visible model.")],
+            language="en",
+        )
+
+        self.assertEqual(dlg.language, "en")
+        self.assertEqual(dlg._texts["close"], "Close")
 
     def test_close_when_not_open_returns_false(self) -> None:
         AtriaHelpDialog.CloseHelp()
@@ -124,16 +161,14 @@ class TestAtriaPanelSectionHelpButton(unittest.TestCase):
         panel.RenderContext(view)
 
         # En secciones (no root):
-        # Index 0: Botón Volver (⬅ Subir)
-        # Index 1: Botón Ayuda (❓ Ayuda) al inicio, cerca del botón volver
+        # Index 0: Botón Volver
+        # Index 1: Botón Ayuda al inicio, cerca del botón volver
         self.assertGreaterEqual(len(panel._toolButtons), 2)
         btn_back = panel._toolButtons[0]
         btn_help = panel._toolButtons[1]
 
-        self.assertIn("⬅", btn_back.text())
-        self.assertIn("subir", btn_back.text().lower())
+        self.assertEqual(btn_back.text(), "Volver")
 
-        self.assertIn("❓", btn_help.text())
         self.assertIn("ayuda", btn_help.text().lower())
 
     def test_help_button_in_base_main_menu(self) -> None:
@@ -239,7 +274,12 @@ class TestVoiceHelpCommands(unittest.TestCase):
         res = self.browser.ProcessPhrase("cerrar ayuda")
         self.assertFalse(res.Success)
         self.assertEqual(res.Action, "close_help")
-        self.assertIn("No hay ventana", res.Message)
+        expected = (
+            "No help window"
+            if self.browser.SetLanguage.value == "en"
+            else "No hay una ventana"
+        )
+        self.assertIn(expected, res.Message)
 
     def test_spoken_phrases_includes_help_and_close(self) -> None:
         phrases = self.browser.GetSpokenPhrases()

@@ -281,15 +281,46 @@ class BrowserPanelSource:
         self._browser = Browser_
         self._adapter = Adapter
         self._panel = None
+        self._language_change_callback = self._OnLanguageChanged
+        self._language_callback_registered = False
 
     def Attach(self, Panel) -> None:
         """Bind to a panel and draw the current context immediately."""
+        self.Detach()
         self._panel = Panel
+        self._browser._prefs.RegisterLanguageChange(self._language_change_callback)
+        self._language_callback_registered = True
         Panel.CommandRequested.connect(self.SendCommand)
         Panel.PreferencesRequested.connect(self.OpenPreferences)
         Panel.HelpRequested.connect(self.OpenHelp)
         self.PublishContext()
         self.RefreshStatus()
+
+    def Detach(self) -> None:
+        """Unbind this source before its dock or browser is replaced."""
+        if self._language_callback_registered:
+            self._browser._prefs.UnregisterLanguageChange(
+                self._language_change_callback
+            )
+            self._language_callback_registered = False
+
+        if self._panel is not None:
+            for signal_name, slot in (
+                ("CommandRequested", self.SendCommand),
+                ("PreferencesRequested", self.OpenPreferences),
+                ("HelpRequested", self.OpenHelp),
+            ):
+                signal = getattr(self._panel, signal_name, None)
+                disconnect = getattr(signal, "disconnect", None)
+                if callable(disconnect):
+                    try:
+                        disconnect(slot)
+                    except (RuntimeError, TypeError):
+                        pass
+            self._panel = None
+
+    def _OnLanguageChanged(self, _previous, _new) -> None:
+        self.PublishContext()
 
     def RefreshStatus(self) -> None:
         """Sincroniza el cartel del microfono con el motor de voz real.
@@ -316,23 +347,46 @@ class BrowserPanelSource:
     def OpenHelp(self) -> None:
         """Abre la ventana emergente de ayuda con la explicación de cada botón de la sección activa."""
         try:
+            from GUIFreeCad.ui.Textos import TEXTS
             from GUIFreeCad.ui.HelpContent import get_help_for_category
             from GUIFreeCad.ui.HelpDialog import AtriaHelpDialog
 
+            language = self._browser.SetLanguage.value
+            texts = TEXTS["en" if language == "en" else "es"]
             title, items, _ = get_help_for_category(
                 self._browser.CurrentContextName,
                 self._browser.ContextPath,
                 self._browser.Context,
+                language=language,
             )
             theme = getattr(self._panel, "_theme", None)
-            AtriaHelpDialog.ShowHelp(title, items, parent=self._panel, theme=theme)
-            self.PublishHistory(f"[ATRIA] Mostrando ayuda de {title}")
+            AtriaHelpDialog.ShowHelp(
+                title,
+                items,
+                parent=self._panel,
+                theme=theme,
+                language=language,
+            )
+            self.PublishHistory(
+                f"[ATRIA] {texts['help_shown'].format(title=title)}"
+            )
         except Exception as exc:  # noqa: BLE001
-            self.PublishHistory(f"[ATRIA] No se pudo abrir la ayuda: {exc}", True)
+            language = self._browser.SetLanguage.value
+            texts = TEXTS["en" if language == "en" else "es"]
+            self.PublishHistory(
+                f"[ATRIA] {texts['help_failed'].format(error=exc)}",
+                True,
+            )
 
     def SendCommand(self, Spoken: str) -> None:
         """Process a phrase picked in the UI as if it had been spoken."""
         self._adapter.procesar_frase_final(Spoken)
+
+    def ScrollMenu(self, Direction: str) -> bool:
+        """Move the panel's horizontal button scroll area."""
+        if self._panel is None:
+            return False
+        return self._panel.ScrollMenu(Direction)
 
     def PublishHistory(self, Line: str, Unknown: bool = False) -> None:
         """Show a line in the panel history."""
@@ -353,6 +407,10 @@ class BrowserPanelSource:
         """Rebuild the panel buttons from the Browser's active context."""
         if self._panel is None:
             return
+
+        language = self._browser.SetLanguage.value
+        if getattr(self._panel, "_lang", None) != language:
+            self._panel.SetLanguage(language)
 
         from GUIFreeCad.ui.ContextView import ContextEntryView, ContextView
 
@@ -576,6 +634,8 @@ def install_dock_panel(browser, adapter):
         from GUIFreeCad.ui.AtriaPanel import AtriaPanel
 
     source = BrowserPanelSource(browser, adapter)
+    if _source is not None:
+        _source.Detach()
 
     existing = main_window.findChild(QDockWidget, _DOCK_OBJECT_NAME)
     if existing is not None:
@@ -590,7 +650,7 @@ def install_dock_panel(browser, adapter):
         _bring_to_front(existing)
         return source
 
-    panel = AtriaPanel(Theme=_detect_theme())
+    panel = AtriaPanel(Theme=_detect_theme(), Lang=browser.SetLanguage.value)
     dock = QDockWidget("ATRIA", main_window)
     dock.setObjectName(_DOCK_OBJECT_NAME)
     dock.setWidget(panel)

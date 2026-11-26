@@ -199,8 +199,7 @@ class TestAtriaPanelBackButtonPlacement(unittest.TestCase):
         # Back button must be at index 0 in toolButtons and display back command
         self.assertGreaterEqual(len(panel._toolButtons), 1)
         first_button = panel._toolButtons[0]
-        self.assertIn("⬅", first_button.text())
-        self.assertIn("subir", first_button.text().lower())
+        self.assertEqual(first_button.text(), "Volver")
 
         # Test clicking the back button
         emitted_commands = []
@@ -212,8 +211,7 @@ class TestAtriaPanelBackButtonPlacement(unittest.TestCase):
         # Test in English
         panel.SetLanguage("en")
         first_button_en = panel._MakeBackButton()
-        self.assertIn("⬅", first_button_en.text())
-        self.assertIn("up", first_button_en.text().lower())
+        self.assertEqual(first_button_en.text(), "Back")
         emitted_commands.clear()
         panel.CommandRequested.connect(emitted_commands.append)
         first_button_en.click()

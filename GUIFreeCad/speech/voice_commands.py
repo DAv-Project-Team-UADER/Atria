@@ -85,7 +85,7 @@ _PHRASES_SORTED.sort(key=lambda x: len(x[0]), reverse=True)
 
 
 def _contains_phrase(normalized: str, phrase: str) -> bool:
-    """Frases cortas solo como palabra completa (evita falsos positivos en PT)."""
+    """Frases cortas solo como palabra completa para evitar falsos positivos."""
     if normalized == phrase:
         return True
     if len(phrase) <= 4:

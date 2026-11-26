@@ -32,12 +32,12 @@ def RunFullDemo(sketch_name: str = "Sketch") -> None:
     _EnsureActiveDocument()
     print("\n========== ATRIA Validator — demo consola ==========\n")
 
-    for language in ("es", "en", "pt"):
+    for language in ("es", "en"):
         print(f"=== geometry.line / create_by_points ({language}) ===")
         DemoGeometryLine(language)
         print()
 
-    for language in ("es", "en", "pt"):
+    for language in ("es", "en"):
         print(f"=== additive / pad_sketch ({language}) ===")
         DemoAdditivePad(language, sketch_name=sketch_name)
         print()

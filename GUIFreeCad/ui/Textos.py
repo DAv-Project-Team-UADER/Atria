@@ -17,128 +17,131 @@
 
 TEXTS = {
     "es": {
-        "title":           "ASISTENTE DE VOZ PARA TECNICOS",
         "mic_active":      "Microfono activo - Escuchando...",
-        "mic_error":       "Esperando microfono",
+        "mic_error":       "Error de micrófono",
         "section_listen":  "Voz reconocida:",
-        "detected":        "Detectado:",
         "section_model":   "Modelo 3D:",
         "section_history": "Historial:",
         "mic_inactive":    "Microfono inactivo",
         "empty_context":   "Sin comandos en este contexto",
-        "section_cmds":    "Comandos sugeridos",
         "help_btn":        "Ayuda",
-        "help_title":      "AYUDA PARA ASISTENTE DE VOZ",
-        "help_text": (
-            "COMANDOS DE VOZ DISPONIBLES:\n\n"
-            "CONTROL DE LA APP:\n"
-            "   'ayuda'           - abre esta ventana\n"
-            "   'cerrar ayuda'    - cierra esta ventana\n"
-            "   'minimizar'       - minimiza el programa\n"
-            "   'maximizar'       - maximiza el programa\n"
-            "   'cerrar programa' - cierra la aplicacion\n\n"
-            "COMANDOS TECNICOS:\n"
-            "   'dibujar linea'\n"
-            "   'dibujar circulo'\n"
-            "   'acercar'\n"
-            "   'guardar archivo'\n"
-            "   'limpiar pantalla'\n\n"
-            "NAVEGACION EN HISTORIAL:\n"
-            "   'subir' - sube 5 comandos en el historial\n"
-            "   'bajar' - baja 5 comandos en el historial\n\n"
-            "NAVEGACION EN MODELO:\n"
-            "   'ir a [nombre]'  - resalta la parte del modelo\n\n"
-            "TIP: Habla CLARO. Tambien podes hacer CLICK."
+        "status_idle":     "Microfono inactivo",
+        "no_document":    "(sin documento abierto)",
+        "document_name":  "Documento",
+        "hidden":         "(oculto)",
+        "dock_floating":  "⧈ Volver a unir a la ventana de FreeCAD",
+        "dock_attached":  "⧉ Separar de la ventana de FreeCAD",
+        "dock_tooltip":   "⧉ Desacoplar / Acoplar panel ATRIA\n(Permite flotar o fijar el panel en FreeCAD)",
+        "preferences_tooltip": (
+            "⚙ Preferencias y configuración de voz\n"
+            "Di: «preferencias»\n"
+            "Haz clic para abrir las opciones"
         ),
-        "help_close":  "CERRAR AYUDA",
-        "unknown":     "No entendi",
-        "go_to":       "ir a",
-        "not_found":   "no encontrado en modelo",
+        "help_tooltip": (
+            "? Ayuda y manual de la sección\n"
+            "Di: «ayuda» o «manual»\n"
+            "Abre una ventana con la explicación de cada botón\n"
+            "Para cerrar, di: «cerrar ayuda» o «cerrar»"
+        ),
+        "submenu_tooltip": (
+            "Submenú: {name}\n"
+            "Di: «{spoken}»\n"
+            "Haz clic para explorar las herramientas"
+        ),
+        "tool_tooltip": (
+            "Herramienta: {name}\n"
+            "Di: «{spoken}»\n"
+            "Haz clic para ejecutar"
+        ),
+        "back_tooltip": (
+            "Volver al nivel anterior\n"
+            "Di: «volver» o «subir»\n"
+            "Haz clic para regresar"
+        ),
+        "context_help_tooltip": (
+            "Ayuda y manual de la sección\n"
+            "Di: «ayuda» o «manual»\n"
+            "Haz clic para abrir la ayuda de esta sección\n"
+            "Di: «cerrar ayuda» o «cerrar» para cerrarla"
+        ),
+        "menu_scroll_hint": "Voz: «menú izquierda» / «menú derecha»",
+        "menu_scroll_tooltip": (
+            "Desplazá los botones con la barra o decí: "
+            "«menú izquierda» / «menú derecha»"
+        ),
+        "help_window_title": "ATRIA - Manual y ayuda: {title}",
+        "help_intro": "Di el comando o haz clic en su botón en la pantalla:",
+        "help_close_hint": "Di: «cerrar ayuda» o «cerrar» para cerrar esta ventana",
+        "close": "Cerrar",
+        "help_shown": "Mostrando ayuda de {title}",
+        "help_failed": "No se pudo mostrar la ayuda: {error}",
+        "help_closed": "Ventana de ayuda cerrada",
+        "help_not_open": "No hay una ventana de ayuda abierta",
+        "help_close_failed": "Error al cerrar la ayuda: {error}",
     },
     "en": {
-        "title":           "VOICE ASSISTANT FOR TECHNICIANS",
         "mic_active":      "Microphone active - Listening...",
         "mic_error":       "Microphone error",
         "section_listen":  "Recognized voice:",
-        "detected":        "Detected:",
         "section_model":   "3D Model:",
         "section_history": "History:",
         "mic_inactive":    "Microphone inactive",
         "empty_context":   "No commands in this context",
-        "section_cmds":    "Suggested commands",
         "help_btn":        "Help",
-        "help_title":      "HELP FOR VOICE ASSISTANT",
-        "help_text": (
-            "AVAILABLE VOICE COMMANDS:\n\n"
-            "APP CONTROL:\n"
-            "   'ayuda'           - opens this window\n"
-            "   'cerrar ayuda'    - closes this window\n"
-            "   'minimizar'       - minimizes the program\n"
-            "   'maximizar'       - maximizes the program\n"
-            "   'cerrar programa' - closes the application\n\n"
-            "TECHNICAL COMMANDS:\n"
-            "   'dibujar linea'\n"
-            "   'dibujar circulo'\n"
-            "   'acercar'\n"
-            "   'guardar archivo'\n"
-            "   'limpiar pantalla'\n\n"
-            "HISTORY NAVIGATION:\n"
-            "   'subir' - scrolls history up 5 entries\n"
-            "   'bajar' - scrolls history down 5 entries\n\n"
-            "MODEL NAVIGATION:\n"
-            "   'ir a [name]'  - highlights model part\n\n"
-            "TIP: Speak CLEARLY. You can also CLICK."
+        "status_idle":     "Microphone inactive",
+        "no_document":    "(no open document)",
+        "document_name":  "Document",
+        "hidden":         "(hidden)",
+        "dock_floating":  "⧈ Dock panel in the FreeCAD window",
+        "dock_attached":  "⧉ Detach from the FreeCAD window",
+        "dock_tooltip":   "⧉ Dock / undock the ATRIA panel\n(Floats or docks the panel in FreeCAD)",
+        "preferences_tooltip": (
+            "Preferences and voice settings\n"
+            "Say: «preferences»\n"
+            "Click to open the options"
         ),
-        "help_close":  "CLOSE HELP",
-        "unknown":     "Not understood",
-        "go_to":       "ir a",
-        "not_found":   "not found in model",
-    },
-    "pt": {
-        "title":           "ASSISTENTE DE VOZ PARA TECNICOS",
-        "mic_active":      "Microfone ativo - Escutando...",
-        "mic_error":       "Erro de microfone",
-        "section_listen":  "Voz reconhecida:",
-        "detected":        "Detectado:",
-        "section_model":   "Modelo 3D:",
-        "section_history": "Histórico:",
-        "mic_inactive":    "Microfone inativo",
-        "empty_context":   "Sem comandos neste contexto",
-        "section_cmds":    "Comandos sugeridos",
-        "help_btn":        "Ajuda",
-        "help_title":      "AJUDA PARA ASSISTENTE DE VOZ",
-        "help_text": (
-            "COMANDOS DE VOZ DISPONIVEIS:\n\n"
-            "CONTROLE DO APP:\n"
-            "   'ayuda'           - abre esta janela\n"
-            "   'cerrar ayuda'    - fecha esta janela\n"
-            "   'minimizar'       - minimiza o programa\n"
-            "   'maximizar'       - maximiza o programa\n"
-            "   'cerrar programa' - fecha o aplicativo\n\n"
-            "COMANDOS TECNICOS:\n"
-            "   'dibujar linea'\n"
-            "   'dibujar circulo'\n"
-            "   'acercar'\n"
-            "   'guardar archivo'\n"
-            "   'limpiar pantalla'\n\n"
-            "NAVEGACAO NO HISTORICO:\n"
-            "   'subir' - sobe 5 entradas no historico\n"
-            "   'bajar' - desce 5 entradas no historico\n\n"
-            "NAVEGACAO NO MODELO:\n"
-            "   'ir a [nome]'  - destaca a parte do modelo\n\n"
-            "DICA: Fale CLARAMENTE. Voce tambem pode CLICAR."
+        "help_tooltip": (
+            "Section help and manual\n"
+            "Say: «help» or «manual»\n"
+            "Opens a window explaining each button\n"
+            "To close it, say: «close help» or «close»"
         ),
-        "help_close":  "FECHAR AJUDA",
-        "unknown":     "Nao entendido",
-        "go_to":       "ir a",
-        "not_found":   "nao encontrado no modelo",
+        "submenu_tooltip": (
+            "Submenu: {name}\n"
+            "Say: «{spoken}»\n"
+            "Click to browse tools"
+        ),
+        "tool_tooltip": (
+            "Tool: {name}\n"
+            "Say: «{spoken}»\n"
+            "Click to run"
+        ),
+        "back_tooltip": (
+            "Return to the previous level\n"
+            "Say: «up» or «back»\n"
+            "Click to go back"
+        ),
+        "context_help_tooltip": (
+            "Section help and manual\n"
+            "Say: «help» or «manual»\n"
+            "Click to open help for this section\n"
+            "Say: «close help» or «close» to close it"
+        ),
+        "menu_scroll_hint": "Voice: “menu left” / “menu right”",
+        "menu_scroll_tooltip": (
+            "Scroll the buttons with the bar or say: "
+            "“menu left” / “menu right”"
+        ),
+        "help_window_title": "ATRIA - Help and Manual: {title}",
+        "help_intro": "Say the command or click its button on the screen:",
+        "help_close_hint": "Say: «close help» or «close» to close this window",
+        "close": "Close",
+        "help_shown": "Showing help for {title}",
+        "help_failed": "Could not show help: {error}",
+        "help_closed": "Help window closed",
+        "help_not_open": "No help window is open",
+        "help_close_failed": "Could not close help: {error}",
     },
-}
-
-MODEL_PARTS = ["Documento 1"]
-
-MODEL_PARTS_ALIASES = {
-    "documento uno": "Documento 1",
 }
 
 SECTION_NAMES = {
@@ -166,7 +169,6 @@ SECTION_NAMES = {
         "expressions": "Expresiones",
         "tools": "Herramientas",
         "structure": "Estructura",
-        "examples": "Ejemplos y Tutoriales",
     },
     "en": {
         "Base": "Main Categories",
@@ -192,39 +194,15 @@ SECTION_NAMES = {
         "expressions": "Expressions",
         "tools": "Tools",
         "structure": "Structure",
-        "examples": "Examples & Tutorials",
-    },
-    "pt": {
-        "Base": "Categorias Principais",
-        "3D-BIM": "3D - Modelagem BIM",
-        "BIM3D": "3D - Modelagem BIM",
-        "2D-Drafting": "2D - Desenho e Esboço",
-        "Drafting2D": "2D - Desenho e Esboço",
-        "Annotation": "Anotação e Cotas",
-        "Manage": "Administração e Gestão BIM",
-        "Modify": "Modificar e Transformar",
-        "Preferences": "Preferências e Configurações",
-        "Snapping": "Encaixe (Snapping)",
-        "StatusBar": "Barra de Estado e Vistas",
-        "Utils": "Utilidades e Ferramentas",
-        "Explorer": "Explorador de Arquivos",
-        "file": "Arquivo",
-        "edit": "Edição",
-        "print": "Imprimir / Exportar PDF",
-        "windows": "Janelas",
-        "expressions": "Expressões",
-        "tools": "Ferramentas",
-        "structure": "Estrutura",
-        "examples": "Exemplos e Tutoriais",
     },
 }
 
 
 def format_section_title(context_path: str, lang: str = "es") -> str:
     """Genera el título legible y descriptivo para la sección activa de comandos."""
-    lang_key = "en" if str(lang).lower().startswith("en") else ("pt" if str(lang).lower().startswith("pt") else "es")
+    lang_key = "en" if str(lang).lower().startswith("en") else "es"
     names = SECTION_NAMES.get(lang_key, SECTION_NAMES["es"])
-    prefix = "Section:" if lang_key == "en" else ("Seção:" if lang_key == "pt" else "Sección:")
+    prefix = "Section:" if lang_key == "en" else "Sección:"
 
     path = (context_path or "Base").strip()
     if not path or path == "Base":
